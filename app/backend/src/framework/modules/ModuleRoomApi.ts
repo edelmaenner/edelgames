@@ -94,4 +94,7 @@ export default class ModuleRoomApi {
         this.room.setCurrentGame(null);
     }
 
+    public getRoom(){
+        return this.room
+    }
 }

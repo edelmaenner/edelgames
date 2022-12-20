@@ -6,6 +6,7 @@ import debug from "./util/debug";
 import ModuleRegistry from "./modules/ModuleRegistry";
 import XenforoApi, {authDataContainer} from "./util/XenforoApi";
 
+// TODO: fix bug with missing user name
 export default class User {
 
     private readonly id: string = ""; // required for identifying users with the same name

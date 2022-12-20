@@ -38,6 +38,8 @@ export default class GuessState extends AbstractState {
                                 return new HintState((this.currentTeamIndex+1)%gameMembers.length)
                             }
                         }
+                        // make all cards visible
+                        board.forEach(e => e.categoryVisibleForEveryone = true)
                         return new EndState(this.currentTeamIndex)
                     }
                     // TODO 2: evtl error mitteilen?

@@ -69,6 +69,7 @@ export default class CodenamesGame implements ModuleGameInterface {
                 spymaster: this.getUserNameById(team.spymaster),
                 investigators: team.investigators.map(inv => this.getUserNameById(inv)),
             } as Team))
+            // TODO: send boardview for each userRole
         });
         debug(0,`New internal State: `, this.gameMembers, this.gameState.getName());
     }

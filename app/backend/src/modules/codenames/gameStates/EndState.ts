@@ -1,12 +1,20 @@
 import AbstractState from "./AbstractState";
 import {Team} from "../Team";
+import InitialState from "./InitialState";
+import Room from "../../../framework/Room";
+import {BoardElement} from "../BoardElement";
+import debug from "../../../framework/util/debug";
 
-// TODO 1: restart funktion, (nur spielmaster kann das)
 export default class EndState extends AbstractState {
 
     idOfWinner: number
 
-    onStateChange(eventData: { [p: string]: any }, gameMembers: Team[]): AbstractState {
+    onStateChange(eventData: { [p: string]: any }, gameMembers: Team[], room: Room, board: BoardElement[]): AbstractState {
+        if (eventData.action && eventData.action === "restartGame" && eventData.senderId === room.getRoomMaster().getId()) {
+            return new InitialState()
+        }else{
+            debug(2,"illegal restart of game tryed")
+        }
         return this
     }
 
@@ -19,7 +27,7 @@ export default class EndState extends AbstractState {
         this.idOfWinner = winnderId
     }
 
-    // TODO 1: implement
     handleUserLeave(gameMembers: Team[], userid: string): void {
+        gameMembers.forEach(team => team.removePlayer(userid))
     }
 }

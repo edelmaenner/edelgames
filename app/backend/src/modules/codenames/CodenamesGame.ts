@@ -17,7 +17,7 @@ export default class CodenamesGame implements ModuleGameInterface {
     gameState: AbstractState
     gameMembers: Team[]
     room: Room
-    board: BoardElement[]
+    board: BoardElement[] = []
 
     onGameInitialize(roomApi: ModuleRoomApi): void {
         this.roomApi = roomApi;
@@ -28,8 +28,8 @@ export default class CodenamesGame implements ModuleGameInterface {
         this.roomApi.addEventHandler('userMessageSend', this.onUserMessageReceived.bind(this));
         this.gameState = new InitialState()
         this.gameMembers = [
-            new Team("A"),
-            new Team("B")
+            new Team("A", 5),
+            new Team("B", 5)
         ]
         this.sendCurrentStateOfGame()
 
@@ -46,7 +46,7 @@ export default class CodenamesGame implements ModuleGameInterface {
         }
     }
 
-    onUserJoin(eventData: {[key: string]: any}) {
+    onUserJoin() {
         this.sendCurrentStateOfGame()
     }
 
@@ -57,7 +57,7 @@ export default class CodenamesGame implements ModuleGameInterface {
 
     onUserMessageReceived(eventData: {[key: string]: any}) {
         debug(0,`User ID ${eventData.senderId} send in message: `, eventData.action);
-        this.gameState.onStateChange(eventData, this.gameMembers, this.room, this.board)
+        this.gameState = this.gameState.onStateChange(eventData, this.gameMembers, this.room, this.board)
         this.sendCurrentStateOfGame()
     }
 
@@ -74,11 +74,6 @@ export default class CodenamesGame implements ModuleGameInterface {
     }
 
     getUserNameById(userId: string): string {
-        debug(0, this.room.getRoomMembers()?.find(member => member.getId() === userId)?.getUsername() ?? "")
-        debug(0, this.room.getRoomMembers()?.find(member => member.getId() === userId)?.getUsername())
-        debug(0, this.room.getRoomMembers()?.find(member => member.getId() === userId))
-        debug(0, this.room.getRoomMembers())
-        debug(0, this.room)
         return this.room.getRoomMembers()?.find(member => member.getId() === userId)?.getUsername() ?? ""
     }
 }

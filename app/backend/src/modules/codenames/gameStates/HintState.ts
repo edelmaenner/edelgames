@@ -9,14 +9,22 @@ import {Hint} from "../Hint";
 export default class HintState extends AbstractState {
     currentTeamIndex = 0
 
+    constructor(indexOfCurrentTeam?:number) {
+        super()
+        this.currentTeamIndex = indexOfCurrentTeam
+
+    }
+
+
     onStateChange(eventData: { [p: string]: any }, gameMembers: Team[], room: Room, board: BoardElement[])
         : AbstractState {
         if (eventData.action) {
             switch (eventData.action) {
                 case "publishHint":
                     if(this.isPublishHintAllowed(eventData.senderId, eventData.hint, board, gameMembers))
-                        return new GuessState(this.currentTeamIndex)
-                    break;
+                        // remove all marks for next guess round
+                        board.forEach(e => e.marked = false)
+                        return new GuessState(this.currentTeamIndex, eventData.hint.amnt+1)
                 default:
                     debug(2,`User ID ${eventData.senderId} send in invalid action: `, eventData.action);
             }

@@ -2,9 +2,11 @@ export class Team{
     name: string
     spymaster: string
     investigators: string[]
+    wordsLeft: number
 
-    constructor(name: string) {
+    constructor(name: string, wordsLeft: number) {
         this.name = name;
+        this.wordsLeft = wordsLeft
         this.investigators = []
     }
 

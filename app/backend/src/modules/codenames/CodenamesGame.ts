@@ -31,18 +31,6 @@ export default class CodenamesGame implements ModuleGameInterface {
             new Team("B", 5)
         ]
         this.sendCurrentStateOfGame()
-
-        // TODO: add real data
-        for (let i = 0; i < 5; i++) {
-            this.board.push(new BoardElement("teamA", Category.team, "A"))
-        }
-        for (let i = 0; i < 5; i++) {
-            this.board.push(new BoardElement("teamB", Category.team, "B"))
-        }
-        this.board.push(new BoardElement("bomb", Category.bomb, ""))
-        for (let i = 0; i < 14; i++) {
-            this.board.push(new BoardElement("neutral", Category.neutral, ""))
-        }
     }
 
     onUserJoin() {

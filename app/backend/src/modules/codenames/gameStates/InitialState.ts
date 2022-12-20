@@ -3,7 +3,7 @@ import HintState from "./HintState";
 import debug from "../../../framework/util/debug";
 import {Team} from "../Team";
 import Room from "../../../framework/Room";
-import {BoardElement} from "../BoardElement";
+import {BoardElement, Category} from "../BoardElement";
 
 export default class InitialState extends AbstractState {
 
@@ -24,11 +24,14 @@ export default class InitialState extends AbstractState {
                     this.setSpymaster(eventData, gameMembers);
                     break;
                 case "startGame":
-                    if(eventData.senderId === room.getRoomMaster().getId())
+                    if(eventData.senderId === room.getRoomMaster().getId()){
+                        // generate cards on board
+                        this.setBoard(board)
                         return new HintState()
-                    else
+                    } else {
                         debug(2, `User ID ${eventData.senderId} send in invalid action: `
                             + eventData.action + "due to missing rights")
+                    }
                     break;
                 default:
                     debug(2,`User ID ${eventData.senderId} send in invalid action: `, eventData.action);
@@ -64,6 +67,20 @@ export default class InitialState extends AbstractState {
             }else{
                 this.debugIllegalPropertyValue(eventData.senderId, "target", eventData.target)
             }
+        }
+    }
+
+    private setBoard(board: BoardElement[]){
+        // TODO: add real data
+        for (let i = 0; i < 5; i++) {
+            board.push(new BoardElement("teamA", Category.team, "A"))
+        }
+        for (let i = 0; i < 5; i++) {
+            board.push(new BoardElement("teamB", Category.team, "B"))
+        }
+        board.push(new BoardElement("bomb", Category.bomb, ""))
+        for (let i = 0; i < 14; i++) {
+            board.push(new BoardElement("neutral", Category.neutral, ""))
         }
     }
 }

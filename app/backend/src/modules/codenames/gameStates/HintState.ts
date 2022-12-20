@@ -6,16 +6,16 @@ import Room from "../../../framework/Room";
 import {BoardElement} from "../BoardElement";
 import {Hint} from "../Hint";
 
-// TODO 1: done()-funktion -> checkt ob, guess == wörter oder contained & nur alphabetisch & anzahl sinnvoll
-// TODO 1: rechteprüfung
 export default class HintState extends AbstractState {
+    currentTeamIndex = 0
 
     onStateChange(eventData: { [p: string]: any }, gameMembers: Team[], room: Room, board: BoardElement[])
         : AbstractState {
         if (eventData.action) {
             switch (eventData.action) {
                 case "publishHint":
-                    this.publishHint(eventData.senderId, eventData.hint, room, board)
+                    if(this.isPublishHintAllowed(eventData.senderId, eventData.hint, board, gameMembers))
+                        return new GuessState(this.currentTeamIndex)
                     break;
                 default:
                     debug(2,`User ID ${eventData.senderId} send in invalid action: `, eventData.action);
@@ -24,10 +24,6 @@ export default class HintState extends AbstractState {
             debug(2,`User ID ${eventData.senderId} made illegal request, property action missing`);
         }
         return this;
-    }
-
-    onStateLeave(): AbstractState {
-        return new GuessState()
     }
 
     getName(): string {
@@ -39,15 +35,14 @@ export default class HintState extends AbstractState {
         gameMembers.forEach(team => team.removePlayer(userid))
     }
 
-    // TODO 1:
-    protected publishHint(userId: string, hint: Hint, room: Room, board: BoardElement[]):Boolean{
-        if(hint){
-            // if userId == spymaster of current team (which turn it is)
-            // check if hint is valid
-            return true;
+    protected isPublishHintAllowed(userId: string, hint: Hint, board: BoardElement[], teams:Team[]):Boolean{
+        if(hint && hint.word && hint.amnt && (teams[this.currentTeamIndex].spymaster === userId)){
+            if(board.find(e => e.word === hint.word) === undefined && hint.amnt > 0){
+                return true
+            }
         }else{
-            debug(2, "Invalid action due to missing hint property")
-            return false;
+            debug(2, "Invalid action due to missing property or invalid rights")
         }
+        return false
     }
 }

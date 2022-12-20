@@ -10,8 +10,6 @@ export default abstract class AbstractState {
     abstract onStateChange(eventData: { [p: string]: any }, gameMembers: Team[], room: Room, board: BoardElement[])
         : AbstractState
 
-    abstract onStateLeave(): AbstractState
-
     abstract handleUserLeave(gameMembers: Team[], userid: string): void
 
     // TODO 2: refactor valid action logik in here + map "action name", lambda

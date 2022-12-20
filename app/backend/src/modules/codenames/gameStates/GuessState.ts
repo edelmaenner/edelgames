@@ -10,14 +10,17 @@ import {BoardElement} from "../BoardElement";
 // TODO 1: Außerdem: rechteprüfung
 export default class GuessState extends AbstractState {
     wordsLeft: Boolean
+    currentTeamIndex: number
 
     onStateChange(eventData: { [p: string]: any }, gameMembers: Team[], room: Room, board: BoardElement[]): AbstractState {
         if (eventData.action) {
             switch (eventData.action) {
                 case "makeGuess":
                     if(this.makeGuess())
-                        return
-                    break;
+                        if(this.wordsLeft)
+                            return new HintState()
+
+                        return new EndState()
                 default:
                     debug(2,`User ID ${eventData.senderId} send in invalid action: `, eventData.action);
             }
@@ -27,12 +30,11 @@ export default class GuessState extends AbstractState {
         return this;
     }
 
-    onStateLeave(): AbstractState {
-        if(this.wordsLeft)
-            return new HintState()
-
-        return new EndState()
+    constructor(currentTeamIndex: number) {
+        super()
+        this.currentTeamIndex = currentTeamIndex
     }
+
 
     getName(): string {
         return "guess";

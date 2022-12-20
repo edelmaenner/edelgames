@@ -25,7 +25,7 @@ export default class InitialState extends AbstractState {
                     break;
                 case "startGame":
                     if(eventData.senderId === room.getRoomMaster().getId())
-                        return this.onStateLeave()
+                        return new HintState()
                     else
                         debug(2, `User ID ${eventData.senderId} send in invalid action: `
                             + eventData.action + "due to missing rights")
@@ -37,10 +37,6 @@ export default class InitialState extends AbstractState {
             debug(2,`User ID ${eventData.senderId} made illegal request, property action missing`);
         }
         return this;
-    }
-
-    onStateLeave(): AbstractState {
-        return new HintState()
     }
 
     private joinInvestigator(eventData: { [p: string]: any }, gameMembers: Team[]) {

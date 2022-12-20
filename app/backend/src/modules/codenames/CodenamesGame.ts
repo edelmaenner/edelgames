@@ -7,7 +7,6 @@ import {Team} from "./Team";
 import Room from "../../framework/Room";
 import {BoardElement, Category} from "./BoardElement";
 
-
 /*
  * The actual game instance, that controls and manages the game
  */
@@ -71,10 +70,40 @@ export default class CodenamesGame implements ModuleGameInterface {
             } as Team))
             // TODO: send boardview for each userRole
         });
+        this.roomApi.getRoom().getRoomMembers().forEach(member => member.messageUser(
+            "userSpecificBoardViewSent", {
+                board: this.generateUserBoard(member.getId())
+            }
+        ))
         debug(0,`New internal State: `, this.gameMembers, this.gameState.getName());
     }
 
     getUserNameById(userId: string): string {
         return this.room.getRoomMembers()?.find(member => member.getId() === userId)?.getUsername() ?? ""
+    }
+
+    generateUserBoard(receiverId: string):BoardElement[]{
+        return this.board.map((element:BoardElement) => ({
+            word: element.word,
+            categoryVisibleForEveryone: element.categoryVisibleForEveryone,
+            marked: element.marked,
+            category: this.filterCategory(receiverId, element.category, element.categoryVisibleForEveryone),
+            teamName: this.filterTeamName(receiverId, element.teamName, element.categoryVisibleForEveryone)
+
+        }) as BoardElement)
+    }
+
+    filterCategory(receiverId: string, cardCategory: Category, cardVisible: Boolean): Category | undefined {
+        if(this.gameMembers.find(team => team.spymaster === receiverId) || cardVisible){
+            return cardCategory
+        }
+        return undefined
+    }
+
+    filterTeamName(receiverId: string, cardTeamName: string, cardVisible: Boolean): string | undefined {
+        if(this.gameMembers.find(team => team.spymaster === receiverId) || cardVisible){
+            return cardTeamName
+        }
+        return undefined
     }
 }

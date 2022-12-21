@@ -5,9 +5,12 @@ import codenames from "./Codenames";
 import {Team} from "./types/Team";
 import InitialStateComponent from "./components/initialState/InitialStateComponent";
 import HintStateComponent from "./components/hintState/HintStateComponent";
+import {BoardElement} from "./types/BoardElement";
+import GuessStateComponent from "./components/guessState/GuessStateComponent";
 
 interface IState {
     teams : Team[]
+    board: BoardElement[][]
     stateName: string
 }
 
@@ -26,6 +29,7 @@ export default class CodenamesGame extends React.Component<{},IState> implements
     // state is an inherited property from React.Component
     state = {
         teams: [],
+        board: [],
         stateName: "initial"
     }
 
@@ -34,13 +38,33 @@ export default class CodenamesGame extends React.Component<{},IState> implements
         this.gameApi = new ModuleGameApi(codenames, this);
     }
 
-    // this method is called, once the component is ready and setState can be used
-    componentDidMount() {
-        this.gameApi.addEventHandler('serverMessageSend', this.onReceiveMessage.bind(this));
+    // TODO: Method name fixen
+    mapBoardArrayToArrayArray(board: BoardElement[], rowCount: number, columnCount: number): BoardElement[][] {
+        let newBoard: BoardElement[][] = []
+
+        if(board && board.length > 0) {
+            for (let i = 0; i < rowCount; i++) {
+                newBoard[i] = []
+                for (let j = 0; j < columnCount; j++) {
+                    newBoard[i].push(board[i*columnCount+j])
+                }
+            }
+        }
+
+        return newBoard
     }
 
-    onReceiveMessage(eventData: {[key: string]: any}) {
+    // this method is called, once the component is ready and setState can be used
+    componentDidMount() {
+        // this.gameApi.addEventHandler('serverMessageSend', this.onReceiveMessage.bind(this));
+        this.gameApi.addEventHandler('userSpecificBoardViewSent', this.onReceiveBoard.bind(this));
+    }
+
+    // FIXME: 2 Events direkt nacheinander hebeln die setState-Methoden aus, da asynchron -> Die Änderungen überschreiben sich gegenseitig
+    onReceiveBoard(eventData: {[key: string]: any}) {
         this.setState({
+            ...this.state,
+            board: this.mapBoardArrayToArrayArray(eventData.board, 5, 5),
             teams: eventData.teams.map((team: any, index: number) => ({
                 id: index,
                 name: team.name,
@@ -52,6 +76,20 @@ export default class CodenamesGame extends React.Component<{},IState> implements
         })
     }
 
+    // onReceiveMessage(eventData: {[key: string]: any}) {
+    //     this.setState({
+    //         ...this.state,
+    //         teams: eventData.teams.map((team: any, index: number) => ({
+    //             id: index,
+    //             name: team.name,
+    //             investigators: team.investigators,
+    //             spymaster: team.spymaster,
+    //             teamColor: teamColors[index]
+    //         }) as Team),
+    //         stateName: eventData.state
+    //     })
+    // }
+
     render() {
         switch (this.state.stateName){
             case "initial":
@@ -60,7 +98,9 @@ export default class CodenamesGame extends React.Component<{},IState> implements
             case "start":
                 return (<InitialStateComponent gameApi={this.gameApi} teams={this.state.teams} />);
             case "hint":
-                return (<HintStateComponent gameApi={this.gameApi} teams={this.state.teams} />);
+                return (<HintStateComponent gameApi={this.gameApi} teams={this.state.teams} board={this.state.board} />);
+            case "guess":
+                return (<GuessStateComponent gameApi={this.gameApi} teams={this.state.teams} board={this.state.board} />);
             default:
                 return(<div>Error</div>);
         }

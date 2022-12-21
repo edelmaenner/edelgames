@@ -6,6 +6,7 @@ import InitialState from "./gameStates/InitialState";
 import {Team} from "./Team";
 import Room from "../../framework/Room";
 import {BoardElement, Category} from "./BoardElement";
+import Codenames from "./Codenames";
 
 /*
  * The actual game instance, that controls and manages the game
@@ -49,18 +50,24 @@ export default class CodenamesGame implements ModuleGameInterface {
     }
 
     sendCurrentStateOfGame(){
-        this.roomApi.sendRoomMessage('serverMessageSend', {
-            state: this.gameState.getName(),
-            teams: this.gameMembers.map(team => ({
-                name: team.name,
-                spymaster: this.getUserNameById(team.spymaster),
-                investigators: team.investigators.map(inv => this.getUserNameById(inv)),
-            } as Team))
-            // TODO: send boardview for each userRole
-        });
-        this.roomApi.getRoom().getRoomMembers().forEach(member => member.messageUser(
+        // FIXME: 2 Events direkt nacheinander hebeln die setState-Methoden aus, da asynchron -> Die Änderungen überschreiben sich gegenseitig
+        // this.roomApi.sendRoomMessage('serverMessageSend', {
+        //     state: this.gameState.getName(),
+        //     teams: this.gameMembers.map(team => ({
+        //         name: team.name,
+        //         spymaster: this.getUserNameById(team.spymaster),
+        //         investigators: team.investigators.map(inv => this.getUserNameById(inv)),
+        //     } as Team))
+        // });
+        this.roomApi.getRoom().getRoomMembers().forEach(member => member.messageGameUser(
             "userSpecificBoardViewSent", {
-                board: this.generateUserBoard(member.getId())
+                board: this.generateUserBoard(member.getId()),
+                state: this.gameState.getName(),
+                teams: this.gameMembers.map(team => ({
+                    name: team.name,
+                    spymaster: this.getUserNameById(team.spymaster),
+                    investigators: team.investigators.map(inv => this.getUserNameById(inv)),
+                } as Team))
             }
         ))
         debug(0,`New internal State: `, this.gameMembers, this.gameState.getName());

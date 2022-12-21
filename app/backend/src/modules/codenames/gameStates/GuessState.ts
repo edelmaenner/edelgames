@@ -94,6 +94,8 @@ export default class GuessState extends AbstractState {
     }
 
     private isDoneValid(eventData: { [p: string]: any }, gameMembers: Team[]):Boolean{
-        return !!gameMembers[this.currentTeamIndex].investigators.find(eventData.senderId);
+        debug(0, this.currentTeamIndex)
+        debug(0, gameMembers[this.currentTeamIndex])
+        return !!gameMembers[this.currentTeamIndex]?.investigators?.find(inv => inv === eventData.senderId);
     }
 }

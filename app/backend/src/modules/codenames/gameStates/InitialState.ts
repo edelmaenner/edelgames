@@ -27,7 +27,7 @@ export default class InitialState extends AbstractState {
                     if(eventData.senderId === room.getRoomMaster().getId()){
                         // generate cards on board
                         this.setBoard(board)
-                        return new HintState()
+                        return new HintState(0)
                     } else {
                         debug(2, `User ID ${eventData.senderId} send in invalid action: `
                             + eventData.action + "due to missing rights")

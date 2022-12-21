@@ -39,6 +39,14 @@ export default class SocketManager {
         });
     }
 
+    // does the same thing as directMessage, but skips the id search of the socket by passing it directly
+    public static directGameMessageToSocket(socket: Socket, eventName: string, eventData: object): void {
+        socket.emit('message', {
+            eventName: eventName,
+            eventData: eventData
+        });
+    }
+
     public static sendNotificationBubbleToSocket(socket: Socket, message: string, type: 'info' | 'error' | 'success' | 'warning' = 'info'): void {
         SocketManager.directMessageToSocket(socket, 'showNotificationBubble', {
             type: type,

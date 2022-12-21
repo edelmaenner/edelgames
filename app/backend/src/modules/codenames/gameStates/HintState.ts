@@ -7,12 +7,11 @@ import {BoardElement} from "../BoardElement";
 import {Hint} from "../Hint";
 
 export default class HintState extends AbstractState {
-    currentTeamIndex = 0
+    currentTeamIndex: number
 
-    constructor(indexOfCurrentTeam?:number) {
+    constructor(indexOfCurrentTeam:number) {
         super()
-        this.currentTeamIndex = indexOfCurrentTeam
-
+        this.currentTeamIndex = indexOfCurrentTeam ?? 0
     }
 
 
@@ -21,10 +20,12 @@ export default class HintState extends AbstractState {
         if (eventData.action) {
             switch (eventData.action) {
                 case "publishHint":
-                    if(this.isPublishHintAllowed(eventData.senderId, eventData.hint, board, gameMembers))
+                    if(this.isPublishHintAllowed(eventData.senderId, eventData.hint, board, gameMembers)) {
                         // remove all marks for next guess round
                         board.forEach(e => e.marked = false)
                         return new GuessState(this.currentTeamIndex, eventData.hint.amnt+1)
+                    }
+                    break
                 default:
                     debug(2,`User ID ${eventData.senderId} send in invalid action: `, eventData.action);
             }
@@ -44,6 +45,9 @@ export default class HintState extends AbstractState {
     }
 
     protected isPublishHintAllowed(userId: string, hint: Hint, board: BoardElement[], teams:Team[]):Boolean{
+        debug(0, teams)
+        debug(0, this.currentTeamIndex)
+        debug(0, teams[this.currentTeamIndex])
         if(hint && hint.word && hint.amnt && (teams[this.currentTeamIndex].spymaster === userId)){
             if(board.find(e => e.word === hint.word) === undefined && hint.amnt > 0){
                 return true

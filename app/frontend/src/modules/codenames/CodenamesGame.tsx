@@ -2,13 +2,23 @@ import React from "react";
 import ModuleGameInterface from "../../framework/modules/ModuleGameInterface";
 import ModuleGameApi from "../../framework/modules/ModuleGameApi";
 import codenames from "./Codenames";
-import TeamSelectionComponent from "./component/TeamSelectionComponent";
-import {Team} from "./Team";
+import {Team} from "./types/Team";
+import InitialStateComponent from "./components/initialState/InitialStateComponent";
+import HintStateComponent from "./components/hintState/HintStateComponent";
 
 interface IState {
     teams : Team[]
     stateName: string
 }
+
+let teamColors: string[] = [
+    "#8f2b1c",
+    "#3284a3",
+    "#1e6f24",
+    "#5f2dad",
+    "#b0aa18",
+    "#ab4909"
+]
 
 export default class CodenamesGame extends React.Component<{},IState> implements ModuleGameInterface {
     private readonly gameApi: ModuleGameApi;
@@ -31,7 +41,13 @@ export default class CodenamesGame extends React.Component<{},IState> implements
 
     onReceiveMessage(eventData: {[key: string]: any}) {
         this.setState({
-            teams: eventData.teams,
+            teams: eventData.teams.map((team: any, index: number) => ({
+                id: index,
+                name: team.name,
+                investigators: team.investigators,
+                spymaster: team.spymaster,
+                teamColor: teamColors[index]
+            }) as Team),
             stateName: eventData.state
         })
     }
@@ -42,28 +58,11 @@ export default class CodenamesGame extends React.Component<{},IState> implements
                 // TODO: grep new state
                 return(<div>Waiting</div>);
             case "start":
-                return this.showStartScreen();
+                return (<InitialStateComponent gameApi={this.gameApi} teams={this.state.teams} />);
+            case "hint":
+                return (<HintStateComponent gameApi={this.gameApi} teams={this.state.teams} />);
             default:
                 return(<div>Error</div>);
-        }
-    }
-
-    showStartScreen(){
-        return (
-            <div id={"codenames"}>
-                {this.state.teams.map(team => this.renderTeamSelectionComponent(team))}
-            </div>
-            // TODO: show roommaster the start button
-        );
-    }
-
-    renderTeamSelectionComponent(team: Team){
-        if(team){
-            return (
-                <TeamSelectionComponent gameApi={this.gameApi} team={team} teamColor={'#ff0000'}/>
-            );
-        } else {
-            return(<div></div>);
         }
     }
 

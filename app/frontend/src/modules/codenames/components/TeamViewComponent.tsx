@@ -4,7 +4,6 @@ import "./TeamViewComponent.scss"
 
 interface Props {
     even: boolean
-    wordsLeft: number
     team: Team
 }
 
@@ -26,7 +25,7 @@ export default class TeamViewComponent extends React.Component<Props,{}> {
                     </div>
                     <div className={"wordsLeft"}>
                         <div className={"textCenter right"}>
-                            {this.props.wordsLeft}
+                            {this.props.team.wordsLeft}
                         </div>
                     </div>
                 </div>
@@ -45,7 +44,7 @@ export default class TeamViewComponent extends React.Component<Props,{}> {
                 <div className={"header"}>
                     <div className={"wordsLeft"}>
                         <div className={"textCenter left"}>
-                            {this.props.wordsLeft}
+                            {this.props.team.wordsLeft}
                         </div>
                     </div>
                     <div className={"spymaster"}>

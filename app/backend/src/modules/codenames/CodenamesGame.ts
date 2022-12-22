@@ -12,7 +12,6 @@ import {Hint} from "./Hint";
  * The actual game instance, that controls and manages the game
  */
 export default class CodenamesGame implements ModuleGameInterface {
-
     roomApi: ModuleRoomApi|null = null;
     gameState: AbstractState
     gameMembers: Team[]
@@ -24,9 +23,9 @@ export default class CodenamesGame implements ModuleGameInterface {
         this.roomApi = roomApi;
         this.room = this.roomApi.getRoom();
         this.roomApi.addUserLeaveHandler(this.onUserLeave.bind(this))
-        // TODO: repair on user joined handler
         this.roomApi.addUserJoinedHandler(this.onUserJoin.bind(this))
         this.roomApi.addEventHandler('userMessageSend', this.onUserMessageReceived.bind(this));
+        this.roomApi.addEventHandler('requestGameState', this.onGameStateRequest.bind(this));
         this.gameState = new InitialState()
         this.gameMembers = [
             new Team("A", 5),
@@ -46,7 +45,13 @@ export default class CodenamesGame implements ModuleGameInterface {
 
     onUserMessageReceived(eventData: {[key: string]: any}) {
         debug(0,`User ID ${eventData.senderId} send in message: `, eventData.action);
+        // FIXME: Eine Änderungen am gameState bewirkt KEINE Änderung an den hier gehaltenen Variablen! Ausnahme: Board und GameMembers, da diese Arrays sind
         this.gameState = this.gameState.onStateChange(eventData, this.gameMembers, this.room, this.board, this.hint)
+        this.sendCurrentStateOfGame()
+    }
+
+    onGameStateRequest(eventData: {[key: string]: any}) {
+        debug(0,`User ID ${eventData.senderId} requestes current gameState`);
         this.sendCurrentStateOfGame()
     }
 

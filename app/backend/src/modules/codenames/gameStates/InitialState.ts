@@ -6,10 +6,10 @@ import Room from "../../../framework/Room";
 import {BoardElement, Category} from "../BoardElement";
 
 export default class InitialState extends AbstractState {
-
     handleUserLeave(gameMembers: Team[], userid: string): void {
         gameMembers.forEach(team => team.removePlayer(userid))
     }
+
     getName(): string {
         return "start"
     }
@@ -74,21 +74,39 @@ export default class InitialState extends AbstractState {
         return senderId === room.getRoomMaster().getId()
             && gameMembers.find(
                 team => team.spymaster === undefined || team.investigators === undefined
-                    || team.investigators.length > 0
+                    || team.investigators.length === 0
             ) === undefined
     }
 
     private setBoard(board: BoardElement[]){
         // TODO: add real data & shuffle teams cards
-        for (let i = 0; i < 5; i++) {
-            board.push(new BoardElement("teamA", Category.team, "A"))
-        }
-        for (let i = 0; i < 5; i++) {
-            board.push(new BoardElement("teamB", Category.team, "B"))
-        }
-        board.push(new BoardElement("bomb", Category.bomb, ""))
-        for (let i = 0; i < 14; i++) {
-            board.push(new BoardElement("neutral", Category.neutral, ""))
-        }
+        board.push(new BoardElement("Apfel", Category.team, "A"))
+        board.push(new BoardElement("Kokosnuss", Category.team, "A"))
+        board.push(new BoardElement("Zauberstab", Category.team, "A"))
+        board.push(new BoardElement("Technik", Category.team, "A"))
+        board.push(new BoardElement("Pinguin", Category.team, "A"))
+
+        board.push(new BoardElement("Ameise", Category.team, "B"))
+        board.push(new BoardElement("Vogel", Category.team, "B"))
+        board.push(new BoardElement("Christbaum", Category.team, "B"))
+        board.push(new BoardElement("Leuchtstab", Category.team, "B"))
+        board.push(new BoardElement("Feder", Category.team, "B"))
+
+        board.push(new BoardElement("Pilz", Category.bomb, ""))
+
+        board.push(new BoardElement("Floh", Category.neutral, ""))
+        board.push(new BoardElement("Rot", Category.neutral, ""))
+        board.push(new BoardElement("Lieblich", Category.neutral, ""))
+        board.push(new BoardElement("Schnitzel", Category.neutral, ""))
+        board.push(new BoardElement("Jaguar", Category.neutral, ""))
+        board.push(new BoardElement("Schnecke", Category.neutral, ""))
+        board.push(new BoardElement("Amerika", Category.neutral, ""))
+        board.push(new BoardElement("Ozean", Category.neutral, ""))
+        board.push(new BoardElement("Tempo", Category.neutral, ""))
+        board.push(new BoardElement("Taste", Category.neutral, ""))
+        board.push(new BoardElement("Herz", Category.neutral, ""))
+        board.push(new BoardElement("Schale", Category.neutral, ""))
+        board.push(new BoardElement("Rauch", Category.neutral, ""))
+        board.push(new BoardElement("Nuss", Category.neutral, ""))
     }
 }

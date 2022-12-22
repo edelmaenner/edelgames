@@ -4,9 +4,15 @@
   display: inline-block;
   height: calc(100% / 6);
   width: calc((100% - (10*5px)) / 5);
-  background-color: #6f4018;
   margin: 0 5px 10px 5px;
-  padding: 25px;
+
+  .guessButton {
+    width: 45px;
+    height: 25px;
+    position: relative;
+    left: 75px;
+    background-color: aliceblue;
+  }
 
   .boardElementContent {
     display: flex;
@@ -16,6 +22,7 @@
     height: 100%;
     width: 100%;
     font-size: 30px;
+    padding-bottom: 45px;
     word-break: break-word;
     word-wrap: break-word;
     overflow-wrap: break-word;
@@ -33,15 +40,11 @@
     height: calc(100% / 10);
     width: 100%;
 
-    .hintButton {
+    .hintButton, .stopGuessingButton {
       height: 100%;
       width: calc((100% - 75% - 10px) / 2);
       padding: 0;
       vertical-align: bottom;
-    }
-
-    .hintButton.hidden {
-      opacity: 0;
     }
 
     .hintNumber {

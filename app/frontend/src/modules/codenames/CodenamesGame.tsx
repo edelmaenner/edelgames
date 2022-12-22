@@ -28,8 +28,8 @@ export default class CodenamesGame extends React.Component<{},IState> implements
 
     // state is an inherited property from React.Component
     state = {
-        teams: [],
-        board: [],
+        teams: [] as Team[],
+        board: [] as BoardElement[][],
         stateName: "initial"
     }
 
@@ -38,15 +38,25 @@ export default class CodenamesGame extends React.Component<{},IState> implements
         this.gameApi = new ModuleGameApi(codenames, this);
     }
 
+    mapToBoardElement(boardElement: any): BoardElement {
+        return {
+            word: boardElement.word,
+            category: boardElement.category,
+            teamId: this.state.teams.find(team => team.name === boardElement.teamName)?.id ?? -1,
+            categoryVisibleForEveryone: boardElement.categoryVisibleForEveryone,
+            marked: boardElement.marked,
+        } as BoardElement
+    }
+
     // TODO: Method name fixen
-    mapBoardArrayToArrayArray(board: BoardElement[], rowCount: number, columnCount: number): BoardElement[][] {
+    mapBoardArrayToArrayArray(board: any[], rowCount: number, columnCount: number): BoardElement[][] {
         let newBoard: BoardElement[][] = []
 
         if(board && board.length > 0) {
             for (let i = 0; i < rowCount; i++) {
                 newBoard[i] = []
                 for (let j = 0; j < columnCount; j++) {
-                    newBoard[i].push(board[i*columnCount+j])
+                    newBoard[i].push(this.mapToBoardElement(board[i*columnCount+j]))
                 }
             }
         }
@@ -58,6 +68,7 @@ export default class CodenamesGame extends React.Component<{},IState> implements
     componentDidMount() {
         // this.gameApi.addEventHandler('serverMessageSend', this.onReceiveMessage.bind(this));
         this.gameApi.addEventHandler('userSpecificBoardViewSent', this.onReceiveBoard.bind(this));
+        this.gameApi.sendMessageToServer("requestGameState", {})
     }
 
     // FIXME: 2 Events direkt nacheinander hebeln die setState-Methoden aus, da asynchron -> Die Änderungen überschreiben sich gegenseitig
@@ -70,7 +81,8 @@ export default class CodenamesGame extends React.Component<{},IState> implements
                 name: team.name,
                 investigators: team.investigators,
                 spymaster: team.spymaster,
-                teamColor: teamColors[index]
+                teamColor: teamColors[index],
+                wordsLeft: team.wordsLeft
             }) as Team),
             stateName: eventData.state
         })

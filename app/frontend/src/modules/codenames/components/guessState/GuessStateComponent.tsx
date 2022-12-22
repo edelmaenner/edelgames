@@ -14,7 +14,7 @@ interface Props {
 
 export default class GuessStateComponent extends React.Component<Props,{}> {
     renderTeamView(team: Team, even: boolean) {
-        return (<TeamViewComponent team={team} even={even} wordsLeft={4}/>)
+        return (<TeamViewComponent key={"teamView" + team.id} team={team} even={even}/>)
     }
 
     render() {
@@ -23,7 +23,7 @@ export default class GuessStateComponent extends React.Component<Props,{}> {
                 { this.props.teams.filter(team => team.id % 2 === 0).map(team => this.renderTeamView(team, true)) }
             </div>
             <div id={"centerPanel"}>
-                <BoardComponent gameApi={this.props.gameApi} board={this.props.board} hintButton={true} />
+                <BoardComponent gameApi={this.props.gameApi} board={this.props.board} teams={this.props.teams} hintState={true} />
             </div>
             <div id={"rightPanel"}>
                 { this.props.teams.filter(team => team.id % 2 === 1).map(team => this.renderTeamView(team, false)) }

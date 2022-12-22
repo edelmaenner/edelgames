@@ -14,13 +14,13 @@ export default class HintState extends AbstractState {
         this.currentTeamIndex = indexOfCurrentTeam ?? 0
     }
 
-
     onStateChange(eventData: { [p: string]: any }, gameMembers: Team[], room: Room, board: BoardElement[], hint: Hint)
         : AbstractState {
         if (eventData.action) {
             switch (eventData.action) {
                 case "publishHint":
                     if(this.isPublishHintAllowed(eventData.senderId, eventData.hint, board, gameMembers)) {
+                        // FIXME: Hier wird der Hint nicht zurück an das "CodenamesGame" gegeben
                         hint = eventData.hint
                         // remove all marks for next guess round
                         board.forEach(e => e.marked = false)

@@ -86,12 +86,12 @@ export default class GuessState extends AbstractState {
     private isMakeGuessValid(eventData: { [p: string]: any }, board: BoardElement[], gameMembers: Team[]):Boolean{
         // Check if has guess and guess in words on board and if guesser has the needed rights
         return !!(eventData.guess && board.find(e => e.word === eventData.guess)
-            && gameMembers[this.currentTeamIndex].investigators.find(eventData.senderId));
+            && !!gameMembers[this.currentTeamIndex]?.investigators?.find(inv => inv === eventData.senderId));
     }
 
     private isMarkValid(eventData: { [p: string]: any }, board: BoardElement[], gameMembers: Team[]):Boolean{
         return !!(eventData.mark && board.find(e => e.word === eventData.mark)
-            && gameMembers[this.currentTeamIndex].investigators.find(eventData.senderId));
+            && !!gameMembers[this.currentTeamIndex]?.investigators?.find(inv => inv === eventData.senderId));
     }
 
     private isDoneValid(eventData: { [p: string]: any }, gameMembers: Team[]):Boolean{

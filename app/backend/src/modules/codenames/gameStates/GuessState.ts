@@ -5,13 +5,14 @@ import {Team} from "../Team";
 import Room from "../../../framework/Room";
 import debug from "../../../framework/util/debug";
 import {BoardElement, Category} from "../BoardElement";
+import {Hint} from "../Hint";
 
 export default class GuessState extends AbstractState {
     wordsLeft: Boolean
     currentTeamIndex: number
     guessesLeft: number
 
-    onStateChange(eventData: { [p: string]: any }, gameMembers: Team[], room: Room, board: BoardElement[])
+    onStateChange(eventData: { [p: string]: any }, gameMembers: Team[], room: Room, board: BoardElement[], hint: Hint)
         : AbstractState {
         if (eventData.action) {
             switch (eventData.action) {

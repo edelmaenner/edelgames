@@ -6,7 +6,7 @@ import InitialState from "./gameStates/InitialState";
 import {Team} from "./Team";
 import Room from "../../framework/Room";
 import {BoardElement, Category} from "./BoardElement";
-import Codenames from "./Codenames";
+import {Hint} from "./Hint";
 
 /*
  * The actual game instance, that controls and manages the game
@@ -18,6 +18,7 @@ export default class CodenamesGame implements ModuleGameInterface {
     gameMembers: Team[]
     room: Room
     board: BoardElement[] = []
+    hint: Hint
 
     onGameInitialize(roomApi: ModuleRoomApi): void {
         this.roomApi = roomApi;
@@ -45,7 +46,7 @@ export default class CodenamesGame implements ModuleGameInterface {
 
     onUserMessageReceived(eventData: {[key: string]: any}) {
         debug(0,`User ID ${eventData.senderId} send in message: `, eventData.action);
-        this.gameState = this.gameState.onStateChange(eventData, this.gameMembers, this.room, this.board)
+        this.gameState = this.gameState.onStateChange(eventData, this.gameMembers, this.room, this.board, this.hint)
         this.sendCurrentStateOfGame()
     }
 
@@ -67,7 +68,9 @@ export default class CodenamesGame implements ModuleGameInterface {
                     name: team.name,
                     spymaster: this.getUserNameById(team.spymaster),
                     investigators: team.investigators.map(inv => this.getUserNameById(inv)),
-                } as Team))
+                    wordsLeft: team.wordsLeft
+                } as Team)),
+                hint: this.hint
             }
         ))
         debug(0,`New internal State: `, this.gameMembers, this.gameState.getName());

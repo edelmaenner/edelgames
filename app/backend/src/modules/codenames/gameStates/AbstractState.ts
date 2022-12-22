@@ -2,17 +2,17 @@ import {Team} from "../Team";
 import {BoardElement} from "../BoardElement";
 import debug from "../../../framework/util/debug";
 import Room from "../../../framework/Room";
+import {Hint} from "../Hint";
 
 export default abstract class AbstractState {
 
     abstract getName():string
 
-    abstract onStateChange(eventData: { [p: string]: any }, gameMembers: Team[], room: Room, board: BoardElement[])
+    //TODO2: refactor all paramaters to new class "gameparts" or such
+    abstract onStateChange(eventData: { [p: string]: any }, gameMembers: Team[], room: Room, board: BoardElement[], hint: Hint)
         : AbstractState
 
     abstract handleUserLeave(gameMembers: Team[], userid: string): void
-
-    // TODO 2: refactor valid action logik in here + map "action name", lambda
 
     doesEventPropertyExist(eventData: { [p: string]: any }, propertyName: string): Boolean{
         if(eventData.hasOwnProperty(propertyName)){

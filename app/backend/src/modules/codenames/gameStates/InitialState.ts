@@ -24,7 +24,7 @@ export default class InitialState extends AbstractState {
                     this.setSpymaster(eventData, gameMembers);
                     break;
                 case "startGame":
-                    if(eventData.senderId === room.getRoomMaster().getId()){
+                    if(this.isStartGameValid(eventData.senderId, room, gameMembers)){
                         // generate cards on board
                         this.setBoard(board)
                         return new HintState(0)
@@ -68,6 +68,14 @@ export default class InitialState extends AbstractState {
                 this.debugIllegalPropertyValue(eventData.senderId, "target", eventData.target)
             }
         }
+    }
+
+    private isStartGameValid(senderId: string, room: Room, gameMembers: Team[]):Boolean{
+        return senderId === room.getRoomMaster().getId()
+            && gameMembers.find(
+                team => team.spymaster === undefined || team.investigators === undefined
+                    || team.investigators.length > 0
+            ) === undefined
     }
 
     private setBoard(board: BoardElement[]){

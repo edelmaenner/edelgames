@@ -79,7 +79,7 @@ export default class InitialState extends AbstractState {
     }
 
     private setBoard(board: BoardElement[]){
-        // TODO: add real data
+        // TODO: add real data & shuffle teams cards
         for (let i = 0; i < 5; i++) {
             board.push(new BoardElement("teamA", Category.team, "A"))
         }

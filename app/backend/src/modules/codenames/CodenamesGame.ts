@@ -85,7 +85,6 @@ export default class CodenamesGame implements ModuleGameInterface {
     generateUserBoard(receiverId: string):BoardElement[]{
         return this.board.map((element:BoardElement) => ({
             word: element.word,
-            categoryVisibleForEveryone: element.categoryVisibleForEveryone,
             marked: element.marked,
             category: this.filterCategory(receiverId, element.category, element.categoryVisibleForEveryone),
             teamName: this.filterTeamName(receiverId, element.teamName, element.categoryVisibleForEveryone)

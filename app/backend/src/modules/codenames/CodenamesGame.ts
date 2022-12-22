@@ -60,8 +60,10 @@ export default class CodenamesGame implements ModuleGameInterface {
         //         investigators: team.investigators.map(inv => this.getUserNameById(inv)),
         //     } as Team))
         // });
-        this.roomApi.getRoom().getRoomMembers().forEach(member => member.messageGameUser(
-            "userSpecificBoardViewSent", {
+        this.roomApi.getRoom().getRoomMembers().forEach(member => this.roomApi.sendPlayerMessage(
+            member.getId(),
+            "userSpecificBoardViewSent",
+            {
                 board: this.generateUserBoard(member.getId()),
                 state: this.gameState.getName(),
                 teams: this.gameMembers.map(team => ({

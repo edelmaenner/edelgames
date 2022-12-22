@@ -5,9 +5,7 @@ import RoomManager from "./RoomManager";
 import debug from "./util/debug";
 import ModuleRegistry from "./modules/ModuleRegistry";
 import XenforoApi, {authDataContainer} from "./util/XenforoApi";
-import Codenames from "../modules/codenames/Codenames";
 
-// TODO: fix bug with missing user name
 export default class User {
 
     private readonly id: string = ""; // required for identifying users with the same name
@@ -88,14 +86,6 @@ export default class User {
 
     public messageUser(eventName: string, data: object): void {
         SocketManager.directMessageToSocket(this.socket, eventName, data);
-    }
-
-    public messageGameUser(eventName: string, data: object): void {
-        let event = Codenames.getUniqueId() + '_' + eventName;
-        SocketManager.directGameMessageToSocket(this.socket, 'ServerToClientGameMessage', {
-            messageTypeId: event,
-            ...data
-        });
     }
 
     private sendUserProfileChangedMessage(): void {

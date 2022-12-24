@@ -44,14 +44,14 @@ export default class BoardComponent extends React.Component<Props,{}> {
 
     renderBoard() {
         return this.props.board.map(boardRow => boardRow.map(boardElement => (
-            <button key={boardElement.word} className={"boardElement"}
+            <div key={boardElement.word} className={"boardElement"}
                  style={{backgroundColor: boardElement.category === 0 ? "#161616" : this.props.teams[boardElement.teamId]?.teamColor ?? "#967c4b"}}
                  onClick={this.props.hintState ? this.markGuess.bind(this, boardElement) : () => {}}>
                 <button className={"guessButton"} onClick={this.makeGuess.bind(this, boardElement)} style={this.props.hintState ? {} : {display: "none"}}/>
                 <div className={"boardElementContent"}>
                     {boardElement.word}
                 </div>
-            </button>
+            </div>
         )))
     }
 

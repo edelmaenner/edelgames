@@ -30,6 +30,10 @@
   }
 }
 
+.boardElement:hover {
+  cursor: pointer;
+}
+
 .board {
   height: 100%;
   width: calc(100% - 10px);

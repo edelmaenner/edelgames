@@ -56,28 +56,21 @@ export default class CodenamesGame implements ModuleGameInterface {
     }
 
     sendCurrentStateOfGame(){
-        // FIXME: 2 Events direkt nacheinander hebeln die setState-Methoden aus, da asynchron -> Die Änderungen überschreiben sich gegenseitig
-        // this.roomApi.sendRoomMessage('serverMessageSend', {
-        //     state: this.gameState.getName(),
-        //     teams: this.gameMembers.map(team => ({
-        //         name: team.name,
-        //         spymaster: this.getUserNameById(team.spymaster),
-        //         investigators: team.investigators.map(inv => this.getUserNameById(inv)),
-        //     } as Team))
-        // });
+        this.roomApi.sendRoomMessage('serverMessageSend', {
+            state: this.gameState.getName(),
+            teams: this.gameMembers.map(team => ({
+                name: team.name,
+                spymaster: this.getUserNameById(team.spymaster),
+                investigators: team.investigators.map(inv => this.getUserNameById(inv)),
+            } as Team)),
+            hint: this.hint
+
+        });
         this.roomApi.getRoom().getRoomMembers().forEach(member => this.roomApi.sendPlayerMessage(
             member.getId(),
             "userSpecificBoardViewSent",
             {
                 board: this.generateUserBoard(member.getId()),
-                state: this.gameState.getName(),
-                teams: this.gameMembers.map(team => ({
-                    name: team.name,
-                    spymaster: this.getUserNameById(team.spymaster),
-                    investigators: team.investigators.map(inv => this.getUserNameById(inv)),
-                    wordsLeft: team.wordsLeft
-                } as Team)),
-                hint: this.hint
             }
         ))
         debug(0,`New internal State: `, this.gameMembers, this.gameState.getName());

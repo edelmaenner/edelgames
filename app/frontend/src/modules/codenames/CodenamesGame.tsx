@@ -66,41 +66,29 @@ export default class CodenamesGame extends React.Component<{},IState> implements
 
     // this method is called, once the component is ready and setState can be used
     componentDidMount() {
-        // this.gameApi.addEventHandler('serverMessageSend', this.onReceiveMessage.bind(this));
+        this.gameApi.addEventHandler('serverMessageSend', this.onReceiveMessage.bind(this));
         this.gameApi.addEventHandler('userSpecificBoardViewSent', this.onReceiveBoard.bind(this));
         this.gameApi.sendMessageToServer("requestGameState", {})
     }
 
-    // FIXME: 2 Events direkt nacheinander hebeln die setState-Methoden aus, da asynchron -> Die Änderungen überschreiben sich gegenseitig
     onReceiveBoard(eventData: {[key: string]: any}) {
         this.setState({
-            ...this.state,
             board: this.mapBoardArrayToArrayArray(eventData.board, 5, 5),
+        })
+    }
+
+    onReceiveMessage(eventData: {[key: string]: any}) {
+        this.setState({
             teams: eventData.teams.map((team: any, index: number) => ({
                 id: index,
                 name: team.name,
                 investigators: team.investigators,
                 spymaster: team.spymaster,
-                teamColor: teamColors[index],
-                wordsLeft: team.wordsLeft
+                teamColor: teamColors[index]
             }) as Team),
             stateName: eventData.state
         })
     }
-
-    // onReceiveMessage(eventData: {[key: string]: any}) {
-    //     this.setState({
-    //         ...this.state,
-    //         teams: eventData.teams.map((team: any, index: number) => ({
-    //             id: index,
-    //             name: team.name,
-    //             investigators: team.investigators,
-    //             spymaster: team.spymaster,
-    //             teamColor: teamColors[index]
-    //         }) as Team),
-    //         stateName: eventData.state
-    //     })
-    // }
 
     render() {
         switch (this.state.stateName){

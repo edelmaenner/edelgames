@@ -1,8 +1,6 @@
-import ModuleGameInterface from "./ModuleGameInterface";
+import ModuleGameInterface from './ModuleGameInterface';
 
 export default interface ModuleInterface {
-
-    getUniqueId(): string;
-    getGameInstance(): ModuleGameInterface;
-
+	getUniqueId(): string;
+	getGameInstance(): ModuleGameInterface;
 }

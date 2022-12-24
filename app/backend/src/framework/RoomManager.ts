@@ -1,65 +1,68 @@
-import Room from "./Room";
-import User from "./User";
-import SocketMessenger from "./util/SocketMessenger";
-import Lobby from "./Lobby";
+import Room from './Room';
+import User from './User';
+import SocketMessenger from './util/SocketMessenger';
+import Lobby from './Lobby';
 
 export class RoomManagerSingleton {
+	private readonly lobby: Lobby;
+	private rooms: Room[] = [];
 
-    private readonly lobby: Lobby;
-    private rooms: Room[] = [];
+	constructor() {
+		// create lobby room
+		this.lobby = new Lobby();
+	}
 
+	// rooms require a user as the admin
+	public createRoom(firstUser: User): void {
+		const newRoom = new Room(firstUser);
+		this.rooms.push(newRoom);
+		firstUser
+			.switchRoom(newRoom)
+			.then(newRoom.sendRoomChangedBroadcast.bind(newRoom));
+	}
 
-    constructor() {
-        // create lobby room
-        this.lobby = new Lobby();
-    }
+	// rooms will be automatically removed, when the last user leaves
+	public removeRoom(room: Room): void {
+		if (room.getMemberCount() === 0) {
+			this.rooms = this.rooms.filter((r) => r !== room);
+		}
+	}
 
-    // rooms require a user as the admin
-    public createRoom(firstUser: User): void {
-        let newRoom = new Room(firstUser);
-        this.rooms.push(newRoom);
-        firstUser.switchRoom(newRoom).then(newRoom.sendRoomChangedBroadcast.bind(newRoom));
-    }
+	public getRoomById(roomId: string): Room | null {
+		return this.rooms.find((room) => room.getRoomId() === roomId) || null;
+	}
 
-    // rooms will be automatically removed, when the last user leaves
-    public removeRoom(room: Room): void {
-        if(room.getMemberCount() === 0) {
-            this.rooms = this.rooms.filter(r => r !== room);
-        }
-    }
+	public getLobbyRoom(): Lobby {
+		return this.lobby;
+	}
 
-    public getRoomById(roomId: string): Room|null  {
-        return this.rooms.find(room => room.getRoomId() === roomId) || null;
-    }
+	public getRoomList(): Room[] {
+		return this.rooms;
+	}
 
-    public getLobbyRoom(): Lobby {
-        return this.lobby;
-    }
+	public updateLobbyMembersRoomData(): void {
+		SocketMessenger.broadcast(
+			this.getLobbyRoom().getRoomId(),
+			'lobbyRoomsChanged',
+			this.getLobbyMemberRoomData()
+		);
+	}
 
-    public getRoomList(): Room[] {
-        return this.rooms;
-    }
+	public getLobbyMemberRoomData(): { rooms: object[] } {
+		const roomData: { rooms: object[] } = {
+			rooms: [],
+		};
 
-    public updateLobbyMembersRoomData(): void {
-        SocketMessenger.broadcast(this.getLobbyRoom().getRoomId(), 'lobbyRoomsChanged', this.getLobbyMemberRoomData())
-    }
-
-    public getLobbyMemberRoomData(): {rooms: object[]} {
-        let roomData: {rooms: object[]} = {
-            rooms:  []
-        };
-
-        for(let room of [...this.rooms, this.lobby]) {
-            roomData.rooms.push({
-                roomId: room.getRoomId(),
-                roomName: room.getRoomName(),
-                roomMembers: room.getPublicRoomMemberList(),
-                roomUsePassword: room.getRoomPassword() !== null
-            });
-        }
-        return roomData;
-    }
-
+		for (const room of [...this.rooms, this.lobby]) {
+			roomData.rooms.push({
+				roomId: room.getRoomId(),
+				roomName: room.getRoomName(),
+				roomMembers: room.getPublicRoomMemberList(),
+				roomUsePassword: room.getRoomPassword() !== null,
+			});
+		}
+		return roomData;
+	}
 }
 
 const RoomManager = new RoomManagerSingleton();

@@ -1,7 +1,4 @@
 app/backend/build/*
 !app/backend/build/.gitignore
-app/backend/node_modules
-
-app/frontend/node_modules
-
+node_modules
 .idea

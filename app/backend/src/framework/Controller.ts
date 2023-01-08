@@ -1,42 +1,37 @@
-import { Server, Socket } from 'socket.io';
-import User from './User';
-import RoomManager from './RoomManager';
-import debug from './util/debug';
+import {Server, Socket} from "socket.io";
+import User from "./User";
+import roomManager from "./RoomManager";
+import {systemLogger} from "./util/Logger";
 
 export default class Controller {
-	public static io: Server;
-	public static connectedUsers = 0;
 
-	constructor(io: Server) {
-		Controller.io = io;
-	}
+    public static io: Server;
+    public static connectedUsers: number = 0;
 
-	onConnect(socket: Socket): void {
-		// create user and register disconnect listener
-		const user: User = new User(socket);
-		socket.on('disconnect', this.onDisconnect.bind(this, socket, user));
+    constructor(io: Server) {
+        if (Controller.io) {
+            throw "Cannot create multiple socket controllers!";
+        }
+        Controller.io = io;
+    }
 
-		// debug output
-		Controller.connectedUsers++;
-		debug(
-			2,
-			`user ${user.getId()} (socket ${socket.id}) connected! (${
-				Controller.connectedUsers
-			} users in total)`
-		);
+    onConnect(socket: Socket): void {
+        // create user and register disconnect listener
+        let user: User = new User(socket);
+        socket.on('disconnect', this.onDisconnect.bind(this, socket, user));
 
-		// switch user into lobby
-		RoomManager.getLobbyRoom().joinRoom(user);
-	}
+        // debug output
+        Controller.connectedUsers++;
+        systemLogger.debug(`user ${user.getId()} (socket ${socket.id}) connected! (${Controller.connectedUsers} users in total)`);
 
-	onDisconnect(socket: Socket, user: User): void {
-		Controller.connectedUsers--;
-		debug(
-			2,
-			`user ${user.getId()} (socket ${socket.id}) disconnected! (${
-				Controller.connectedUsers
-			} users remaining)`
-		);
-		user.destroyUser();
-	}
+
+        // switch user into lobby
+        roomManager.getLobbyRoom().joinRoom(user);
+    }
+
+    onDisconnect(socket: Socket, user: User): void {
+        Controller.connectedUsers--;
+        systemLogger.debug(`user ${user.getId()} (socket ${socket.id}) disconnected! (${Controller.connectedUsers} users remaining)`);
+        user.destroyUser();
+    }
 }

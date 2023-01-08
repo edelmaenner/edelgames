@@ -2,3 +2,5 @@ app/backend/build/*
 !app/backend/build/.gitignore
 node_modules
 .idea
+
+package-lock.json

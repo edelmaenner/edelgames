@@ -1,38 +1,37 @@
 #login-backdrop {
-  width: 100vw;
-  height: 100vh;
-  position: fixed;
-  left: 0;
-  top: 0;
-  display: flex;
-  align-items: center;
-  z-index: 500;
-  justify-content: center;
-  background-color: #000000bb;
-  cursor: pointer;
+	width: 100vw;
+	height: 100vh;
+	position: fixed;
+	left: 0;
+	top: 0;
+	display: flex;
+	align-items: center;
+	z-index: 500;
+	justify-content: center;
+	background-color: #000000bb;
+	cursor: pointer;
 
+	.frame {
+		display: flex;
+		flex-direction: column;
+		box-shadow: 0 0 7px -1px $black;
+		cursor: default;
 
-  .frame {
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 0 7px -1px $black;
-    cursor: default;
+		img {
+			margin-bottom: 2rem;
+		}
 
-    img {
-      margin-bottom: 2rem;
-    }
+		.error-message {
+			height: 1.2rem;
+			margin-bottom: 1rem;
+			color: $error;
+		}
 
-    .error-message {
-      height: 1.2rem;
-      margin-bottom: 1rem;
-      color: $error;
-    }
-
-    input {
-      padding: 0.5rem 1rem;
-      margin-bottom: 1rem;
-      border-radius: 4px;
-      border: none;
-    }
-  }
+		input {
+			padding: 0.5rem 1rem;
+			margin-bottom: 1rem;
+			border-radius: 4px;
+			border: none;
+		}
+	}
 }

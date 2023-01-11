@@ -1,152 +1,168 @@
-import * as querystring from "querystring";
-import * as https from "https";
-import {IncomingMessage} from "http";
-import {systemLogger} from "./Logger";
-
-
-export type authDataContainer = {
-    authCookie: string,
-    username: string,
-    profileImageUrl: string,
-    user_id: number,
-    group_id: number,
-    custom_title: string
-}
+import * as querystring from 'querystring';
+import * as https from 'https';
+import { IncomingMessage } from 'http';
+import { systemLogger } from './Logger';
+import { authDataContainer } from '@edelgames/types/src/app/ApiTypes';
 
 type loginResponse = {
-    login_successful: boolean,
-    xenforo_token?: string,
-    minecraft_name?: string,
-    user_id?: number,
-    group_id?: number,
-    custom_title?: string,
-    gravatar?: string
-}
+	login_successful: boolean;
+	xenforo_token?: string;
+	minecraft_name?: string;
+	user_id?: number;
+	group_id?: number;
+	custom_title?: string;
+	gravatar?: string;
+};
 
-type authRequestCallbackFunction = (success: boolean, authData: null | authDataContainer) => void;
+type authRequestCallbackFunction = (
+	success: boolean,
+	authData: null | authDataContainer
+) => void;
 
 const edelmaennerHost = 'edelmaenner.net';
 const edelmaennerLoginPath = '/edelgames/authenticate';
 
 export default class XenforoApi {
+	/**
+	 * Send an authentication request to the server, using either username + password or the xenforo token.
+	 *
+	 * @param username
+	 * @param password
+	 * @param session_token
+	 * @param callback
+	 */
+	private static sendAuthRequest(
+		username: string | null,
+		password: string | null,
+		session_token: string | null,
+		callback: authRequestCallbackFunction
+	): void {
+		const form = {
+			login: username,
+			password: password,
+			xenforo_token: session_token,
+		};
 
+		const formData = querystring.stringify(form).replace('%20', '+');
+		const contentLength = formData.length;
 
-    /**
-     * Send an authentication request to the server, using either username + password or the xenforo token.
-     *
-     * @param username
-     * @param password
-     * @param session_token
-     * @param callback
-     */
-    private static sendAuthRequest(username: string | null, password: string | null, session_token: string | null, callback: authRequestCallbackFunction): void {
-        let form = {
-            login: username,
-            password: password,
-            xenforo_token: session_token
-        };
+		const req = https.request(
+			{
+				host: edelmaennerHost,
+				path: edelmaennerLoginPath,
+				headers: {
+					'Content-Length': contentLength,
+					'Content-Type': 'application/x-www-form-urlencoded',
+				},
+				method: 'POST',
+			},
+			XenforoApi.onAuthResponse.bind(null, callback)
+		);
 
-        let formData = querystring.stringify(form).replace('%20', '+');
-        let contentLength = formData.length;
+		req.write(formData);
+		req.end();
+	}
 
-        let req = https.request({
-            host: edelmaennerHost,
-            path: edelmaennerLoginPath,
-            headers: {
-                'Content-Length': contentLength,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            method: "POST"
-        }, XenforoApi.onAuthResponse.bind(null, callback));
+	/**
+	 * When the request headers have been returned, collect the response text and pass it on
+	 *
+	 * @param callback
+	 * @param result
+	 */
+	private static onAuthResponse(
+		callback: authRequestCallbackFunction,
+		result: IncomingMessage
+	): void {
+		if (result.statusCode !== 200) {
+			callback(false, null);
+			return;
+		}
 
-        req.write(formData);
-        req.end();
-    }
+		result.setEncoding('utf8');
 
-    /**
-     * When the request headers have been returned, collect the response text and pass it on
-     *
-     * @param callback
-     * @param result
-     */
-    private static onAuthResponse(callback: authRequestCallbackFunction, result: IncomingMessage): void {
-        if (result.statusCode !== 200) {
-            callback(false, null);
-            return;
-        }
+		let responseText = '';
+		result.on('data', (chunk) => {
+			responseText += chunk;
+		});
+		result.on('end', () => {
+			XenforoApi.onAuthResponseBody(callback, responseText);
+		});
+	}
 
-        result.setEncoding("utf8");
+	/**
+	 * Parse the server response after login
+	 *
+	 * @param callback
+	 * @param responseText
+	 */
+	private static onAuthResponseBody(
+		callback: authRequestCallbackFunction,
+		responseText: string
+	): void {
+		systemLogger.debug('Got response from server with data:', responseText);
 
-        let responseText = ''
-        result.on('data', chunk => {
-            responseText += chunk;
-        });
-        result.on('end', () => {
-            XenforoApi.onAuthResponseBody(callback, responseText)
-        });
-    }
+		try {
+			const jsonResponse: loginResponse = JSON.parse(responseText);
+			systemLogger.debug(
+				'Login was successfull:',
+				jsonResponse.login_successful
+			);
 
-    /**
-     * Parse the server response after login
-     *
-     * @param callback
-     * @param responseText
-     */
-    private static onAuthResponseBody(callback: authRequestCallbackFunction, responseText: string): void {
-        systemLogger.debug("Got response from server with data:", responseText)
+			if (!jsonResponse.login_successful) {
+				callback(false, null);
+				return;
+			}
 
-        try {
-            let jsonResponse: loginResponse = JSON.parse(responseText)
-            systemLogger.debug("Login was successfull:", jsonResponse.login_successful)
+			let profileImage;
+			if (jsonResponse.gravatar) {
+				profileImage = `https://minotar.net/helm/${jsonResponse.minecraft_name}/128.png`;
+			} else {
+				profileImage = `https://edelmaenner.net/data/avatars/m/${Math.floor(
+					jsonResponse.user_id / 1000
+				)}/${jsonResponse.user_id}.jpg`;
+			}
 
-            if (!jsonResponse.login_successful) {
-                callback(false, null)
-                return
-            }
+			callback(true, {
+				authCookie: jsonResponse.xenforo_token,
+				profileImageUrl: profileImage,
+				username: jsonResponse.minecraft_name,
+				custom_title: jsonResponse.custom_title,
+				user_id: jsonResponse.user_id,
+				group_id: jsonResponse.group_id,
+			});
+		} catch (e) {
+			// No valid JSON, most likely a server error, try again later.
+			callback(false, null);
+		}
+	}
 
-            let profileImage
-            if (jsonResponse.gravatar) {
-                profileImage = `https://minotar.net/helm/${jsonResponse.minecraft_name}/128.png`
-            } else {
-                profileImage = `https://edelmaenner.net/data/avatars/m/${Math.floor(jsonResponse.user_id / 1000)}/${jsonResponse.user_id}.jpg`
-            }
+	/**
+	 *
+	 * Perform a login with the Xenforo session token
+	 *
+	 * @param sessionId
+	 * @param callback
+	 */
+	public static loginWithToken(
+		sessionId: string,
+		callback: authRequestCallbackFunction
+	): void {
+		XenforoApi.sendAuthRequest(null, null, sessionId, callback);
+	}
 
-            callback(true, {
-                authCookie: jsonResponse.xenforo_token,
-                profileImageUrl: profileImage,
-                username: jsonResponse.minecraft_name,
-                custom_title: jsonResponse.custom_title,
-                user_id: jsonResponse.user_id,
-                group_id: jsonResponse.group_id,
-            });
-        } catch (e) {
-            // No valid JSON, most likely a server error, try again later.
-            callback(false, null)
-        }
-    }
-
-    /**
-     *
-     * Perform a login with the Xenforo session token
-     *
-     * @param sessionId
-     * @param callback
-     */
-    public static loginWithToken(sessionId: string, callback: authRequestCallbackFunction): void {
-        XenforoApi.sendAuthRequest(null, null, sessionId, callback)
-    }
-
-
-    /**
-     *
-     * Perform a login with a username + password
-     *
-     * @param username
-     * @param password
-     * @param callback
-     */
-    public static loginWithPassword(username: string, password: string, callback: authRequestCallbackFunction): void {
-        XenforoApi.sendAuthRequest(username, password, null, callback)
-    }
-
+	/**
+	 *
+	 * Perform a login with a username + password
+	 *
+	 * @param username
+	 * @param password
+	 * @param callback
+	 */
+	public static loginWithPassword(
+		username: string,
+		password: string,
+		callback: authRequestCallbackFunction
+	): void {
+		XenforoApi.sendAuthRequest(username, password, null, callback);
+	}
 }

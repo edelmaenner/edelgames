@@ -1,4 +1,4 @@
-FROM node:18-alpine as build-stage
+FROM node:18-alpine
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -19,14 +19,8 @@ RUN npm install
 # Bundle app source
 COPY --chown=node:node ./frontend/ .
 
-# Build optimized production files
-RUN npm run build
-
-# --- Build-Stage finished ---
-RUN npm install -g serve
-
 # Expose port
 EXPOSE 3000
 
 # What the server should do
-CMD [ "serve", "-s", "build" ]
+RUN npm run dev

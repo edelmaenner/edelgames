@@ -14,11 +14,11 @@ class SocketManager {
 
 	constructor() {
 		const PORT = process.env.API_HTTP_PORT ?? 5000;
-		const DOMAIN = process.env.REACT_APP_DOMAIN ?? 'http://localhost';
+		const DOMAIN = process.env.API_APP_DOMAIN ?? 'http://localhost';
 		clientLogger.debug(
-			'Starting connection using domain ',
+			'Starting connection using environment variables ',
 			process.env,
-			`Resultung in ${DOMAIN}:${PORT}`
+			`Resulting in ${DOMAIN}:${PORT}`
 		);
 
 		this.socket = io(DOMAIN + ':' + PORT);

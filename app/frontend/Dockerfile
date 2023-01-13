@@ -7,6 +7,7 @@ WORKDIR /usr/src/app
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 COPY package*.json ./
 COPY .npmrc ./
+COPY ../types /usr/src/types
 
 ARG FONT_AWESOME_AUTH_TOKEN
 

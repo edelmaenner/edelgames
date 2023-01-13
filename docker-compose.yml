@@ -2,27 +2,19 @@ version: '2'
 
 services:
   frontend:
-    image: 'node:16'
-    working_dir: '/var/www/app/frontend'
-    volumes:
-      - './app/frontend:/var/www/app/frontend'
+    build: './app/frontend'
     ports:
-      - '${REACT_HTTP_PORT}:${REACT_HTTP_PORT}'
+      - '${REACT_HTTP_PORT_OUTSIDE}:${REACT_HTTP_PORT}'
     expose:
       - '${REACT_HTTP_PORT}'
-    command: 'npm run dev'
     env_file:
       - ./.env
 
   backend:
-    image: 'node:16'
-    working_dir: '/var/www/app/backend'
-    volumes:
-      - './app/backend:/var/www/app/backend'
+    build: './app/backend'
     ports:
-      - '${API_HTTP_PORT}:${API_HTTP_PORT}'
+      - '${API_HTTP_PORT_OUTSIDE}:${API_HTTP_PORT}'
     expose:
       - '${API_HTTP_PORT}'
-    command: 'npm run dev'
     env_file:
       - ./.env

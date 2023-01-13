@@ -10,6 +10,9 @@ COPY ./frontend/.npmrc ./
 COPY ./types /usr/src/types
 
 ARG FONT_AWESOME_AUTH_TOKEN
+ARG API_HTTP_PORT
+ARG REACT_HTTP_PORT
+ARG REACT_APP_DOMAIN
 
 RUN npm install
 

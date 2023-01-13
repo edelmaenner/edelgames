@@ -13,8 +13,8 @@ class SocketManager {
 	protected readonly socket: Socket;
 
 	constructor() {
-		const PORT = process.env.API_HTTP_PORT ?? 5000;
-		const DOMAIN = process.env.API_APP_DOMAIN ?? 'http://localhost';
+		const PORT = process.env.API_HTTP_PORT ?? 10134;
+		const DOMAIN = process.env.API_APP_DOMAIN ?? 'https://edelgamesdevbackend.potionlabs.de';
 		clientLogger.debug(
 			'Starting connection using environment variables ',
 			process.env,

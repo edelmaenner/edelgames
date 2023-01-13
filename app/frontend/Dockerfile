@@ -16,8 +16,14 @@ RUN npm install
 # Bundle app source
 COPY --chown=node:node ./frontend/ .
 
+# Build optimized production files
+RUN npm run build
+
+# --- Build-Stage finished ---
+RUN npm install -g serve
+
 # Expose port
 EXPOSE 3000
 
 # What the server should do
-CMD ["npm", "run", "dev"]
+CMD [ "npm", "run", "serve" ]

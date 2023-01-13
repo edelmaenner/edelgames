@@ -22,6 +22,7 @@
 		"react-dom": "^18.2.0",
 		"react-p5": "^1.3.33",
 		"react-scripts": "5.0.1",
+		"react-dotenv": "^0.1.3",
 		"sass": "^1.56.1",
 		"socket.io-client": "^4.5.3",
 		"typescript": "^4.9.3",
@@ -37,8 +38,9 @@
 		"react-app-rewired": "2.2.1"
 	},
 	"scripts": {
-		"dev": "react-app-rewired start",
-		"build": "tsc -p . && react-app-rewired build"
+		"dev": "react-dotenv && react-app-rewired start",
+		"build": "tsc -p . && react-dotenv && react-app-rewired build",
+		"serve": "react-dotenv && serve -s build"
 	},
 	"eslintConfig": {
 		"extends": [
@@ -56,6 +58,14 @@
 			"last 1 chrome version",
 			"last 1 firefox version",
 			"last 1 safari version"
+		]
+	},
+	"react-dotenv": {
+		"whitelist": [
+			"REACT_HTTP_PORT",
+			"REACT_APP_DOMAIN",
+			"API_HTTP_PORT",
+			"API_APP_DOMAIN"
 		]
 	}
 }

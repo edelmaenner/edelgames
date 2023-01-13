@@ -3,6 +3,7 @@ import eventManager from './EventManager';
 import { clientLogger } from './Logger';
 import ProfileManager from './ProfileManager';
 import { ListenerFunction } from '@edelgames/types/src/app/ApiTypes';
+import env from "react-dotenv";
 
 // helper constants don`t need a type, as it is recognized by the value
 export const SocketEventNames = {
@@ -10,8 +11,8 @@ export const SocketEventNames = {
 };
 
 const PORT =
-	(Number.parseInt(process.env.API_HTTP_PORT ?? '') || undefined) ?? 5000;
-const DOMAIN = process.env.API_APP_DOMAIN ?? 'http://localhost';
+	(Number.parseInt(env.API_HTTP_PORT ?? '') || undefined) ?? 5000;
+const DOMAIN = env.API_APP_DOMAIN ?? 'http://localhost';
 
 class SocketManager {
 	protected readonly socket: Socket;
@@ -19,7 +20,7 @@ class SocketManager {
 	constructor() {
 		clientLogger.debug(
 			'Starting connection using environment variables ',
-			process.env,
+			env,
 			`Resulting in ${DOMAIN}:${PORT}`
 		);
 

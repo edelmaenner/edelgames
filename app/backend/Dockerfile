@@ -14,7 +14,7 @@ ARG FONT_AWESOME_AUTH_TOKEN
 RUN npm install
 
 # Bundle app source
-COPY --chown=node:node . .
+COPY --chown=node:node ./backend/ .
 
 # Expose port
 EXPOSE 5000

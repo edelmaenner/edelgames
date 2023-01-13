@@ -23,15 +23,10 @@ COPY --chown=node:node ./frontend/ .
 RUN npm run build
 
 # --- Build-Stage finished ---
-
-FROM nginx:1.18-alpine
-
-ARG API_HTTP_PORT
-ARG REACT_HTTP_PORT
-ARG REACT_APP_DOMAIN
-
-COPY --from=build-stage /usr/src/app/build/ /usr/share/nginx/html
-COPY --from=build-stage /usr/src/app/nginx.conf /etc/nginx/conf.d/default.conf
+RUN npm install -g serve
 
 # Expose port
 EXPOSE 3000
+
+# What the server should do
+CMD [ "serve", "-s", "build" ]

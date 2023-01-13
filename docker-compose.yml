@@ -2,7 +2,9 @@ version: '3'
 
 services:
   frontend:
-    build: './app/frontend'
+    build:
+      context: './app'
+      dockerfile: './frontend/Dockerfile'
     ports:
       - '${REACT_HTTP_PORT_OUTSIDE}:${REACT_HTTP_PORT}'
     expose:
@@ -11,7 +13,9 @@ services:
       - ./.env
 
   backend:
-    build: './app/backend'
+    build:
+      context: './app'
+      dockerfile: './backend/Dockerfile'
     ports:
       - '${API_HTTP_PORT_OUTSIDE}:${API_HTTP_PORT}'
     expose:

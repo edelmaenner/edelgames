@@ -7,6 +7,9 @@ WORKDIR /usr/src/app
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 COPY package*.json ./
 COPY .npmrc ./
+
+ARG FONT_AWESOME_AUTH_TOKEN
+
 RUN npm install
 
 # Bundle app source

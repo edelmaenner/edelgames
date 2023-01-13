@@ -4,13 +4,7 @@ import * as http from 'http';
 import { Server } from 'socket.io';
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
-import * as path from 'path';
 import Controller from './framework/Controller';
-
-dotenv.config({
-	path: path.resolve(__dirname + '/./../../../.env'),
-});
 
 const BACKEND_PORT: number =
 	(Number.parseInt(process.env.API_HTTP_PORT) || undefined) ?? 5000;

@@ -3,19 +3,14 @@ import eventManager from './EventManager';
 import { clientLogger } from './Logger';
 import ProfileManager from './ProfileManager';
 import { ListenerFunction } from '@edelgames/types/src/app/ApiTypes';
-import path from "path";
-import dotenv from 'dotenv';
 
 // helper constants don`t need a type, as it is recognized by the value
 export const SocketEventNames = {
 	connectionStatusChanged: 'connectionStatusChanged',
 };
 
-dotenv.config({
-	path: path.resolve(__dirname + '/./../../../../.env'),
-});
-
-const PORT = (Number.parseInt(process.env.API_HTTP_PORT ?? "") || undefined) ?? 5000;
+const PORT =
+	(Number.parseInt(process.env.API_HTTP_PORT ?? '') || undefined) ?? 5000;
 const DOMAIN = process.env.API_APP_DOMAIN ?? 'http://localhost';
 
 class SocketManager {

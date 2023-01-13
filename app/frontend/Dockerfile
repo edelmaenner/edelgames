@@ -23,4 +23,4 @@ COPY --chown=node:node ./frontend/ .
 EXPOSE 3000
 
 # What the server should do
-RUN npm run dev
+CMD ["npm", "run", "dev"]

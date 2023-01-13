@@ -23,6 +23,9 @@ RUN npm run build
 
 FROM nginx:1.18-alpine
 
+ARG API_HTTP_PORT
+ARG REACT_HTTP_PORT
+
 COPY --from=build-stage /usr/src/app/build/ /usr/share/nginx/html
 COPY --from=build-stage /usr/src/app/nginx.conf /etc/nginx/conf.d/default.conf
 

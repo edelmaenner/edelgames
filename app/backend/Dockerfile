@@ -16,8 +16,11 @@ RUN npm install
 # Bundle app source
 COPY --chown=node:node ./backend/ .
 
+ARG API_HTTP_PORT
+ARG REACT_HTTP_PORT
+
 # Expose port
 EXPOSE 5000
 
 # What the server should do
-CMD [ "npm", "run start" ]
+CMD [ "npm", "run", "start" ]

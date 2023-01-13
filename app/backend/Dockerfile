@@ -18,6 +18,7 @@ COPY --chown=node:node ./backend/ .
 
 ARG API_HTTP_PORT
 ARG REACT_HTTP_PORT
+ARG REACT_APP_DOMAIN
 
 # Expose port
 EXPOSE 5000

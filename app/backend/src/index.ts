@@ -16,7 +16,7 @@ const BACKEND_PORT: number =
 	(Number.parseInt(process.env.API_HTTP_PORT) || undefined) ?? 5000;
 const REACT_PORT: number =
 	(Number.parseInt(process.env.REACT_HTTP_PORT) || undefined) ?? 3000;
-const DOMAIN: string = process.env.DOMAIN || 'http://localhost';
+const DOMAIN: string = process.env.REACT_APP_DOMAIN || 'http://localhost';
 
 // setup server
 const app = express();

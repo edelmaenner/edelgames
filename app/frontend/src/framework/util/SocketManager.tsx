@@ -13,8 +13,8 @@ class SocketManager {
 	protected readonly socket: Socket;
 
 	constructor() {
-		const PORT = process.env.REACT_APP_API_HTTP_PORT || 5000;
-		const DOMAIN = process.env.REACT_APP_DOMAIN || 'http://localhost';
+		const PORT = process.env.API_HTTP_PORT ?? 5000;
+		const DOMAIN = process.env.REACT_APP_DOMAIN ?? 'http://localhost';
 		clientLogger.debug(
 			'Starting connection using domain ',
 			process.env,

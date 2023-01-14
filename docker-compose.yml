@@ -9,6 +9,7 @@ services:
       - '${REACT_DOCKER_PORT}:3000'
     env_file:
       - ./.env
+    restart: unless-stopped
 
   backend:
     build:
@@ -18,3 +19,4 @@ services:
       - '${API_DOCKER_PORT}:${API_HTTP_PORT}'
     env_file:
       - ./.env
+    restart: unless-stopped

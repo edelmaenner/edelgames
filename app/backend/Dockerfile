@@ -16,8 +16,5 @@ RUN npm install
 # Bundle app source
 COPY --chown=node:node ./backend/ .
 
-# Expose port
-EXPOSE 5000
-
 # What the server should do
 CMD [ "npm", "run", "start" ]

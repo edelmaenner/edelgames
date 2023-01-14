@@ -22,8 +22,5 @@ RUN npm run build
 # --- Build-Stage finished ---
 RUN npm install -g serve
 
-# Expose port
-EXPOSE 3000
-
 # What the server should do
 CMD [ "npm", "run", "serve" ]

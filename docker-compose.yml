@@ -6,7 +6,7 @@ services:
       context: './app'
       dockerfile: './frontend/Dockerfile'
     ports:
-      - '${REACT_DOCKER_PORT}:${REACT_HTTP_PORT}'
+      - '${REACT_DOCKER_PORT}:3000'
     env_file:
       - ./.env
 

@@ -4,6 +4,7 @@ import debug from "../../../framework/util/debug";
 import {Team} from "../Team";
 import Room from "../../../framework/Room";
 import {BoardElement, Category} from "../BoardElement";
+import {Words} from "../WordList";
 
 export default class InitialState extends AbstractState {
     handleUserLeave(gameMembers: Team[], userid: string): void {
@@ -27,10 +28,11 @@ export default class InitialState extends AbstractState {
                     if(this.isStartGameValid(eventData.senderId, room, gameMembers)){
                         // generate cards on board
                         this.setBoard(board)
+                        this.shuffleBoard(board)
                         return new HintState(0)
                     } else {
                         debug(2, `User ID ${eventData.senderId} send in invalid action: `
-                            + eventData.action + "due to missing rights")
+                            + eventData.action + " due to missing rights")
                     }
                     break;
                 default:
@@ -72,41 +74,67 @@ export default class InitialState extends AbstractState {
 
     private isStartGameValid(senderId: string, room: Room, gameMembers: Team[]):Boolean{
         return senderId === room.getRoomMaster().getId()
-            && gameMembers.find(
-                team => team.spymaster === undefined || team.investigators === undefined
-                    || team.investigators.length === 0
-            ) === undefined
+           // && gameMembers.find(
+           //     team => team.spymaster === undefined || team.investigators === undefined
+           //         || team.investigators.length === 0
+           // ) === undefined
     }
 
-    private setBoard(board: BoardElement[]){
-        // TODO: add real data & shuffle teams cards
-        board.push(new BoardElement("Apfel", Category.team, "A"))
-        board.push(new BoardElement("Kokosnuss", Category.team, "A"))
-        board.push(new BoardElement("Zauberstab", Category.team, "A"))
-        board.push(new BoardElement("Technik", Category.team, "A"))
-        board.push(new BoardElement("Pinguin", Category.team, "A"))
+    private setBoard(board: BoardElement[]) {
+        const cardCount = 25;
 
-        board.push(new BoardElement("Ameise", Category.team, "B"))
-        board.push(new BoardElement("Vogel", Category.team, "B"))
-        board.push(new BoardElement("Christbaum", Category.team, "B"))
-        board.push(new BoardElement("Leuchtstab", Category.team, "B"))
-        board.push(new BoardElement("Feder", Category.team, "B"))
+        for (let i = 0; i < cardCount; i++) {
+            let randomWord = Words[Math.floor(Math.random() * Words.length)]
 
-        board.push(new BoardElement("Pilz", Category.bomb, ""))
+            while (board.findIndex(element =>
+                element.word === randomWord
+            ) !== -1) {
+                randomWord = Words[Math.floor(Math.random() * Words.length)]
+            }
 
-        board.push(new BoardElement("Floh", Category.neutral, ""))
-        board.push(new BoardElement("Rot", Category.neutral, ""))
-        board.push(new BoardElement("Lieblich", Category.neutral, ""))
-        board.push(new BoardElement("Schnitzel", Category.neutral, ""))
-        board.push(new BoardElement("Jaguar", Category.neutral, ""))
-        board.push(new BoardElement("Schnecke", Category.neutral, ""))
-        board.push(new BoardElement("Amerika", Category.neutral, ""))
-        board.push(new BoardElement("Ozean", Category.neutral, ""))
-        board.push(new BoardElement("Tempo", Category.neutral, ""))
-        board.push(new BoardElement("Taste", Category.neutral, ""))
-        board.push(new BoardElement("Herz", Category.neutral, ""))
-        board.push(new BoardElement("Schale", Category.neutral, ""))
-        board.push(new BoardElement("Rauch", Category.neutral, ""))
-        board.push(new BoardElement("Nuss", Category.neutral, ""))
+            let randomCategory, randomTeam;
+
+            switch (true) {
+                case (i >= 0 && i <= 9):
+                    randomCategory = Category.team
+                    break;
+                case (i == 10):
+                    randomCategory = Category.bomb
+                    break;
+                default:
+                    randomCategory = Category.neutral
+                    break;
+            }
+
+            switch (true) {
+                case (i >= 0 && i <= 4):
+                    randomTeam = "A"
+                    break;
+                case (i >= 5 && i <= 9):
+                    randomTeam = "B"
+                    break;
+                default:
+                    randomTeam = ""
+                    break;
+            }
+
+            board.push(new BoardElement(randomWord, randomCategory, randomTeam));
+        }
+    }
+
+    private shuffleBoard(board: BoardElement[]) {
+        let currentIndex = board.length, randomIndex;
+
+        // While there remain elements to shuffle.
+        while (currentIndex != 0) {
+
+            // Pick a remaining element.
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+
+            // And swap it with the current element.
+            [board[currentIndex], board[randomIndex]] = [
+                board[randomIndex], board[currentIndex]];
+        }
     }
 }

@@ -61,10 +61,10 @@ export default class CodenamesGame implements ModuleGameInterface {
             teams: this.gameMembers.map(team => ({
                 name: team.name,
                 spymaster: this.getUserNameById(team.spymaster),
+                wordsLeft: team.wordsLeft,
                 investigators: team.investigators.map(inv => this.getUserNameById(inv)),
             } as Team)),
             hint: this.hint
-
         });
         this.roomApi.getRoom().getRoomMembers().forEach(member => this.roomApi.sendPlayerMessage(
             member.getId(),

@@ -9,6 +9,8 @@ interface Props {
     teams: Team[]
     board: BoardElement[][]
     gameApi: ModuleGameApi
+    hint: string
+    amount: number
 }
 
 export default class BoardComponent extends React.Component<Props,{}> {
@@ -48,7 +50,7 @@ export default class BoardComponent extends React.Component<Props,{}> {
                  style={{backgroundColor: boardElement.category === 0 ? "#161616" : this.props.teams[boardElement.teamId]?.teamColor ?? "#967c4b"}}
                  onClick={this.props.hintState ? this.markGuess.bind(this, boardElement) : () => {}}>
                 <button className={"guessButton"} onClick={this.makeGuess.bind(this, boardElement)} style={this.props.hintState ? {} : {display: "none"}}/>
-                <div className={"boardElementContent"}>
+                <div className={boardElement.word.length > 9 ? "boardElementContent longWord"+boardElement.word.length : "boardElementContent"}>
                     {boardElement.word}
                 </div>
             </div>
@@ -59,8 +61,8 @@ export default class BoardComponent extends React.Component<Props,{}> {
         return (<div className={"board"}>
             {this.renderBoard()}
             <div className={"inputBar"}>
-                <input id={"hintNumber"} type={"number"} className={"hintNumber"} min={1} max={9} defaultValue={0}></input>
-                <input id={"hintInput"} type={"text"} className={"hintInput"} placeholder={"Gib hier deinen Hinweis ein..."}/>
+                <input id={"hintNumber"} type={"number"} className={"hintNumber"} min={1} max={9} defaultValue={this.props.amount} disabled={this.props.hintState}/>
+                <input id={"hintInput"} type={"text"} className={"hintInput"} placeholder={this.props.hint} disabled={this.props.hintState}/>
                 <button className={this.props.hintState ? "stopGuessingButton" : "hintButton"}
                         onClick={this.props.hintState ? this.stopGuessing.bind(this) : this.sendHint.bind(this)}>
                     {this.props.hintState ? "Raten beenden" : "Gebe Hinweis"}

@@ -7,10 +7,12 @@ import InitialStateComponent from "./components/initialState/InitialStateCompone
 import HintStateComponent from "./components/hintState/HintStateComponent";
 import {BoardElement} from "./types/BoardElement";
 import GuessStateComponent from "./components/guessState/GuessStateComponent";
+import {Hint} from "./types/Hint";
 
 interface IState {
     teams : Team[]
     board: BoardElement[][]
+    hint: Hint
     stateName: string
 }
 
@@ -30,6 +32,7 @@ export default class CodenamesGame extends React.Component<{},IState> implements
     state = {
         teams: [] as Team[],
         board: [] as BoardElement[][],
+        hint: {} as Hint,
         stateName: "initial"
     }
 
@@ -49,7 +52,7 @@ export default class CodenamesGame extends React.Component<{},IState> implements
     }
 
     // TODO: Method name fixen
-    mapBoardArrayToArrayArray(board: any[], rowCount: number, columnCount: number): BoardElement[][] {
+    mapBoardArrayToBoard(board: any[], rowCount: number, columnCount: number): BoardElement[][] {
         let newBoard: BoardElement[][] = []
 
         if(board && board.length > 0) {
@@ -73,7 +76,7 @@ export default class CodenamesGame extends React.Component<{},IState> implements
 
     onReceiveBoard(eventData: {[key: string]: any}) {
         this.setState({
-            board: this.mapBoardArrayToArrayArray(eventData.board, 5, 5),
+            board: this.mapBoardArrayToBoard(eventData.board, 5, 5),
         })
     }
 
@@ -83,34 +86,29 @@ export default class CodenamesGame extends React.Component<{},IState> implements
                 id: index,
                 name: team.name,
                 investigators: team.investigators,
+                wordsLeft: team.wordsLeft,
                 spymaster: team.spymaster,
                 teamColor: teamColors[index]
             }) as Team),
-            stateName: eventData.state
+            stateName: eventData.state,
+            hint: eventData.hint ?? {word: "?", amnt: 0}
         })
     }
 
     render() {
         switch (this.state.stateName){
             case "initial":
-                // TODO: grep new state
                 return(<div>Waiting</div>);
             case "start":
                 return (<InitialStateComponent gameApi={this.gameApi} teams={this.state.teams} />);
             case "hint":
                 return (<HintStateComponent gameApi={this.gameApi} teams={this.state.teams} board={this.state.board} />);
             case "guess":
-                return (<GuessStateComponent gameApi={this.gameApi} teams={this.state.teams} board={this.state.board} />);
+                return (<GuessStateComponent gameApi={this.gameApi} teams={this.state.teams} board={this.state.board} amount={this.state.hint.amnt} hint={this.state.hint.word} />);
             default:
                 return(<div>Error</div>);
         }
     }
-
-    // TODO 1: rendering für spielfeld
-
-    // TODO 1: worteingabemaske
-
-    // TODO 1: gewinner/verlierer dings
 
     // TODO 2: history
 }

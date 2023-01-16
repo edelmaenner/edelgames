@@ -23,7 +23,7 @@ export default class HintStateComponent extends React.Component<Props,{}> {
                 { this.props.teams.filter(team => team.id % 2 === 0).map(team => this.renderTeamView(team, true)) }
             </div>
             <div id={"centerPanel"}>
-                <BoardComponent gameApi={this.props.gameApi} board={this.props.board} teams={this.props.teams} hintState={false} />
+                <BoardComponent gameApi={this.props.gameApi} board={this.props.board} teams={this.props.teams} hintState={false} amount={0} hint={"Gib hier deinen Hinweis ein..."}/>
             </div>
             <div id={"rightPanel"}>
                 { this.props.teams.filter(team => team.id % 2 === 1).map(team => this.renderTeamView(team, false)) }

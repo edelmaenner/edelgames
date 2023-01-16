@@ -10,6 +10,8 @@ interface Props {
     gameApi: ModuleGameApi
     teams: Team[]
     board: BoardElement[][]
+    amount: number
+    hint: string
 }
 
 export default class GuessStateComponent extends React.Component<Props,{}> {
@@ -23,7 +25,7 @@ export default class GuessStateComponent extends React.Component<Props,{}> {
                 { this.props.teams.filter(team => team.id % 2 === 0).map(team => this.renderTeamView(team, true)) }
             </div>
             <div id={"centerPanel"}>
-                <BoardComponent gameApi={this.props.gameApi} board={this.props.board} teams={this.props.teams} hintState={true} />
+                <BoardComponent gameApi={this.props.gameApi} board={this.props.board} teams={this.props.teams} hintState={true} amount={this.props.amount} hint={this.props.hint}/>
             </div>
             <div id={"rightPanel"}>
                 { this.props.teams.filter(team => team.id % 2 === 1).map(team => this.renderTeamView(team, false)) }

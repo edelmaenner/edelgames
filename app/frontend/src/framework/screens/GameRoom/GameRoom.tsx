@@ -1,12 +1,13 @@
 import React from "react";
-import RoomManager from "../../util/RoomManager";
-import ModuleRegistry from "../../modules/ModuleRegistry";
+import roomManager from "../../util/RoomManager";
+import moduleRegistry from "../../modules/ModuleRegistry";
 
 export default class GameRoom extends React.Component {
 
+
     render() {
-        let currentGameId = RoomManager.getCurrentGameId();
-        let currentGameModule = ModuleRegistry.getModuleById(currentGameId);
+        let currentGameId = roomManager.getCurrentGameId();
+        let currentGameModule = moduleRegistry.getModuleById(currentGameId);
 
         if (!currentGameModule) {
             return (
@@ -18,7 +19,7 @@ export default class GameRoom extends React.Component {
 
         return (
             <div id="screenGame">
-                {currentGameModule.renderGame()}
+                 {currentGameModule.renderGame()}
             </div>
         );
     }

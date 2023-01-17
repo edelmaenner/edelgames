@@ -1,8 +1,8 @@
 import User from "./User";
 import SocketManager from "./util/SocketManager";
 import roomManager from "./RoomManager";
-import ModuleRoomApi from "./modules/ModuleRoomApi";
-import debug from "./util/debug";
+import {systemLogger} from "./util/Logger";
+import ModuleApi from "./modules/ModuleApi";
 
 export default class Room {
 
@@ -11,7 +11,7 @@ export default class Room {
     protected roomMembers: User[] = [];
     protected roomMaster: User | null;
     protected roomPassword: string | null = null;
-    protected currentModuleRoomApi: ModuleRoomApi | null = null;
+    protected moduleApi: ModuleApi | null = null;
 
     constructor(roomMaster: User | null) {
         this.roomId = this.createIdHash();
@@ -19,7 +19,7 @@ export default class Room {
         this.roomMaster = roomMaster;
         if (roomMaster) this.roomMembers = [roomMaster];
 
-        debug(2, `created room ${this.roomName} (${this.roomId}) with user ${this.roomMaster ? this.roomMaster.getId() : 'NONE'}`);
+        systemLogger.debug(`created room ${this.roomName} (${this.roomId}) with user ${this.roomMaster ? this.roomMaster.getId() : 'NONE'}`);
     }
 
     public getRoomId(): string {
@@ -39,7 +39,7 @@ export default class Room {
     }
 
     public getCurrentGameId(): string | null {
-        return this.currentModuleRoomApi ? this.currentModuleRoomApi.getGameId() : null
+        return this.moduleApi ? this.moduleApi.getGameId() : null
     }
 
     public getRoomMaster(): User | null {
@@ -51,29 +51,38 @@ export default class Room {
     }
 
     public setRoomName(newName: string): void {
-        this.roomName = newName;
-        this.sendRoomChangedBroadcast();
+        if(newName !== this.roomName) {
+            this.roomName = newName;
+            this.sendRoomChangedBroadcast();
+        }
     }
 
-    public setCurrentGame(roomApi: ModuleRoomApi | null) {
-        if (this.currentModuleRoomApi && roomApi === null) {
-            this.currentModuleRoomApi.alertEvent('gameStopped', {});
-            debug(1, `stopped current game ${this.currentModuleRoomApi.getGameId()} in room ${this.roomId}`);
+    public setRoomPassword(newPassword: string|null): void {
+        if(newPassword !== this.roomPassword) {
+            this.roomPassword = newPassword;
+            this.sendRoomChangedBroadcast();
+        }
+    }
+
+    public setCurrentGame(roomApi: ModuleApi | null) {
+        if (this.moduleApi && roomApi === null) {
+            this.moduleApi.getEventApi().alertEvent('gameStopped', {});
+            systemLogger.info(`stopped current game ${this.moduleApi.getGameId()} in room ${this.roomId}`);
         }
 
-        this.currentModuleRoomApi = roomApi;
+        this.moduleApi = roomApi;
         this.sendRoomChangedBroadcast();
 
-        debug(1, `started game ${roomApi ? roomApi.getGameId() : 'IDLE'} in room ${this.roomId}`);
+        systemLogger.info(`started game ${roomApi ? roomApi.getGameId() : 'IDLE'} in room ${this.roomId}`);
     }
 
     public onUserNotifiedGame(userId: string, eventName: string, eventData: { [key: string]: any }) {
-        if (this.currentModuleRoomApi) {
-            this.currentModuleRoomApi.alertEvent(eventName, {
+        if (this.moduleApi) {
+            this.moduleApi.getEventApi().alertEvent(eventName, {
                 senderId: userId,
                 ...eventData
             }, true);
-            debug(1, `user ${userId} notified the gameEvent ${eventName}`);
+            systemLogger.info(`user ${userId} notified the gameEvent ${eventName}`);
         }
     }
 
@@ -84,8 +93,9 @@ export default class Room {
         this.broadcastRoomMembers('roomChanged', {
             roomId: this.roomId,
             roomName: this.roomName,
+            requirePassphrase: !!this.roomPassword,
             roomMembers: this.getPublicRoomMemberList(),
-            currentGameId: this.currentModuleRoomApi ? this.currentModuleRoomApi.getGameId() : null
+            currentGameId: this.moduleApi ? this.moduleApi.getGameId() : null
         });
 
         roomManager.updateLobbyMembersRoomData();
@@ -110,20 +120,21 @@ export default class Room {
      * Adds the given user to the current room. If a passphrase is used, it will be checked and eventually block the user from joining
      */
     public joinRoom(newMember: User, passphrase: string | null = null): boolean {
-        if (passphrase !== this.roomPassword) {
+        if (this.roomPassword && passphrase !== this.roomPassword) {
+            SocketManager.sendNotificationBubbleToSocket(newMember.getSocket(), 'Falsches Passwort', 'error');
             return false;
         }
 
         this.roomMembers.push(newMember);
-        if (this.currentModuleRoomApi) {
-            this.currentModuleRoomApi.alertEvent('userJoined', {
+        if (this.moduleApi) {
+            this.moduleApi.getEventApi().alertEvent('userJoined', {
                 newUser: newMember,
                 userList: this.getPublicRoomMemberList()
             });
         }
         newMember.switchRoom(this).then(this.sendRoomChangedBroadcast.bind(this));
 
-        debug(2, `user ${newMember.getId()} joined room ${this.roomId} (using passphrase: ${this.roomPassword ? 'yes' : 'no'})`);
+        systemLogger.debug(`user ${newMember.getId()} joined room ${this.roomId} (using passphrase: ${this.roomPassword ? 'yes' : 'no'})`);
         return true;
     }
 
@@ -137,8 +148,8 @@ export default class Room {
     public removeUserFromRoom(user: User) {
         this.roomMembers = this.roomMembers.filter((member) => member !== user);
 
-        if (this.currentModuleRoomApi) {
-            this.currentModuleRoomApi.alertEvent('userLeft', {
+        if (this.moduleApi) {
+            this.moduleApi.getEventApi().alertEvent('userLeft', {
                 removedUser: user,
                 userList: this.getPublicRoomMemberList()
             });
@@ -152,7 +163,7 @@ export default class Room {
         }
 
         this.sendRoomChangedBroadcast();
-        debug(2, `user ${user.getId()} left room ${this.roomId}`);
+        systemLogger.debug(`user ${user.getId()} left room ${this.roomId}`);
     }
 
     /*

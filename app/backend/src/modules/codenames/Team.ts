@@ -3,6 +3,7 @@ export class Team{
     spymaster: string
     investigators: string[]
     wordsLeft: number
+    active: boolean
 
     constructor(name: string, wordsLeft: number) {
         this.name = name;

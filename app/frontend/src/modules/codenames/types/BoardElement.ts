@@ -9,5 +9,5 @@ export interface BoardElement{
     category: Category
     teamId: number
     categoryVisibleForEveryone: boolean
-    marked: boolean
+    marks: string[]
 }

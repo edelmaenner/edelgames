@@ -1,6 +1,5 @@
 import AbstractState from "./AbstractState";
 import HintState from "./HintState";
-import debug from "../../../framework/util/debug";
 import {Team} from "../Team";
 import Room from "../../../framework/Room";
 import {BoardElement, Category} from "../BoardElement";
@@ -29,17 +28,18 @@ export default class InitialState extends AbstractState {
                         // generate cards on board
                         this.setBoard(board)
                         this.shuffleBoard(board)
-                        return new HintState(0)
+                        gameMembers[0].active = true;
+                        return new HintState(this.gameApi)
                     } else {
-                        debug(2, `User ID ${eventData.senderId} send in invalid action: `
+                        this.gameApi.getLogger().warning(`User ID ${eventData.senderId} send in invalid action: `
                             + eventData.action + " due to missing rights")
                     }
                     break;
                 default:
-                    debug(2,`User ID ${eventData.senderId} send in invalid action: `, eventData.action);
+                    this.gameApi.getLogger().warning(`User ID ${eventData.senderId} send in invalid action: `, eventData.action);
             }
         } else {
-            debug(2,`User ID ${eventData.senderId} made illegal request, property action missing`);
+            this.gameApi.getLogger().warning(`User ID ${eventData.senderId} made illegal request, property action missing`);
         }
         return this;
     }

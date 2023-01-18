@@ -1,18 +1,19 @@
 import React from "react";
 import {Team} from "../../types/Team";
+import ModuleApi from "../../../../framework/modules/ModuleApi";
 import TeamViewComponent from "../TeamViewComponent";
 import BoardComponent from "../BoardComponent";
-import "./HintStateComponent.scss"
 import {BoardElement} from "../../types/BoardElement";
-import ModuleApi from "../../../../framework/modules/ModuleApi";
 
 interface Props {
     gameApi: ModuleApi
     teams: Team[]
     board: BoardElement[][]
+    amount: number
+    hint: string
 }
 
-export default class HintStateComponent extends React.Component<Props,{}> {
+export default class EndStateComponent extends React.Component<Props,{}> {
     renderTeamView(team: Team, even: boolean) {
         return (<TeamViewComponent key={"teamView" + team.id} team={team} even={even}/>)
     }
@@ -23,7 +24,7 @@ export default class HintStateComponent extends React.Component<Props,{}> {
                 { this.props.teams.filter(team => team.id % 2 === 0).map(team => this.renderTeamView(team, true)) }
             </div>
             <div id={"centerPanel"}>
-                <BoardComponent gameApi={this.props.gameApi} board={this.props.board} teams={this.props.teams} guessState={false} endState={false} amount={0} hint={"Gib hier deinen Hinweis ein..."}/>
+                <BoardComponent gameApi={this.props.gameApi} board={this.props.board} teams={this.props.teams} guessState={false} endState={true} amount={this.props.amount} hint={this.props.hint}/>
             </div>
             <div id={"rightPanel"}>
                 { this.props.teams.filter(team => team.id % 2 === 1).map(team => this.renderTeamView(team, false)) }

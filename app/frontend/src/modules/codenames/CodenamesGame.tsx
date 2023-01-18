@@ -1,13 +1,14 @@
 import React from "react";
 import ModuleGameInterface from "../../framework/modules/ModuleGameInterface";
-import ModuleGameApi from "../../framework/modules/ModuleGameApi";
+import ModuleApi from "../../framework/modules/ModuleApi";
 import codenames from "./Codenames";
 import {Team} from "./types/Team";
+import {BoardElement} from "./types/BoardElement";
+import {Hint} from "./types/Hint";
 import InitialStateComponent from "./components/initialState/InitialStateComponent";
 import HintStateComponent from "./components/hintState/HintStateComponent";
-import {BoardElement} from "./types/BoardElement";
 import GuessStateComponent from "./components/guessState/GuessStateComponent";
-import {Hint} from "./types/Hint";
+import EndStateComponent from "./components/endState/EndStateComponent";
 
 interface IState {
     teams : Team[]
@@ -26,7 +27,7 @@ let teamColors: string[] = [
 ]
 
 export default class CodenamesGame extends React.Component<{},IState> implements ModuleGameInterface {
-    private readonly gameApi: ModuleGameApi;
+    private readonly gameApi: ModuleApi;
 
     // state is an inherited property from React.Component
     state = {
@@ -38,7 +39,7 @@ export default class CodenamesGame extends React.Component<{},IState> implements
 
     constructor(props: any) {
         super(props);
-        this.gameApi = new ModuleGameApi(codenames, this);
+        this.gameApi = new ModuleApi(codenames, this);
     }
 
     mapToBoardElement(boardElement: any): BoardElement {
@@ -47,11 +48,10 @@ export default class CodenamesGame extends React.Component<{},IState> implements
             category: boardElement.category,
             teamId: this.state.teams.find(team => team.name === boardElement.teamName)?.id ?? -1,
             categoryVisibleForEveryone: boardElement.categoryVisibleForEveryone,
-            marked: boardElement.marked,
+            marks: boardElement.marks,
         } as BoardElement
     }
 
-    // TODO: Method name fixen
     mapBoardArrayToBoard(board: any[], rowCount: number, columnCount: number): BoardElement[][] {
         let newBoard: BoardElement[][] = []
 
@@ -69,9 +69,9 @@ export default class CodenamesGame extends React.Component<{},IState> implements
 
     // this method is called, once the component is ready and setState can be used
     componentDidMount() {
-        this.gameApi.addEventHandler('serverMessageSend', this.onReceiveMessage.bind(this));
-        this.gameApi.addEventHandler('userSpecificBoardViewSent', this.onReceiveBoard.bind(this));
-        this.gameApi.sendMessageToServer("requestGameState", {})
+        this.gameApi.getEventApi().addEventHandler('serverMessageSend', this.onReceiveMessage.bind(this));
+        this.gameApi.getEventApi().addEventHandler('userSpecificBoardViewSent', this.onReceiveBoard.bind(this));
+        this.gameApi.getEventApi().sendMessageToServer("requestGameState", {})
     }
 
     onReceiveBoard(eventData: {[key: string]: any}) {
@@ -88,6 +88,7 @@ export default class CodenamesGame extends React.Component<{},IState> implements
                 investigators: team.investigators,
                 wordsLeft: team.wordsLeft,
                 spymaster: team.spymaster,
+                active: team.active,
                 teamColor: teamColors[index]
             }) as Team),
             stateName: eventData.state,
@@ -105,6 +106,8 @@ export default class CodenamesGame extends React.Component<{},IState> implements
                 return (<HintStateComponent gameApi={this.gameApi} teams={this.state.teams} board={this.state.board} />);
             case "guess":
                 return (<GuessStateComponent gameApi={this.gameApi} teams={this.state.teams} board={this.state.board} amount={this.state.hint.amnt} hint={this.state.hint.word} />);
+            case "end":
+                return (<EndStateComponent gameApi={this.gameApi} teams={this.state.teams} board={this.state.board} amount={this.state.hint.amnt} hint={this.state.hint.word} />);
             default:
                 return(<div>Error</div>);
         }

@@ -1,10 +1,15 @@
 import {Team} from "../Team";
 import {BoardElement} from "../BoardElement";
-import debug from "../../../framework/util/debug";
 import Room from "../../../framework/Room";
 import {Hint} from "../Hint";
+import ModuleApi from "../../../framework/modules/ModuleApi";
 
 export default abstract class AbstractState {
+    protected gameApi: ModuleApi;
+
+    constructor(gameApi: ModuleApi) {
+        this.gameApi = gameApi;
+    }
 
     abstract getName():string
 
@@ -18,14 +23,14 @@ export default abstract class AbstractState {
         if(eventData.hasOwnProperty(propertyName)){
             return true
         } else {
-            debug(2,`User ID ${eventData.senderId} made illegal request, property `
+            this.gameApi.getLogger().warning(`User ID ${eventData.senderId} made illegal request, property `
                 + propertyName + ' is missing')
             return false
         }
     }
 
     debugIllegalPropertyValue(senderId: string, propertyName: string, value: any){
-        debug(2,`User ID ${senderId} made illegal request, no such property: `+propertyName+" with value: "
+        this.gameApi.getLogger().warning(`User ID ${senderId} made illegal request, no such property: `+propertyName+" with value: "
             + value);
     }
 }

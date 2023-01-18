@@ -5,4 +5,5 @@ export interface Team{
     spymaster: string | undefined
     investigators: string[]
     wordsLeft: number
+    active: boolean
 }

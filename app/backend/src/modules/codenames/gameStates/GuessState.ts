@@ -3,13 +3,12 @@ import HintState from "./HintState";
 import EndState from "./EndState";
 import {Team} from "../Team";
 import Room from "../../../framework/Room";
-import debug from "../../../framework/util/debug";
 import {BoardElement, Category} from "../BoardElement";
 import {Hint} from "../Hint";
+import ModuleApi from "../../../framework/modules/ModuleApi";
 
 export default class GuessState extends AbstractState {
     wordsLeft: Boolean
-    currentTeamIndex: number
     guessesLeft: number
 
     onStateChange(eventData: { [p: string]: any }, gameMembers: Team[], room: Room, board: BoardElement[], hint: Hint)
@@ -32,44 +31,54 @@ export default class GuessState extends AbstractState {
                             // check if more guesses for team left and guess was correct
                             if(this.guessesLeft > 0
                                 && board[board.indexOf(guessedCard)].category === Category.team
-                                && board[board.indexOf(guessedCard)].teamName === gameMembers[this.currentTeamIndex].name)
+                                && board[board.indexOf(guessedCard)].teamName === gameMembers.find(team => team.active).name)
                             {
-                                return new GuessState(this.currentTeamIndex, this.guessesLeft-1)
+                                return new GuessState(this.guessesLeft-1, this.gameApi)
                             }else{
-                                return new HintState((this.currentTeamIndex+1)%gameMembers.length)
+                                const currentActiveTeam = gameMembers.findIndex(team => team.active);
+                                gameMembers[currentActiveTeam].active = false;
+                                gameMembers[(currentActiveTeam+1)%gameMembers.length].active = true;
+                                return new HintState(this.gameApi)
                             }
                         }
                         // make all cards visible
                         board.forEach(e => e.categoryVisibleForEveryone = true)
-                        return new EndState(this.currentTeamIndex)
+                        return new EndState(this.gameApi)
                     }
                     // TODO 2: evtl error mitteilen?
                     return this
                 case "mark":
                     if(this.isMarkValid(eventData, board, gameMembers)){
-                        var markedCard = board.find((e:BoardElement) => e.word === eventData.mark)
-                        board[board.indexOf(markedCard)].marked = true
+                        const markedCard = board.find((e:BoardElement) => e.word === eventData.mark)
+                        const username = this.gameApi.getPlayerApi().getPlayerById(eventData.senderId).getUsername()
+                        if(markedCard.marks.includes(username)) {
+                            markedCard.marks = markedCard.marks.filter(mark => mark !== username)
+                        } else {
+                            markedCard.marks.push(username)
+                        }
                     }
-                    debug(2, "Invalid action mark was made: "+eventData)
+                    this.gameApi.getLogger().warning("Invalid action mark was made: "+eventData)
                     return this
                 case "done":
                     if(this.isDoneValid(eventData, gameMembers)){
-                        return new HintState((this.currentTeamIndex+1)%gameMembers.length)
+                        const currentActiveTeam = gameMembers.findIndex(team => team.active);
+                        gameMembers[currentActiveTeam].active = false;
+                        gameMembers[(currentActiveTeam+1)%gameMembers.length].active = true;
+                        return new HintState(this.gameApi)
                     }
-                    debug(2, "Invalid action done was made")
+                    this.gameApi.getLogger().warning("Invalid action done was made")
                     return this
                 default:
-                    debug(2,`User ID ${eventData.senderId} send in invalid action: `, eventData.action);
+                    this.gameApi.getLogger().warning(`User ID ${eventData.senderId} send in invalid action: `, eventData.action);
             }
         } else {
-            debug(2,`User ID ${eventData.senderId} made illegal request, property action missing`);
+            this.gameApi.getLogger().warning(`User ID ${eventData.senderId} made illegal request, property action missing`);
         }
         return this;
     }
 
-    constructor(currentTeamIndex: number, guessesLeft: number) {
-        super()
-        this.currentTeamIndex = currentTeamIndex
+    constructor(guessesLeft: number, gameApi: ModuleApi) {
+        super(gameApi)
         this.guessesLeft = guessesLeft
     }
 
@@ -85,18 +94,16 @@ export default class GuessState extends AbstractState {
 
     private isMakeGuessValid(eventData: { [p: string]: any }, board: BoardElement[], gameMembers: Team[]):Boolean{
         // Check if has guess and guess in words on board and if guesser has the needed rights
-        return !!(eventData.guess && board.find(e => e.word === eventData.guess)
-            && !!gameMembers[this.currentTeamIndex]?.investigators?.find(inv => inv === eventData.senderId));
+        return eventData.guess && !!board.find(e => e.word === eventData.guess)
+            && !!gameMembers.find(team => !!team.investigators.find(inv => inv === eventData.senderId))?.active;
     }
 
     private isMarkValid(eventData: { [p: string]: any }, board: BoardElement[], gameMembers: Team[]):Boolean{
-        return !!(eventData.mark && board.find(e => e.word === eventData.mark)
-            && !!gameMembers[this.currentTeamIndex]?.investigators?.find(inv => inv === eventData.senderId));
+        return eventData.mark && !!board.find(e => e.word === eventData.mark)
+            && !!gameMembers.find(team => !!team.investigators.find(inv => inv === eventData.senderId))?.active;
     }
 
     private isDoneValid(eventData: { [p: string]: any }, gameMembers: Team[]):Boolean{
-        debug(0, this.currentTeamIndex)
-        debug(0, gameMembers[this.currentTeamIndex])
-        return !!gameMembers[this.currentTeamIndex]?.investigators?.find(inv => inv === eventData.senderId);
+        return !!gameMembers.find(team => !!team.investigators.find(inv => inv === eventData.senderId))?.active;
     }
 }

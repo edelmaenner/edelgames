@@ -7,6 +7,6 @@ import codenames from "./codenames/Codenames";
 export const ModuleList: ModuleInterface[] = [
     exampleChat,
     drawAndGuess,
-    stadtLandFluss
+    stadtLandFluss,
     codenames
 ];

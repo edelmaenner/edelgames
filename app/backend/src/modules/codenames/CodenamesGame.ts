@@ -1,6 +1,5 @@
 import ModuleGameInterface from "../../framework/modules/ModuleGameInterface";
-import ModuleRoomApi from "../../framework/modules/ModuleRoomApi";
-import debug from "../../framework/util/debug";
+import ModuleApi from "../../framework/modules/ModuleApi";
 import AbstractState from "./gameStates/AbstractState";
 import InitialState from "./gameStates/InitialState";
 import {Team} from "./Team";
@@ -12,21 +11,21 @@ import {Hint} from "./Hint";
  * The actual game instance, that controls and manages the game
  */
 export default class CodenamesGame implements ModuleGameInterface {
-    roomApi: ModuleRoomApi|null = null;
+    gameApi: ModuleApi|null = null;
     gameState: AbstractState
     gameMembers: Team[]
     room: Room
     board: BoardElement[] = []
     hint: Hint
 
-    onGameInitialize(roomApi: ModuleRoomApi): void {
-        this.roomApi = roomApi;
-        this.room = this.roomApi.getRoom();
-        this.roomApi.addUserLeaveHandler(this.onUserLeave.bind(this))
-        this.roomApi.addUserJoinedHandler(this.onUserJoin.bind(this))
-        this.roomApi.addEventHandler('userMessageSend', this.onUserMessageReceived.bind(this));
-        this.roomApi.addEventHandler('requestGameState', this.onGameStateRequest.bind(this));
-        this.gameState = new InitialState()
+    onGameInitialize(gameApi: ModuleApi): void {
+        this.gameApi = gameApi;
+        this.room = this.gameApi.getPlayerApi().getRoom();
+        this.gameApi.getEventApi().addUserLeaveHandler(this.onUserLeave.bind(this))
+        this.gameApi.getEventApi().addUserJoinedHandler(this.onUserJoin.bind(this))
+        this.gameApi.getEventApi().addEventHandler('userMessageSend', this.onUserMessageReceived.bind(this));
+        this.gameApi.getEventApi().addEventHandler('requestGameState', this.onGameStateRequest.bind(this));
+        this.gameState = new InitialState(gameApi)
         this.gameMembers = [
             new Team("A", 5),
             new Team("B", 5)
@@ -44,36 +43,37 @@ export default class CodenamesGame implements ModuleGameInterface {
     }
 
     onUserMessageReceived(eventData: {[key: string]: any}) {
-        debug(0,`User ID ${eventData.senderId} send in message: `, eventData.action);
+        this.gameApi.getLogger().debug(`User ID ${eventData.senderId} send in message: `, eventData.action);
         // FIXME: Eine Änderungen am gameState bewirkt KEINE Änderung an den hier gehaltenen Variablen! Ausnahme: Board und GameMembers, da diese Arrays sind
         this.gameState = this.gameState.onStateChange(eventData, this.gameMembers, this.room, this.board, this.hint)
         this.sendCurrentStateOfGame()
     }
 
     onGameStateRequest(eventData: {[key: string]: any}) {
-        debug(0,`User ID ${eventData.senderId} requestes current gameState`);
+        this.gameApi.getLogger().debug(`User ID ${eventData.senderId} requestes current gameState`);
         this.sendCurrentStateOfGame()
     }
 
     sendCurrentStateOfGame(){
-        this.roomApi.sendRoomMessage('serverMessageSend', {
+        this.gameApi.getEventApi().sendRoomMessage('serverMessageSend', {
             state: this.gameState.getName(),
             teams: this.gameMembers.map(team => ({
                 name: team.name,
                 spymaster: this.getUserNameById(team.spymaster),
                 wordsLeft: team.wordsLeft,
                 investigators: team.investigators.map(inv => this.getUserNameById(inv)),
+                active: team.active,
             } as Team)),
             hint: this.hint
         });
-        this.roomApi.getRoom().getRoomMembers().forEach(member => this.roomApi.sendPlayerMessage(
+        this.gameApi.getPlayerApi().getRoom().getRoomMembers().forEach(member => this.gameApi.getEventApi().sendPlayerMessage(
             member.getId(),
             "userSpecificBoardViewSent",
             {
                 board: this.generateUserBoard(member.getId()),
             }
         ))
-        debug(0,`New internal State: `, this.gameMembers, this.gameState.getName());
+        this.gameApi.getLogger().debug(`New internal State: `, this.gameMembers, this.gameState.getName());
     }
 
     getUserNameById(userId: string): string {
@@ -83,10 +83,10 @@ export default class CodenamesGame implements ModuleGameInterface {
     generateUserBoard(receiverId: string):BoardElement[]{
         return this.board.map((element:BoardElement) => ({
             word: element.word,
-            marked: element.marked,
+            marks: element.marks,
             category: this.filterCategory(receiverId, element.category, element.categoryVisibleForEveryone),
-            teamName: this.filterTeamName(receiverId, element.teamName, element.categoryVisibleForEveryone)
-
+            teamName: this.filterTeamName(receiverId, element.teamName, element.categoryVisibleForEveryone),
+            categoryVisibleForEveryone: element.categoryVisibleForEveryone
         }) as BoardElement)
     }
 

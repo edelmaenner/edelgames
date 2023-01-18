@@ -9,9 +9,27 @@
   .guessButton {
     width: 45px;
     height: 25px;
-    position: relative;
-    left: 75px;
     background-color: aliceblue;
+    position: fixed;
+    display: inline-flex;
+    overflow: hidden;
+    margin-left: 60px;
+  }
+
+  .marks {
+    position: fixed;
+    margin-left: calc(-45px - 60px);
+    display: inline-flex;
+    max-width: 160px;
+    flex-flow: wrap;
+    max-height: 80px;
+    overflow: hidden;
+
+    .mark {
+      margin-left: 2px;
+      margin-top: 2px;
+      padding: 3px;
+    }
   }
 
   .boardElementContent {
@@ -22,7 +40,6 @@
     height: 100%;
     width: 100%;
     font-size: 30px;
-    padding-bottom: 45px;
     word-break: break-word;
     word-wrap: break-word;
     overflow-wrap: break-word;
@@ -42,19 +59,19 @@
   }
 
   .longWord13 {
-    font-size: 23px;
-  }
-
-  .longWord14 {
     font-size: 22px;
   }
 
+  .longWord14 {
+    font-size: 20px;
+  }
+
   .longWord15 {
-    font-size: 21px;
+    font-size: 18px;
   }
 
   .longWord16 {
-    font-size: 20px;
+    font-size: 16px;
   }
 }
 
@@ -67,16 +84,24 @@
   width: calc(100% - 10px);
   margin: 0 5px;
 
-  .inputBar {
+  .inputBar, .endBar {
     margin: 5px 5px 0 5px;
     height: calc(100% / 10);
     width: 100%;
 
-    .hintButton, .stopGuessingButton {
+    .hintButton, .stopGuessingButton, .restartButton {
       height: 100%;
       width: calc((100% - 75% - 10px) / 2);
       padding: 0;
       vertical-align: bottom;
+    }
+
+    .restartButton {
+      margin-left: calc(50% - calc((100% - 75% - 10px) / 2) /2);
+    }
+
+    .buttonDisabled {
+      display: none;
     }
 
     .hintNumber {

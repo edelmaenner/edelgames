@@ -1,24 +1,24 @@
 import React from "react";
 import "./TeamSelectionComponent.scss"
-import ModuleGameApi from "../../../../framework/modules/ModuleGameApi";
+import ModuleApi from "../../../../framework/modules/ModuleApi";
 import {Team} from "../../types/Team";
 
 interface Props{
-    gameApi: ModuleGameApi
+    gameApi: ModuleApi
     team: Team
     teamCount: number
 }
 
 export default class TeamSelectionComponent extends React.Component<Props, {}> {
     private setSpymaster() {
-        this.props.gameApi.sendMessageToServer('userMessageSend', {
+        this.props.gameApi.getEventApi().sendMessageToServer('userMessageSend', {
             action: "setSpymaster",
             target: this.props.team.name
         });
     }
 
     private joinInvestigator() {
-        this.props.gameApi.sendMessageToServer('userMessageSend', {
+        this.props.gameApi.getEventApi().sendMessageToServer('userMessageSend', {
             action: "joinInvestigator",
             target: this.props.team.name
         });

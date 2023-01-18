@@ -1,12 +1,11 @@
 import React from "react";
-import profileManager from "../../../../framework/util/ProfileManager";
 import {Team} from "../../types/Team";
 import TeamSelectionComponent from "./TeamSelectionComponent";
-import ModuleGameApi from "../../../../framework/modules/ModuleGameApi";
+import ModuleApi from "../../../../framework/modules/ModuleApi";
 import "./InitialStateComponent.scss"
 
 interface Props {
-    gameApi: ModuleGameApi
+    gameApi: ModuleApi
     teams: Team[]
 }
 
@@ -32,7 +31,7 @@ export default class InitialStateComponent extends React.Component<Props,{}> {
     }
 
     startGame() {
-        this.props.gameApi.sendMessageToServer('userMessageSend', {
+        this.props.gameApi.getEventApi().sendMessageToServer('userMessageSend', {
             action: "startGame"
         });
     }
@@ -40,7 +39,7 @@ export default class InitialStateComponent extends React.Component<Props,{}> {
     render() {
         return (<div id={"codenames"}>
             {this.props.teams.map(team => this.renderTeamSelectionComponent(team))}
-            {this.renderStartButton(this.props.gameApi.getUserDataById(profileManager.getId())?.isRoomMaster())}
+            {this.renderStartButton(this.props.gameApi.getPlayerApi().getLocalePlayer().isRoomMaster())}
         </div>)
     }
 }

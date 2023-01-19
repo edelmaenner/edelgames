@@ -4,6 +4,7 @@ import {Team} from "../Team";
 import Room from "../../../framework/Room";
 import {BoardElement, Category} from "../BoardElement";
 import {Words} from "../WordList";
+import {Hint} from "../Hint";
 
 export default class InitialState extends AbstractState {
     handleUserLeave(gameMembers: Team[], userid: string): void {
@@ -14,7 +15,7 @@ export default class InitialState extends AbstractState {
         return "start"
     }
 
-    onStateChange(eventData: { [p: string]: any }, gameMembers: Team[], room: Room, board: BoardElement[]): AbstractState {
+    onStateChange(eventData: { [p: string]: any }, gameMembers: Team[], room: Room, board: BoardElement[], hint: Hint[]): AbstractState {
         if (eventData.action) {
             switch (eventData.action) {
                 case "joinInvestigator":
@@ -74,13 +75,14 @@ export default class InitialState extends AbstractState {
 
     private isStartGameValid(senderId: string, room: Room, gameMembers: Team[]):Boolean{
         return senderId === room.getRoomMaster().getId()
-           // && gameMembers.find(
-           //     team => team.spymaster === undefined || team.investigators === undefined
-           //         || team.investigators.length === 0
-           // ) === undefined
+           && gameMembers.find(
+                team => team.spymaster === undefined || team.investigators === undefined
+                    || team.investigators.length === 0
+            ) === undefined
     }
 
     private setBoard(board: BoardElement[]) {
+        board.length = 0
         const cardCount = 25;
 
         for (let i = 0; i < cardCount; i++) {
@@ -93,6 +95,7 @@ export default class InitialState extends AbstractState {
             }
 
             let randomCategory, randomTeam;
+
 
             switch (true) {
                 case (i >= 0 && i <= 9):

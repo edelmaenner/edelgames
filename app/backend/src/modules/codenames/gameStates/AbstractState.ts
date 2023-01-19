@@ -14,7 +14,7 @@ export default abstract class AbstractState {
     abstract getName():string
 
     //TODO2: refactor all paramaters to new class "gameparts" or such
-    abstract onStateChange(eventData: { [p: string]: any }, gameMembers: Team[], room: Room, board: BoardElement[], hint: Hint)
+    abstract onStateChange(eventData: { [p: string]: any }, gameMembers: Team[], room: Room, board: BoardElement[], hint: Hint[])
         : AbstractState
 
     abstract handleUserLeave(gameMembers: Team[], userid: string): void

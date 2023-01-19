@@ -16,7 +16,7 @@ export default class CodenamesGame implements ModuleGameInterface {
     gameMembers: Team[]
     room: Room
     board: BoardElement[] = []
-    hint: Hint
+    hint: Hint[] = []
 
     onGameInitialize(gameApi: ModuleApi): void {
         this.gameApi = gameApi;
@@ -64,7 +64,8 @@ export default class CodenamesGame implements ModuleGameInterface {
                 investigators: team.investigators.map(inv => this.getUserNameById(inv)),
                 active: team.active,
             } as Team)),
-            hint: this.hint
+            hint: this.hint.pop(),
+            historyHints: this.hint
         });
         this.gameApi.getPlayerApi().getRoom().getRoomMembers().forEach(member => this.gameApi.getEventApi().sendPlayerMessage(
             member.getId(),

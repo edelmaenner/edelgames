@@ -7,7 +7,7 @@ import {Hint} from "../Hint";
 import ModuleApi from "../../../framework/modules/ModuleApi";
 
 export default class EndState extends AbstractState {
-    onStateChange(eventData: { [p: string]: any }, gameMembers: Team[], room: Room, board: BoardElement[], hint: Hint): AbstractState {
+    onStateChange(eventData: { [p: string]: any }, gameMembers: Team[], room: Room, board: BoardElement[], hint: Hint[]): AbstractState {
         if (eventData.action && eventData.action === "restartGame" && eventData.senderId === room.getRoomMaster().getId()) {
             return new InitialState(this.gameApi)
         }else{

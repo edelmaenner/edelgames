@@ -11,8 +11,9 @@ export default class GuessState extends AbstractState {
     wordsLeft: Boolean
     guessesLeft: number
 
-    onStateChange(eventData: { [p: string]: any }, gameMembers: Team[], room: Room, board: BoardElement[], hint: Hint)
+    onStateChange(eventData: { [p: string]: any }, gameMembers: Team[], room: Room, board: BoardElement[], hint: Hint[])
         : AbstractState {
+        let nextState : AbstractState = this;
         if (eventData.action) {
             switch (eventData.action) {
                 case "makeGuess":
@@ -20,33 +21,43 @@ export default class GuessState extends AbstractState {
                         var guessedCard = board.find((e:BoardElement) => e.word === eventData.guess)
                         // show guessed card
                         board[board.indexOf(guessedCard)].categoryVisibleForEveryone = true
-                        // if teamcard was found -> update counter for according team
-                        if(board[board.indexOf(guessedCard)].category === Category.team){
-                            var teamOfCard = gameMembers.find(team => team.name == guessedCard.teamName)
-                            gameMembers[gameMembers.indexOf(teamOfCard)].wordsLeft -= 1
+                        // further road is defined by category
+                        switch (board[board.indexOf(guessedCard)].category){
+                            // Case bomb -> team that guessed bomb will loose
+                            case Category.bomb:
+                                gameMembers.find(team => team.active).wordsLeft = Infinity
+                                board.forEach(e => e.categoryVisibleForEveryone = true)
+                                nextState = new EndState(this.gameApi);
+                                break;
+                            // Case teamcard found -> update counter for according team
+                            case Category.team:
+                                var teamOfCard = gameMembers.find(team => team.name == guessedCard.teamName)
+                                gameMembers[gameMembers.indexOf(teamOfCard)].wordsLeft -= 1
+                                break;
                         }
                         // there are wordsleft if each team still has words to guess
                         this.wordsLeft = gameMembers.find(team => team.wordsLeft === 0) === undefined
-                        if(this.wordsLeft){
+                        if(this.wordsLeft && !(nextState instanceof EndState)){
                             // check if more guesses for team left and guess was correct
                             if(this.guessesLeft > 0
                                 && board[board.indexOf(guessedCard)].category === Category.team
                                 && board[board.indexOf(guessedCard)].teamName === gameMembers.find(team => team.active).name)
                             {
-                                return new GuessState(this.guessesLeft-1, this.gameApi)
+                                nextState = new GuessState(this.guessesLeft-1, this.gameApi)
                             }else{
                                 const currentActiveTeam = gameMembers.findIndex(team => team.active);
                                 gameMembers[currentActiveTeam].active = false;
                                 gameMembers[(currentActiveTeam+1)%gameMembers.length].active = true;
-                                return new HintState(this.gameApi)
+                                nextState = new HintState(this.gameApi)
                             }
+                        }else{
+                            // make all cards visible
+                            board.forEach(e => e.categoryVisibleForEveryone = true)
+                            nextState = new EndState(this.gameApi)
                         }
-                        // make all cards visible
-                        board.forEach(e => e.categoryVisibleForEveryone = true)
-                        return new EndState(this.gameApi)
                     }
                     // TODO 2: evtl error mitteilen?
-                    return this
+                    return nextState
                 case "mark":
                     if(this.isMarkValid(eventData, board, gameMembers)){
                         const markedCard = board.find((e:BoardElement) => e.word === eventData.mark)
@@ -58,7 +69,7 @@ export default class GuessState extends AbstractState {
                         }
                     }
                     this.gameApi.getLogger().warning("Invalid action mark was made: "+eventData)
-                    return this
+                    return nextState
                 case "done":
                     if(this.isDoneValid(eventData, gameMembers)){
                         const currentActiveTeam = gameMembers.findIndex(team => team.active);
@@ -67,14 +78,14 @@ export default class GuessState extends AbstractState {
                         return new HintState(this.gameApi)
                     }
                     this.gameApi.getLogger().warning("Invalid action done was made")
-                    return this
+                    return nextState
                 default:
                     this.gameApi.getLogger().warning(`User ID ${eventData.senderId} send in invalid action: `, eventData.action);
             }
         } else {
             this.gameApi.getLogger().warning(`User ID ${eventData.senderId} made illegal request, property action missing`);
         }
-        return this;
+        return nextState;
     }
 
     constructor(guessesLeft: number, gameApi: ModuleApi) {

@@ -11,14 +11,14 @@ export default class HintState extends AbstractState {
         super(gameApi)
     }
 
-    onStateChange(eventData: { [p: string]: any }, gameMembers: Team[], room: Room, board: BoardElement[], hint: Hint)
+    onStateChange(eventData: { [p: string]: any }, gameMembers: Team[], room: Room, board: BoardElement[], hint: Hint[])
         : AbstractState {
         if (eventData.action) {
             switch (eventData.action) {
                 case "publishHint":
                     if(this.isPublishHintAllowed(eventData.senderId, eventData.hint, board, gameMembers)) {
                         // FIXME: Hier wird der Hint nicht zurück an das "CodenamesGame" gegeben
-                        hint = eventData.hint
+                        hint.push(eventData.hint)
                         // remove all marks for next guess round
                         board.forEach(e => e.marks = [])
                         return new GuessState(eventData.hint.amnt+1, this.gameApi)
@@ -43,7 +43,7 @@ export default class HintState extends AbstractState {
     }
 
     protected isPublishHintAllowed(userId: string, hint: Hint, board: BoardElement[], teams:Team[]):Boolean{
-        if(hint && hint.word && hint.amnt && !!teams.find(team => team.spymaster === userId)?.active){
+        if(hint && hint.word && hint.amnt && !!teams.find(team => team.spymaster === userId)?.active && !hint.word.includes(" ")){
             if(board.find(e => e.word === hint.word) === undefined && hint.amnt > 0){
                 return true
             }

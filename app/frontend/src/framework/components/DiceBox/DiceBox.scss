@@ -3,6 +3,12 @@
   flex-wrap: wrap;
   gap: 1rem;
   padding: 1rem;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #245924;
+  border: 1rem #3a2419 ridge;
+  box-shadow: 0 0 1rem inset #1e0a02;
 
   $animationTime: 1.5s;
 
@@ -14,6 +20,10 @@
     justify-items: center;
     padding: 2rem;
     perspective: 600px;
+    position: absolute;
+    transition: top ease-out $animationTime,
+                left ease-out $animationTime;
+    transform: translate(-50%,-50%);
 
     &, & * {
       margin: 0;

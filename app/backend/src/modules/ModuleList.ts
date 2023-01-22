@@ -1,6 +1,7 @@
 import exampleChat from "./examplechat/ExampleChat";
 import drawAndGuess from "./drawAndGuess/DrawAndGuess";
 import stadtLandFluss from "./stadtlandfluss/StadtLandFluss";
+import yahtzee from "./yahtzee/Yahtzee";
 /*
  * Register your module here by simply adding it to the array:
  */
@@ -8,7 +9,8 @@ import stadtLandFluss from "./stadtlandfluss/StadtLandFluss";
 const ModuleList = [
     exampleChat,
     drawAndGuess,
-    stadtLandFluss
+    stadtLandFluss,
+    yahtzee,
 ]
 
 export default ModuleList;

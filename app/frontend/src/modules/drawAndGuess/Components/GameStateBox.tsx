@@ -1,24 +1,28 @@
-import React, { Component } from 'react';
+import React, {Component} from "react";
 
 interface IProps {
 	isGuessing: boolean;
 	wordMask: string | null;
 	countdownUntil: number | null;
 }
-export default class GameStateBox extends Component<IProps, {}> {
-	state = {
-		timer: 0,
-	};
+
+interface IState {
+    timer: number
+}
+
+export default class GameStateBox extends Component<IProps,IState> {
+
+    state = {
+        timer: 0
+    }
+
 
 	tickInterval: NodeJS.Timer | undefined;
 	timerUpdateInterval: number = 333;
 
-	componentDidMount() {
-		this.tickInterval = setInterval(
-			this.updateTimer.bind(this),
-			this.timerUpdateInterval
-		);
-	}
+    componentDidMount() {
+        this.tickInterval = setInterval(this.updateTimer.bind(this), this.timerUpdateInterval);
+    }
 
 	componentWillUnmount() {
 		clearInterval(this.tickInterval);

@@ -55,8 +55,17 @@ export default class Room {
 	}
 
 	public setRoomName(newName: string): void {
-		this.roomName = newName;
-		this.sendRoomChangedBroadcast();
+		if (newName !== this.roomName) {
+			this.roomName = newName;
+			this.sendRoomChangedBroadcast();
+		}
+	}
+
+	public setRoomPassword(newPassword: string | null): void {
+		if (newPassword !== this.roomPassword) {
+			this.roomPassword = newPassword;
+			this.sendRoomChangedBroadcast();
+		}
 	}
 
 	public setCurrentGame(roomApi: ModuleApi | null) {
@@ -104,6 +113,7 @@ export default class Room {
 		this.broadcastRoomMembers('roomChanged', {
 			roomId: this.roomId,
 			roomName: this.roomName,
+			requirePassphrase: !!this.roomPassword,
 			roomMembers: this.getPublicRoomMemberList(),
 			currentGameId: this.moduleApi ? this.moduleApi.getGameId() : null,
 		});
@@ -130,7 +140,12 @@ export default class Room {
 	 * Adds the given user to the current room. If a passphrase is used, it will be checked and eventually block the user from joining
 	 */
 	public joinRoom(newMember: User, passphrase: string | null = null): boolean {
-		if (passphrase !== this.roomPassword) {
+		if (this.roomPassword && passphrase !== this.roomPassword) {
+			SocketManager.sendNotificationBubbleToSocket(
+				newMember.getSocket(),
+				'Falsches Passwort',
+				'error'
+			);
 			return false;
 		}
 

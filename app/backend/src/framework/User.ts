@@ -58,6 +58,21 @@ export default class User implements IUser {
 			'clientToServerGameMessage',
 			this.onReceivedGameMessage.bind(this)
 		);
+		SocketManager.subscribeEventToSocket(
+			socket,
+			'returnToGameSelection',
+			this.onGameCancelRequested.bind(this)
+		);
+		SocketManager.subscribeEventToSocket(
+			socket,
+			'changeRoomName',
+			this.onRoomNameChangeRequested.bind(this)
+		);
+		SocketManager.subscribeEventToSocket(
+			socket,
+			'changeRoomPass',
+			this.onRoomPassChangeRequested.bind(this)
+		);
 	}
 
 	/** This will remove the user from its current room, hopefully leaving no reference behind. Thus allowing it to be cleared by the garbage collection
@@ -227,7 +242,7 @@ export default class User implements IUser {
 
 	public onReceivedGameMessage(eventData: {
 		messageTypeId: string;
-		[key: string]: unknown;
+		[key: string]: any;
 	}): void {
 		if (this.currentRoom) {
 			this.currentRoom.onUserNotifiedGame(
@@ -235,6 +250,57 @@ export default class User implements IUser {
 				eventData.messageTypeId,
 				eventData
 			);
+		}
+	}
+
+	public onGameCancelRequested(eventData: {
+		messageTypeId: string;
+		[key: string]: any;
+	}): void {
+		if (
+			this.currentRoom &&
+			this.currentRoom.getRoomMaster() === this &&
+			this.currentRoom.getCurrentGameId()
+		) {
+			this.currentRoom.setCurrentGame(null);
+			for (const user of this.currentRoom.getRoomMembers()) {
+				SocketManager.sendNotificationBubbleToSocket(
+					user.getSocket(),
+					`${this.getUsername()} hat das Spiel beendet`,
+					'info'
+				);
+			}
+		}
+	}
+
+	public onRoomNameChangeRequested(eventData: {
+		messageTypeId: string;
+		[key: string]: any;
+	}): void {
+		const newRoomName = eventData.newRoomName || '';
+
+		if (
+			this.currentRoom &&
+			this.currentRoom.getRoomMaster() === this &&
+			newRoomName.length > 5 &&
+			newRoomName.length <= 30
+		) {
+			this.currentRoom.setRoomName(newRoomName.substring(0, 30));
+		}
+	}
+
+	public onRoomPassChangeRequested(eventData: {
+		messageTypeId: string;
+		[key: string]: any;
+	}): void {
+		const newPassword = eventData.newPassword || '';
+
+		if (
+			this.currentRoom &&
+			this.currentRoom.getRoomMaster() === this &&
+			newPassword.length <= 50
+		) {
+			this.currentRoom.setRoomPassword(newPassword || null);
 		}
 	}
 }

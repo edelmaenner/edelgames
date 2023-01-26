@@ -1,11 +1,10 @@
 #pageHeader {
-	display: flex;
-	justify-content: stretch;
-	height: 3rem;
-	margin: 1rem;
-	background-color: $background;
-	border-radius: 4px;
-	overflow: hidden;
+  display: flex;
+  justify-content: stretch;
+  height: 3rem;
+  margin: 1rem;
+  background-color: $background;
+  border-radius: 4px;
 
 	& > div {
 		flex: 1 1 30%;
@@ -42,4 +41,22 @@
 	align-items: center;
 	font-size: 2rem;
 	font-weight: 600;
+}
+
+.room-data {
+  display: inline-flex;
+  position: relative;
+  height: 100%;
+  align-items: center;
+
+  .room-name {
+
+  }
+
+  .room-actions {
+    margin-left: 1rem;
+    cursor: pointer;
+  }
+
+  @import "RoomActionPanel";
 }

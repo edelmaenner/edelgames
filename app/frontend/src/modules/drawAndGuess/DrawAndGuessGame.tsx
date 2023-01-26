@@ -2,27 +2,21 @@ import React, { ReactNode } from 'react';
 import ModuleGameInterface from '../../framework/modules/ModuleGameInterface';
 import drawAndGuess from './DrawAndGuess';
 import DrawingCanvas, {
-	predefinedColors,
-} from '../../framework/components/DrawingCanvas/DrawingCanvas';
-import DrawingUtils from './Components/DrawingUtils';
-import ProfileManager from '../../framework/util/ProfileManager';
-import RoomManager from '../../framework/util/RoomManager';
-import User from '../../framework/util/User';
-import ChatBox from './Components/ChatBox';
-import GameStateBox from './Components/GameStateBox';
-import GameConfig from './Components/GameConfig';
-import WordSelection from './Components/WordSelection';
-import ModuleApi from '../../framework/modules/ModuleApi';
-import { EventDataObject } from '@edelgames/types/src/app/ApiTypes';
-import {
-	canvasChangedEvent,
-	drawingModes,
-	eventTypes,
-} from '@edelgames/types/src/app/components/DrawingCanvasTypes';
-import {
-	DAGChatMessage,
-	GameConfigObject,
-} from '@edelgames/types/src/modules/drawAndGuess/DAGTypes';
+    canvasChangedEvent,
+    drawingModes,
+    eventTypes,
+    predefinedColors
+} from "../../framework/components/DrawingCanvas/DrawingCanvas";
+import {EventDataObject} from "../../framework/util/EventManager";
+import DrawingUtils from "./Components/DrawingUtils";
+import ProfileManager from "../../framework/util/ProfileManager";
+import RoomManager from "../../framework/util/RoomManager";
+import ChatBox, {DAGChatMessage} from "./Components/ChatBox";
+import GameStateBox from "./Components/GameStateBox";
+import GameConfig, {GameConfigObject} from "./Components/GameConfig";
+import WordSelection from "./Components/WordSelection";
+import ModuleApi from "../../framework/modules/ModuleApi";
+import PlayerList from "../../framework/components/PlayerList/PlayerList";
 
 interface IState {
 	currentMode: string;
@@ -321,25 +315,8 @@ export default class DrawAndGuessGame
 	/* Render Methods */
 	/* ============== */
 
-	renderPlayerListElement(user: User): JSX.Element {
-		let isActivePlayer = this.state.activePlayerId === user.getId();
-		let points = this.scoreboard[user.getId()] || 0;
-
-		return (
-			<div key={user.getId() + points} className={'player-list-element'}>
-				<span className={'player-name'}>{user.getUsername()}</span>
-				<span className={'player-state'}>{isActivePlayer ? '[d]' : ''}</span>
-				<span className={'player-points'}>{points}</span>
-			</div>
-		);
-	}
-
-	renderDrawingBoardSpace(
-		allowDrawing: boolean,
-		isUserRoomMaster: boolean,
-		isActivePlayer: boolean
-	): JSX.Element {
-		let state = this.state.currentGameState;
+    renderDrawingBoardSpace(allowDrawing: boolean, isUserRoomMaster: boolean, isActivePlayer: boolean): JSX.Element {
+        let state = this.state.currentGameState;
 
 		if (state === 'selecting' && !isActivePlayer) {
 			state = 'waiting';
@@ -383,22 +360,12 @@ export default class DrawAndGuessGame
 		let isUserRoomMaster =
 			ProfileManager.getId() === RoomManager.getRoomMaster()?.getId();
 
-		return (
-			<div id={'drawAndGuess'} key={'drawAndGuess'}>
-				<div className={'player-list'}>
-					<div>
-						{this.api
-							.getPlayerApi()
-							.getPlayers()
-							.map(this.renderPlayerListElement.bind(this))}
-					</div>
-				</div>
-				<div className={'drawing-board'}>
-					{this.renderDrawingBoardSpace(
-						allowDrawing,
-						isUserRoomMaster,
-						isActivePlayer
-					)}
+        return (
+            <div id={"drawAndGuess"} key={"drawAndGuess"}>
+                <PlayerList />
+
+                <div className={"drawing-board"}>
+                    {this.renderDrawingBoardSpace(allowDrawing, isUserRoomMaster, isActivePlayer)}
 
 					{!allowDrawing ||
 					this.state.currentGameState === 'configuration' ? null : (

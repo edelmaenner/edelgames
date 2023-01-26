@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React, { Component } from 'react';
 
 interface IProps {
 	isGuessing: boolean;
@@ -7,22 +7,23 @@ interface IProps {
 }
 
 interface IState {
-    timer: number
+	timer: number;
 }
 
-export default class GameStateBox extends Component<IProps,IState> {
-
-    state = {
-        timer: 0
-    }
-
+export default class GameStateBox extends Component<IProps, IState> {
+	state = {
+		timer: 0,
+	};
 
 	tickInterval: NodeJS.Timer | undefined;
 	timerUpdateInterval: number = 333;
 
-    componentDidMount() {
-        this.tickInterval = setInterval(this.updateTimer.bind(this), this.timerUpdateInterval);
-    }
+	componentDidMount() {
+		this.tickInterval = setInterval(
+			this.updateTimer.bind(this),
+			this.timerUpdateInterval
+		);
+	}
 
 	componentWillUnmount() {
 		clearInterval(this.tickInterval);

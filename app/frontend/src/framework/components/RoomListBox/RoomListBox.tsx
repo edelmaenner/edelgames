@@ -1,19 +1,19 @@
-import React, {ReactNode} from "react";
-import ProfileImage from "../ProfileImage/ProfileImage";
-import eventManager, {EventDataObject} from "../../util/EventManager";
-import {RoomEventNames, ServerRoomMember} from "../../util/RoomManager";
-import socketManager from "../../util/SocketManager";
-import profileManager from "../../util/ProfileManager";
-import {clientLogger} from "../../util/Logger";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import React, { ReactNode } from 'react';
+import ProfileImage from '../ProfileImage/ProfileImage';
+import eventManager, { EventDataObject } from '../../util/EventManager';
+import { RoomEventNames, ServerRoomMember } from '../../util/RoomManager';
+import socketManager from '../../util/SocketManager';
+import profileManager from '../../util/ProfileManager';
+import { clientLogger } from '../../util/Logger';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 type ForeignRoomObject = {
-    roomId: string;
-    roomName: string;
-    requirePassphrase: boolean;
-    roomMembers: ServerRoomMember[];
-    allowJoin: boolean;
-}
+	roomId: string;
+	roomName: string;
+	requirePassphrase: boolean;
+	roomMembers: ServerRoomMember[];
+	allowJoin: boolean;
+};
 
 type ForeignRoomObjectList = {
 	rooms: ForeignRoomObject[];
@@ -104,49 +104,58 @@ export default class RoomListBox extends React.Component<{}, IState> {
 			<div id="roomListBox">
 				{this.state.rooms.map(this.renderRoom.bind(this))}
 
-                {!profileManager.isVerified() ? null :
-                    <div className="room-overview-box room-create-box">
+				{!profileManager.isVerified() ? null : (
+					<div className="room-overview-box room-create-box">
+						<div className="room-overview-box--room-data">Create Room</div>
+						<div
+							className="room-overview-box--member-list"
+							onClick={this.onCreateRoom.bind(this)}
+						>
+							<FontAwesomeIcon icon={['fad', 'plus']} size="3x" />
+						</div>
+					</div>
+				)}
+			</div>
+		);
+	}
 
-                        <div className="room-overview-box--room-data">Create Room</div>
-                        <div className="room-overview-box--member-list"
-                             onClick={this.onCreateRoom.bind(this)}>
-                            <FontAwesomeIcon icon={['fad', 'plus']} size="3x" />
-                        </div>
+	renderRoom(room: ForeignRoomObject): ReactNode {
+		let roomColor =
+			room.roomId === 'lobby'
+				? '#3188c3'
+				: `hsl(${parseInt(room.roomId, 36) % 360},70%,30%)`;
 
-                    </div>
-                }
-            </div>
-        );
-    }
-
-    renderRoom(room: ForeignRoomObject): ReactNode {
-        let roomColor = room.roomId === 'lobby' ?
-            '#3188c3' :
-            `hsl(${(parseInt(room.roomId, 36) % 360)},70%,30%)`;
-
-        return (
-            <div className="room-overview-box"
-                 key={room.roomId}
-                 style={{borderColor: roomColor}}>
-
-                <div className="room-overview-box--room-data"
-                     style={{backgroundColor: roomColor}}>
-                    <span className="text-align-left">
-                        {room.roomName}
-                        {room.requirePassphrase ?
-                            <FontAwesomeIcon icon={['fad', 'lock']} size="1x" />
-                            : null}
-                    </span>
-                    {
-                        (room.roomId === 'lobby' || !room.allowJoin) ? null :
-                            <span className="text-align-right">
-                                <span className="room-join-button"
-                                      onClick={this.onJoinRoom.bind(this, room.roomId, room.requirePassphrase)}>
-                                    <FontAwesomeIcon icon={['fad', 'plus']} size="1x" />
-                                </span>
-                            </span>
-                    }
-                </div>
+		return (
+			<div
+				className="room-overview-box"
+				key={room.roomId}
+				style={{ borderColor: roomColor }}
+			>
+				<div
+					className="room-overview-box--room-data"
+					style={{ backgroundColor: roomColor }}
+				>
+					<span className="text-align-left">
+						{room.roomName}
+						{room.requirePassphrase ? (
+							<FontAwesomeIcon icon={['fad', 'lock']} size="1x" />
+						) : null}
+					</span>
+					{room.roomId === 'lobby' || !room.allowJoin ? null : (
+						<span className="text-align-right">
+							<span
+								className="room-join-button"
+								onClick={this.onJoinRoom.bind(
+									this,
+									room.roomId,
+									room.requirePassphrase
+								)}
+							>
+								<FontAwesomeIcon icon={['fad', 'plus']} size="1x" />
+							</span>
+						</span>
+					)}
+				</div>
 
 				<div className="room-overview-box--member-list">
 					{room.roomMembers.map(this.renderMember.bind(this))}

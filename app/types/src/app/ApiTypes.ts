@@ -24,6 +24,14 @@ export type ServerRoomMember = {
 	isRoomMaster: boolean;
 };
 
+export type ServerRoomObject = {
+	roomId: string;
+	roomName: string;
+	requiredPassphrase: boolean;
+	roomMembers: ServerRoomMember[];
+	currentGameId: string;
+};
+
 export interface IUser {
 	getUsername(): string;
 	getId(): string;

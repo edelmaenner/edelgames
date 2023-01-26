@@ -5,45 +5,28 @@ import User from './User';
 import eventManager from './EventManager';
 import {
 	EventDataObject,
-	ServerRoomMember,
+	ServerRoomObject,
 } from '@edelgames/types/src/app/ApiTypes';
 
 export const RoomEventNames = {
-    roomChangedEventNotified: "roomChangedEventNotified",
-    lobbyRoomsChangedEventNotified: "lobbyRoomsChangedEventNotified",
-    roomUpdated: "roomUpdated",
-    returnToLobby: "returnToLobby",
-    createNewRoom: "createNewRoom",
-    joinRoom: "joinRoom",
-    returnToGameSelection: "returnToGameSelection",
-    changeRoomName: "changeRoomName",
-    changeRoomPass: "changeRoomPass",
-}
-
-export type ServerRoomMember = {
-    id: string;
-    username: string;
-    picture: string | null;
-    isRoomMaster: boolean;
-}
-
-type ServerRoomObject = {
-    roomId: string;
-    roomName: string;
-    requiredPassphrase: boolean;
-    roomMembers: ServerRoomMember[];
-    currentGameId: string;
-}
-
+	roomChangedEventNotified: 'roomChangedEventNotified',
+	lobbyRoomsChangedEventNotified: 'lobbyRoomsChangedEventNotified',
+	roomUpdated: 'roomUpdated',
+	returnToLobby: 'returnToLobby',
+	createNewRoom: 'createNewRoom',
+	joinRoom: 'joinRoom',
+	returnToGameSelection: 'returnToGameSelection',
+	changeRoomName: 'changeRoomName',
+	changeRoomPass: 'changeRoomPass',
+};
 
 class RoomManager {
-
-    private roomId: string = 'lobby';
-    private roomName: string = 'Lobby';
-    private roomPassword: string|undefined = undefined;
-    private roomMembers: User[] = [];
-    private roomMaster: User | null = null;
-    private currentGameId: string = '';
+	private roomId: string = 'lobby';
+	private roomName: string = 'Lobby';
+	private roomPassword: string | undefined = undefined;
+	private roomMembers: User[] = [];
+	private roomMaster: User | null = null;
+	private currentGameId: string = '';
 
 	constructor() {
 		eventManager.subscribe(
@@ -59,10 +42,10 @@ class RoomManager {
 
 		data = data as ServerRoomObject;
 
-        this.roomId = data.roomId;
-        this.roomName = data.roomName;
-        this.currentGameId = data.currentGameId;
-        if(!data.requirePassphrase) this.roomPassword = undefined;
+		this.roomId = data.roomId;
+		this.roomName = data.roomName;
+		this.currentGameId = data.currentGameId;
+		if (!data.requirePassphrase) this.roomPassword = undefined;
 
 		// calculate new room members
 		let roomMembers: User[] = [];
@@ -93,21 +76,21 @@ class RoomManager {
 		return this.roomName;
 	}
 
-    public setRoomName(name: string): void {
-        this.roomName = name;
-    }
+	public setRoomName(name: string): void {
+		this.roomName = name;
+	}
 
-    public getRoomPassword(): string|undefined {
-        return this.roomPassword;
-    }
+	public getRoomPassword(): string | undefined {
+		return this.roomPassword;
+	}
 
-    public setRoomPassword(password: string|undefined): void {
-        this.roomPassword = password;
-    }
+	public setRoomPassword(password: string | undefined): void {
+		this.roomPassword = password;
+	}
 
-    public getRoomMembers(): User[] {
-        return this.roomMembers;
-    }
+	public getRoomMembers(): User[] {
+		return this.roomMembers;
+	}
 
 	public getRoomMaster(): User | null {
 		return this.roomMaster;

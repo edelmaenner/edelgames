@@ -1,8 +1,8 @@
-import ModuleGameInterface from "./ModuleGameInterface";
-import ModuleInterface from "./ModuleInterface";
-import ModulePlayerApi from "./api/ModulePlayerApi";
-import ModuleEventApi from "./api/ModuleEventApi";
-import {Logger} from "../util/Logger";
+import ModuleGameInterface from './ModuleGameInterface';
+import ModuleInterface from './ModuleInterface';
+import ModulePlayerApi from './api/ModulePlayerApi';
+import ModuleEventApi from './api/ModuleEventApi';
+import { Logger } from '../util/Logger';
 
 /*
  * This class will be passed to the game instance to allow for restricted access to data.

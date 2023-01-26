@@ -5,7 +5,11 @@ import RoomManager from './RoomManager';
 import ModuleRegistry from './modules/ModuleRegistry';
 import XenforoApi from './util/XenforoApi';
 import { systemLogger } from './util/Logger';
-import { authDataContainer, IUser } from '@edelgames/types/src/app/ApiTypes';
+import {
+	authDataContainer,
+	EventDataObject,
+	IUser,
+} from '@edelgames/types/src/app/ApiTypes';
 
 export default class User implements IUser {
 	private readonly id: string = ''; // required for identifying users with the same name
@@ -240,10 +244,7 @@ export default class User implements IUser {
 		}
 	}
 
-	public onReceivedGameMessage(eventData: {
-		messageTypeId: string;
-		[key: string]: any;
-	}): void {
+	public onReceivedGameMessage(eventData: EventDataObject): void {
 		if (this.currentRoom) {
 			this.currentRoom.onUserNotifiedGame(
 				this.id,
@@ -253,10 +254,7 @@ export default class User implements IUser {
 		}
 	}
 
-	public onGameCancelRequested(eventData: {
-		messageTypeId: string;
-		[key: string]: any;
-	}): void {
+	public onGameCancelRequested(): void {
 		if (
 			this.currentRoom &&
 			this.currentRoom.getRoomMaster() === this &&
@@ -273,10 +271,7 @@ export default class User implements IUser {
 		}
 	}
 
-	public onRoomNameChangeRequested(eventData: {
-		messageTypeId: string;
-		[key: string]: any;
-	}): void {
+	public onRoomNameChangeRequested(eventData: EventDataObject): void {
 		const newRoomName = eventData.newRoomName || '';
 
 		if (
@@ -289,10 +284,7 @@ export default class User implements IUser {
 		}
 	}
 
-	public onRoomPassChangeRequested(eventData: {
-		messageTypeId: string;
-		[key: string]: any;
-	}): void {
+	public onRoomPassChangeRequested(eventData: EventDataObject): void {
 		const newPassword = eventData.newPassword || '';
 
 		if (

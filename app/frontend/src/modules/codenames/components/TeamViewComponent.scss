@@ -4,6 +4,15 @@
   margin-bottom: 20px;
 }
 
+.teamLoser {
+  background-color: dimgrey !important;
+  text-decoration: line-through black !important;
+}
+
+.roleLoser {
+  text-decoration: line-through black !important;
+}
+
 .header {
   display: inline-block;
   height: calc(25% - 10px);

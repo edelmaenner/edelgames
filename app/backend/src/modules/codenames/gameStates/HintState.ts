@@ -17,7 +17,6 @@ export default class HintState extends AbstractState {
             switch (eventData.action) {
                 case "publishHint":
                     if(this.isPublishHintAllowed(eventData.senderId, eventData.hint, board, gameMembers)) {
-                        // FIXME: Hier wird der Hint nicht zurück an das "CodenamesGame" gegeben
                         hint.push(eventData.hint)
                         // remove all marks for next guess round
                         board.forEach(e => e.marks = [])

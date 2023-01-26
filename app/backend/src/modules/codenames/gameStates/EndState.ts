@@ -9,6 +9,8 @@ import ModuleApi from "../../../framework/modules/ModuleApi";
 export default class EndState extends AbstractState {
     onStateChange(eventData: { [p: string]: any }, gameMembers: Team[], room: Room, board: BoardElement[], hint: Hint[]): AbstractState {
         if (eventData.action && eventData.action === "restartGame" && eventData.senderId === room.getRoomMaster().getId()) {
+            gameMembers.length = 0
+            gameMembers.push(new Team("A", 5), new Team("B", 5))
             return new InitialState(this.gameApi)
         }else{
             this.gameApi.getLogger().warning("illegal restart of game tryed")

@@ -16,18 +16,18 @@ export default class TeamViewComponent extends React.Component<Props,{}> {
 
     renderEvenSpymasterHeader() {
         return (
-            <div className={"teamView"} style={{background: this.props.team.teamColor}}>
+            <div className={this.props.team.wordsLeft !== null ? "teamView" : "teamView teamLoser"} style={{background: this.props.team.teamColor}}>
                 <div className={"header"}>
                     <div className={"spymaster"}>
-                        <div id={"spymaster"+this.props.team.name} className={"roleList spymaster textCenter"}>
+                        <div id={"spymaster"+this.props.team.name} className={this.props.team.wordsLeft !== null ? "roleList spymaster textCenter" : "roleList spymaster textCenter roleLoser"}>
                             <span>{this.props.team.spymaster}</span>
                         </div>
                     </div>
-                    <div className={"wordsLeft"}>
+                    {this.props.team.wordsLeft !== null && <div className={"wordsLeft"}>
                         <div className={"textCenter right"}>
                             {this.props.team.wordsLeft}
                         </div>
-                    </div>
+                    </div>}
                 </div>
 
                 { /* Investigators */ }

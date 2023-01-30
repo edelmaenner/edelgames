@@ -7,6 +7,7 @@ WORKDIR /usr/src/app
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 COPY ./frontend/package*.json ./frontend/
 COPY ./frontend/tsconfig.json ./frontend/
+COPY ./frontend/.env ./frontend/
 COPY ./frontend/.npmrc ./frontend/
 COPY ./types /usr/src/app/types
 
@@ -18,7 +19,8 @@ WORKDIR /usr/src/app/frontend
 RUN npm install
 
 # Bundle app source
-COPY --chown=node:node ./ .
+COPY --chown=node:node ./frontend/src ./src/
+COPY --chown=node:node ./frontend/public ./public/
 
 # Build optimized production files
 RUN npm run build

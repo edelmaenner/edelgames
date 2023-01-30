@@ -11,6 +11,9 @@ COPY ./types /usr/src/types
 
 ARG FONT_AWESOME_AUTH_TOKEN
 
+WORKDIR /usr/src/app/types
+RUN npm install
+WORKDIR /usr/src/app/backend
 RUN npm install
 
 # Bundle app source

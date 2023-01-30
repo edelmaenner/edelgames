@@ -5,8 +5,8 @@ WORKDIR /usr/src/app
 
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
-COPY ./frontend/package*.json ./frontend
-COPY ./frontend/.npmrc ./frontend
+COPY ./frontend/package*.json ./frontend/
+COPY ./frontend/.npmrc ./frontend/
 COPY ./types /usr/src/app/types
 
 ARG FONT_AWESOME_AUTH_TOKEN

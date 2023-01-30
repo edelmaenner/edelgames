@@ -5,17 +5,15 @@ import yahtzee from "./Yahtzee";
 import Scoreboard from "./components/Scoreboard";
 import DiceTable from "./components/DiceTable";
 
-type scoreType = number|undefined;
+type scoreType = number|null;
 export type YahtzeeScoreObject = {
     playerId: string,
-    gather: {
-        one: scoreType,
-        two: scoreType,
-        three: scoreType,
-        four: scoreType,
-        five: scoreType,
-        six: scoreType,
-    }|undefined,
+    one: scoreType,
+    two: scoreType,
+    three: scoreType,
+    four: scoreType,
+    five: scoreType,
+    six: scoreType,
     threeOfAKind: scoreType,
     fourOfAKind: scoreType,
     fiveOfAKind: scoreType,
@@ -48,21 +46,19 @@ export default class YahtzeeGame extends React.Component<{}, IState> implements 
         scoreboard: [
             {
                 playerId: '',
-                gather: {
-                    one: undefined,
-                    two: undefined,
-                    three: undefined,
-                    four: undefined,
-                    five: undefined,
-                    six: undefined,
-                },
-                threeOfAKind: undefined,
-                fourOfAKind: undefined,
-                fiveOfAKind: undefined,
-                fullHouse: undefined,
-                smallStraight: undefined,
-                largeStraight: undefined,
-                chance: undefined,
+                one: null,
+                two: null,
+                three: null,
+                four: null,
+                five: null,
+                six: null,
+                threeOfAKind: null,
+                fourOfAKind: null,
+                fiveOfAKind: null,
+                fullHouse: null,
+                smallStraight: null,
+                largeStraight: null,
+                chance: null,
                 total: 0
             }
         ]

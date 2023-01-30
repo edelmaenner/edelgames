@@ -1,6 +1,6 @@
 import React, {ReactNode} from "react";
 import ModuleGameInterface from "../../../framework/modules/ModuleGameInterface";
-import { YahtzeeScoreboardType, YahtzeeScoreObject} from "../YahtzeeGame";
+import {YahtzeeScoreboardType, YahtzeeScoreObject} from "../YahtzeeGame";
 import ModuleApi from "../../../framework/modules/ModuleApi";
 import ProfileImage from "../../../framework/components/ProfileImage/ProfileImage";
 
@@ -10,7 +10,7 @@ interface IProps {
     scoreboard: YahtzeeScoreboardType,
     activePlayerId?: string,
     allowCellClick?: boolean,
-    onCellClicked?: {(cellType: scoreCellIDs): void}
+    onCellClicked?: { (cellType: scoreCellIDs): void }
 }
 
 export enum scoreCellIDs {
@@ -30,8 +30,6 @@ export enum scoreCellIDs {
 }
 
 export default class Scoreboard extends React.Component<IProps, {}> implements ModuleGameInterface {
-
-
 
     render(): ReactNode {
         return (
@@ -73,15 +71,19 @@ export default class Scoreboard extends React.Component<IProps, {}> implements M
 
         let playerApi = this.props.api.getPlayerApi();
         let player = playerApi.getPlayerById(playerId);
-        if(!player) {
+        if (!player) {
             return (<span></span>);
         }
         let isLocalePlayer = playerApi.getLocalePlayer().getId() === player.getId();
         let isActivePlayer = this.props.activePlayerId === player.getId();
 
-        let totalFirstPart: number = playerScore.gather ? (Object.values(playerScore.gather).reduce(
-            (prev, curr) => (prev || 0) + (curr || 0)
-        ) || 0) : 0;
+        let totalFirstPart: number =
+            (playerScore.one||0) +
+            (playerScore.two||0) +
+            (playerScore.three||0) +
+            (playerScore.four||0) +
+            (playerScore.five||0) +
+            (playerScore.six||0);
 
         let clickListener = isLocalePlayer ? this.props.onCellClicked : undefined;
 
@@ -92,54 +94,54 @@ export default class Scoreboard extends React.Component<IProps, {}> implements M
         return (
             <div className={className}>
                 <div className={"yahtzee-tcell"}>
-                    <ProfileImage picture={player.getPicture()} username={player.getUsername()} id={player.getId()} />
+                    <ProfileImage picture={player.getPicture()} username={player.getUsername()} id={player.getId()}/>
                 </div>
-                {this.renderCell(playerScore.gather?.one,playerScore.gather?.one === undefined, undefined,
+                {this.renderCell(playerScore.one, playerScore.one === null, undefined,
                     clickListener, scoreCellIDs.ONE)}
-                {this.renderCell(playerScore.gather?.two,playerScore.gather?.two === undefined, undefined,
+                {this.renderCell(playerScore.two, playerScore.two === null, undefined,
                     clickListener, scoreCellIDs.TWO)}
-                {this.renderCell(playerScore.gather?.three,playerScore.gather?.three === undefined, undefined,
+                {this.renderCell(playerScore.three, playerScore.three === null, undefined,
                     clickListener, scoreCellIDs.THREE)}
-                {this.renderCell(playerScore.gather?.four,playerScore.gather?.four === undefined, undefined,
+                {this.renderCell(playerScore.four, playerScore.four === null, undefined,
                     clickListener, scoreCellIDs.FOUR)}
-                {this.renderCell(playerScore.gather?.five,playerScore.gather?.five === undefined, undefined,
+                {this.renderCell(playerScore.five, playerScore.five === null, undefined,
                     clickListener, scoreCellIDs.FIVE)}
-                {this.renderCell(playerScore.gather?.six,playerScore.gather?.six === undefined, undefined,
+                {this.renderCell(playerScore.six, playerScore.six === null, undefined,
                     clickListener, scoreCellIDs.SIX)}
-                {this.renderCell(totalFirstPart >= 63 ? 35 : 0,false)}
-                {this.renderCell(playerScore.threeOfAKind,playerScore.threeOfAKind === undefined, undefined,
+                {this.renderCell(totalFirstPart >= 63 ? 35 : 0, false)}
+                {this.renderCell(playerScore.threeOfAKind, playerScore.threeOfAKind === null, undefined,
                     clickListener, scoreCellIDs.THREE_OF_A_KIND)}
-                {this.renderCell(playerScore.fourOfAKind,playerScore.fourOfAKind === undefined, undefined,
+                {this.renderCell(playerScore.fourOfAKind, playerScore.fourOfAKind === null, undefined,
                     clickListener, scoreCellIDs.FOUR_OF_A_KIND)}
-                {this.renderCell(playerScore.fullHouse,playerScore.fullHouse === undefined, undefined,
+                {this.renderCell(playerScore.fullHouse, playerScore.fullHouse === null, undefined,
                     clickListener, scoreCellIDs.FULL_HOUSE)}
-                {this.renderCell(playerScore.smallStraight,playerScore.smallStraight === undefined, undefined,
+                {this.renderCell(playerScore.smallStraight, playerScore.smallStraight === null, undefined,
                     clickListener, scoreCellIDs.SMALL_STRAIGHT)}
-                {this.renderCell(playerScore.largeStraight,playerScore.largeStraight === undefined, undefined,
+                {this.renderCell(playerScore.largeStraight, playerScore.largeStraight === null, undefined,
                     clickListener, scoreCellIDs.LARGE_STRAIGHT)}
-                {this.renderCell(playerScore.fiveOfAKind,playerScore.fiveOfAKind === undefined, undefined,
+                {this.renderCell(playerScore.fiveOfAKind, playerScore.fiveOfAKind === null, undefined,
                     clickListener, scoreCellIDs.FIVE_OF_A_KIND)}
-                {this.renderCell(playerScore.chance,playerScore.chance === undefined, undefined,
+                {this.renderCell(playerScore.chance, playerScore.chance === null, undefined,
                     clickListener, scoreCellIDs.CHANCE)}
-                {this.renderCell('',false)}
-                {this.renderCell(playerScore.total,false)}
+                {this.renderCell('', false)}
+                {this.renderCell(playerScore.total, false)}
             </div>
         );
     }
 
 
-    renderCell(value: number|string|undefined,
+    renderCell(value: number | string | null,
                isAvailable: boolean,
-               title: string|undefined = undefined,
-               onClick: Function|undefined = undefined,
-               cellIdentifier: number|string|undefined = undefined,
+               title: string | undefined = undefined,
+               onClick: Function | undefined = undefined,
+               cellIdentifier: number | string | undefined = undefined,
     ): JSX.Element {
         let className = "yahtzee-tcell" +
             (isAvailable && this.props.allowCellClick ? ' is-available-cell' : '');
         return (
             <div className={className}
-                title={title}
-                onClick={() => (onClick && isAvailable) ? onClick(cellIdentifier) : null}
+                 title={title}
+                 onClick={() => (onClick && isAvailable) ? onClick(cellIdentifier) : null}
             >{value}</div>
         );
     }

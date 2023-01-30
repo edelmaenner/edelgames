@@ -1,11 +1,15 @@
 import React, { ReactNode } from 'react';
 import ProfileImage from '../ProfileImage/ProfileImage';
-import eventManager, { EventDataObject } from '../../util/EventManager';
-import { RoomEventNames, ServerRoomMember } from '../../util/RoomManager';
+import eventManager from '../../util/EventManager';
+import { RoomEventNames } from '../../util/RoomManager';
 import socketManager from '../../util/SocketManager';
 import profileManager from '../../util/ProfileManager';
 import { clientLogger } from '../../util/Logger';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+	EventDataObject,
+	ServerRoomMember,
+} from '@edelgames/types/src/app/ApiTypes';
 
 type ForeignRoomObject = {
 	roomId: string;

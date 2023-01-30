@@ -40,12 +40,7 @@ export default class DiceBox extends Component<IProps, {}> {
 			});
 
 			if (this.props.onDicesRolled) {
-				// @ts-ignore
-				setTimeout(
-					() =>
-						this.props.onDicesRolled(dicesToRoll, this.props.nextRollResults),
-					1500
-				);
+				setTimeout(this.props.onDicesRolled, 1500);
 			}
 		}
 

@@ -2,21 +2,27 @@ import React, { ReactNode } from 'react';
 import ModuleGameInterface from '../../framework/modules/ModuleGameInterface';
 import drawAndGuess from './DrawAndGuess';
 import DrawingCanvas, {
-	canvasChangedEvent,
-	drawingModes,
-	eventTypes,
 	predefinedColors,
 } from '../../framework/components/DrawingCanvas/DrawingCanvas';
-import { EventDataObject } from '../../framework/util/EventManager';
 import DrawingUtils from './Components/DrawingUtils';
 import ProfileManager from '../../framework/util/ProfileManager';
 import RoomManager from '../../framework/util/RoomManager';
-import ChatBox, { DAGChatMessage } from './Components/ChatBox';
+import ChatBox from './Components/ChatBox';
 import GameStateBox from './Components/GameStateBox';
-import GameConfig, { GameConfigObject } from './Components/GameConfig';
+import GameConfig from './Components/GameConfig';
 import WordSelection from './Components/WordSelection';
 import ModuleApi from '../../framework/modules/ModuleApi';
 import PlayerList from '../../framework/components/PlayerList/PlayerList';
+import {
+	DAGChatMessage,
+	GameConfigObject,
+} from '@edelgames/types/src/modules/drawAndGuess/DAGTypes';
+import { EventDataObject } from '@edelgames/types/src/app/ApiTypes';
+import {
+	canvasChangedEvent,
+	drawingModes,
+	eventTypes,
+} from '@edelgames/types/src/app/components/DrawingCanvasTypes';
 
 interface IState {
 	currentMode: string;

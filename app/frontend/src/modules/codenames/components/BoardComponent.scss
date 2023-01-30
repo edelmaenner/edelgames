@@ -1,0 +1,123 @@
+.boardElement {
+  vertical-align: bottom;
+  text-align: center;
+  display: inline-block;
+  height: calc(100% / 6);
+  width: calc((100% - (10*5px)) / 5);
+  margin: 0 5px 10px 5px;
+
+  .guessButton {
+    width: 45px;
+    height: 25px;
+    background-color: aliceblue;
+    position: fixed;
+    display: inline-flex;
+    overflow: hidden;
+    margin-left: 60px;
+  }
+
+  .marks {
+    position: fixed;
+    margin-left: calc(-45px - 60px);
+    display: inline-flex;
+    max-width: 160px;
+    flex-flow: wrap;
+    max-height: 80px;
+    overflow: hidden;
+
+    .mark {
+      margin-left: 2px;
+      margin-top: 2px;
+      padding: 3px;
+    }
+  }
+
+  .boardElementContent {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    height: 100%;
+    width: 100%;
+    font-size: 30px;
+    word-break: break-word;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    letter-spacing: 0;
+  }
+
+  .longWord10 {
+    font-size: 28px;
+  }
+
+  .longWord11 {
+    font-size: 26px;
+  }
+
+  .longWord12 {
+    font-size: 24px;
+  }
+
+  .longWord13 {
+    font-size: 22px;
+  }
+
+  .longWord14 {
+    font-size: 20px;
+  }
+
+  .longWord15 {
+    font-size: 18px;
+  }
+
+  .longWord16 {
+    font-size: 16px;
+  }
+}
+
+.boardElement:hover {
+  cursor: pointer;
+}
+
+.board {
+  height: 100%;
+  width: calc(100% - 10px);
+  margin: 0 5px;
+
+  .inputBar, .endBar {
+    margin: 5px 5px 0 5px;
+    height: calc(100% / 10);
+    width: 100%;
+
+    .hintButton, .stopGuessingButton, .restartButton {
+      height: 100%;
+      width: calc((100% - 75% - 10px) / 2);
+      padding: 0;
+      vertical-align: bottom;
+    }
+
+    .restartButton {
+      margin-left: calc(50% - calc((100% - 75% - 10px) / 2) /2);
+    }
+
+    .buttonDisabled {
+      display: none;
+    }
+
+    .hintNumber {
+      height: 100%;
+      width: calc((100% - 75% - 10px) / 2);
+      padding: 0;
+      font-size: 30px;
+      text-align: center;
+    }
+
+    .hintInput {
+      margin: 0 5px 0 5px;
+      height: 100%;
+      width: calc(100% - 25% - 10px);
+      font-size: 30px;
+      text-align: center;
+    }
+  }
+}

@@ -1,44 +1,44 @@
 .bold {
-  font-weight: $font-weight-bold;
+	font-weight: $font-weight-bold;
 }
 
 .text-align- {
-  &left {
-    text-align: left;
-    justify-content: flex-start;
-  }
+	&left {
+		text-align: left;
+		justify-content: flex-start;
+	}
 
-  &center {
-    text-align: center;
-    justify-content: center;
-  }
+	&center {
+		text-align: center;
+		justify-content: center;
+	}
 
-  &right {
-    text-align: right;
-    justify-content: flex-end;
-  }
+	&right {
+		text-align: right;
+		justify-content: flex-end;
+	}
 }
 
 .primary-text {
-  color: $primary;
+	color: $primary;
 }
 
 .signature-text {
-  color: $signature;
+	color: $signature;
 }
 
 .error-text {
-  color: $error;
+	color: $error;
 }
 
 .info-text {
-  color: $info;
+	color: $info;
 }
 
 .info-warning {
-  color: $warning;
+	color: $warning;
 }
 
 .info-warning {
-  color: $success;
+	color: $success;
 }

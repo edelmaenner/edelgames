@@ -1,63 +1,61 @@
 #pageHeader {
-  display: flex;
-  justify-content: stretch;
-  height: 3rem;
-  margin: 1rem;
-  background-color: $background;
-  border-radius: 4px;
+	display: flex;
+	justify-content: stretch;
+	height: 3rem;
+	margin: 1rem;
+	background-color: $background;
+	border-radius: 4px;
 
-  & > div {
-    flex: 1 1 30%;
-    display: flex;
-    align-items: center;
+	& > div {
+		flex: 1 1 30%;
+		display: flex;
+		align-items: center;
 
-    #userProfileInfoShort {
-      display: flex;
-      height: 100%;
-      align-items: center;
-      padding: 0 1rem;
-      cursor: pointer;
+		#userProfileInfoShort {
+			display: flex;
+			height: 100%;
+			align-items: center;
+			padding: 0 1rem;
+			cursor: pointer;
 
-      &:hover {
-        background: $backgroundDark;
-      }
+			&:hover {
+				background: $backgroundDark;
+			}
 
-      .profile-name {
-        color: $text-color;
-      }
-    }
-
-  }
+			.profile-name {
+				color: $text-color;
+			}
+		}
+	}
 }
 
 .profile-picture-anonymous {
-  height: 2rem;
-  width: 2rem;
-  border-radius: 4px;
+	height: 2rem;
+	width: 2rem;
+	border-radius: 4px;
 
-  background-color: #bbb;
-  color: $gray-900;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 2rem;
-  font-weight: 600;
+	background-color: #bbb;
+	color: $gray-900;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-size: 2rem;
+	font-weight: 600;
 }
 
 .room-data {
-  display: inline-flex;
-  position: relative;
-  height: 100%;
-  align-items: center;
+	display: inline-flex;
+	position: relative;
+	height: 100%;
+	align-items: center;
 
-  .room-name {
+	.room-name {
+	}
 
-  }
+	.room-actions {
+		margin-left: 1rem;
+		cursor: pointer;
+	}
 
-  .room-actions {
-    margin-left: 1rem;
-    cursor: pointer;
-  }
-
-  @import "RoomActionPanel";
+	@import 'RoomActionPanel';
 }

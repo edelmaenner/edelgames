@@ -1,0 +1,19 @@
+{
+	"declaration": true,
+	"outDir": "./dist",
+	"types": "index.d.ts",
+	"compilerOptions": {
+		"module": "commonjs",
+		"lib": ["es6"],
+		"noImplicitAny": true,
+		"noImplicitThis": true,
+		"strictNullChecks": true,
+		"strictFunctionTypes": true,
+		"types": [],
+		"noEmit": true,
+		"forceConsistentCasingInFileNames": true,
+		"baseUrl": "../",
+		"typeRoots": ["../"]
+	},
+	"include": ["src/**/*"]
+}

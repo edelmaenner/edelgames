@@ -1,97 +1,86 @@
-import React, {Component} from "react";
+import React, { Component } from 'react';
 
 interface IProps {
-    isGuessing: boolean,
-    wordMask: string|null,
-    countdownUntil: number|null;
+	isGuessing: boolean;
+	wordMask: string | null;
+	countdownUntil: number | null;
 }
 
 interface IState {
-    timer: number
+	timer: number;
 }
 
-export default class GameStateBox extends Component<IProps,IState> {
+export default class GameStateBox extends Component<IProps, IState> {
+	state = {
+		timer: 0,
+	};
 
-    state = {
-        timer: 0
-    }
+	tickInterval: NodeJS.Timer | undefined;
+	timerUpdateInterval: number = 333;
 
+	componentDidMount() {
+		this.tickInterval = setInterval(
+			this.updateTimer.bind(this),
+			this.timerUpdateInterval
+		);
+	}
 
-    tickInterval: NodeJS.Timer | undefined;
-    timerUpdateInterval: number = 333;
+	componentWillUnmount() {
+		clearInterval(this.tickInterval);
+	}
 
-    componentDidMount() {
-        this.tickInterval = setInterval(this.updateTimer.bind(this), this.timerUpdateInterval);
-    }
+	updateTimer() {
+		if (!this.props.countdownUntil) {
+			return;
+		}
 
-    componentWillUnmount() {
-        clearInterval(this.tickInterval);
-    }
+		const now = Date.now(),
+			remainingTime = this.props.countdownUntil - now;
 
-    updateTimer() {
-        if(!this.props.countdownUntil) {
-            return;
-        }
+		this.setState({
+			timer: Math.floor(remainingTime / 1000),
+		});
+	}
 
-        const   now = Date.now(),
-                remainingTime = this.props.countdownUntil - now;
+	renderTimer(): JSX.Element | null {
+		let deadline = this.props.countdownUntil;
+		if (!deadline) {
+			return null;
+		}
 
-        this.setState({
-            timer: Math.floor(remainingTime / 1000)
-        });
-    }
+		return <div className={'countdown'}>{this.state.timer}</div>;
+	}
 
-    renderTimer(): JSX.Element|null {
-        let deadline = this.props.countdownUntil;
-        if(!deadline) {
-            return null;
-        }
+	renderMaskedLetter(letter: string): JSX.Element {
+		if (letter === '_') {
+			return <span className={'masked-letter'}>&nbsp;</span>;
+		} else {
+			return <span className={'hint-letter'}>{letter}</span>;
+		}
+	}
 
-        return (
-            <div className={"countdown"}>{this.state.timer}</div>
-        );
-    }
+	renderWordMask(): JSX.Element | null {
+		let word = this.props.wordMask;
+		if (!word) {
+			return null;
+		}
 
-    renderMaskedLetter(letter: string): JSX.Element {
-        if(letter === '_') {
-            return (
-                <span className={'masked-letter'}>&nbsp;</span>
-            );
-        }
-        else {
-            return (
-                <span className={'hint-letter'}>{letter}</span>
-            );
-        }
-    }
+		return (
+			<div className={'word-mask'}>
+				{word.split('').map(this.renderMaskedLetter.bind(this))}
+			</div>
+		);
+	}
 
-    renderWordMask(): JSX.Element|null {
-        let word = this.props.wordMask;
-        if(!word) {
-            return null;
-        }
-
-        return(
-            <div className={"word-mask"}>
-                {word.split('').map(this.renderMaskedLetter.bind(this))}
-            </div>
-        );
-    }
-
-
-    render() {
-        return(
-            <div className={"game-state-box"}>
-                <div className={"game-state"}>
-                    <div>
-                        {this.props.isGuessing ? 'Finde' : 'Zeichne'} das Word:
-                    </div>
-                    {this.renderWordMask()}
-                </div>
-                <div className={"game-timer"}>
-                    {this.renderTimer()}
-                </div>
-            </div>
-        );
-    }
+	render() {
+		return (
+			<div className={'game-state-box'}>
+				<div className={'game-state'}>
+					<div>{this.props.isGuessing ? 'Finde' : 'Zeichne'} das Word:</div>
+					{this.renderWordMask()}
+				</div>
+				<div className={'game-timer'}>{this.renderTimer()}</div>
+			</div>
+		);
+	}
 }

@@ -1,21 +1,18 @@
-import ModuleInterface from "../../framework/modules/ModuleInterface";
-import ModuleGameInterface from "../../framework/modules/ModuleGameInterface";
-import ExampleChatGame from "./ExampleChatGame";
+import ModuleInterface from '../../framework/modules/ModuleInterface';
+import ModuleGameInterface from '../../framework/modules/ModuleGameInterface';
+import ExampleChatGame from './ExampleChatGame';
 
 /*
  * This singleton is used to register the game to the ModuleList
  */
 class ExampleChat implements ModuleInterface {
+	getUniqueId(): string {
+		return 'exampleChat';
+	}
 
-    getUniqueId(): string {
-        return "exampleChat";
-    }
-
-    getGameInstance(): ModuleGameInterface {
-        return new ExampleChatGame();
-    }
-
-
+	getGameInstance(): ModuleGameInterface {
+		return new ExampleChatGame();
+	}
 }
 
 const exampleChat = new ExampleChat();

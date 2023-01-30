@@ -1,13 +1,11 @@
-import {ReactNode} from "react";
+import { ReactNode } from 'react';
 
 export default interface ModuleInterface {
+	getTitle(): string;
 
-    getTitle(): string;
+	getUniqueId(): string;
 
-    getUniqueId(): string;
+	getPreviewImage(): string | undefined;
 
-    getPreviewImage(): string | undefined;
-
-    renderGame(): ReactNode;
-
+	renderGame(): ReactNode;
 }

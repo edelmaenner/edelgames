@@ -22,7 +22,7 @@ export type Hint = {
 	amnt: number;
 };
 
-export enum Category {
+export const enum Category {
 	'bomb',
 	'neutral',
 	'team',

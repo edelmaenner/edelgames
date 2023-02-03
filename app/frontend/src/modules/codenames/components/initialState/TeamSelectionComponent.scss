@@ -1,0 +1,61 @@
+.teamSelection {
+	padding: 5px;
+	margin: 5px;
+	display: inline-block;
+
+	.roleChoice {
+		padding: 5px;
+
+		span {
+			padding: 5px;
+		}
+
+		.roleList {
+			display: flex;
+			background: aliceblue;
+			min-width: calc((100% / 6) - 10px);
+			color: black;
+			margin-bottom: 5px;
+		}
+
+		.roleList.spymaster {
+			min-height: 5vh;
+			justify-content: center;
+			flex-direction: column;
+			text-align: center;
+		}
+
+		.roleList.investigators {
+			min-height: 15vh;
+			justify-content: center;
+			flex-direction: column;
+			text-align: center;
+		}
+	}
+}
+
+.teams1 {
+	min-width: calc((100% / 1) - 10px);
+}
+.teams2 {
+	min-width: calc((100% / 2) - 10px);
+}
+.teams3 {
+	min-width: calc((100% / 3) - 10px);
+}
+.teams4 {
+	min-width: calc((100% / 4) - 10px);
+}
+.teams5 {
+	min-width: calc((100% / 5) - 10px);
+}
+.teams6 {
+	min-width: calc((100% / 6) - 10px);
+}
+
+.joinButton {
+	background-color: rgba(0, 0, 0, 0.15);
+}
+.joinButton:hover {
+	background-color: rgba(0, 0, 0, 0.45);
+}

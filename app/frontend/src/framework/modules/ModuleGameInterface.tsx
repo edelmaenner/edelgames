@@ -1,5 +1,1 @@
-
-export default interface ModuleGameInterface {
-
-
-}
+export default interface ModuleGameInterface {}

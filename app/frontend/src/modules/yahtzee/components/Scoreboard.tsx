@@ -1,32 +1,17 @@
 import React, {ReactNode} from "react";
 import ModuleGameInterface from "../../../framework/modules/ModuleGameInterface";
-import {YahtzeeScoreboardType, YahtzeeScoreObject} from "../YahtzeeGame";
 import ModuleApi from "../../../framework/modules/ModuleApi";
 import ProfileImage from "../../../framework/components/ProfileImage/ProfileImage";
-
+import {ScoreCellIDs, YahtzeeScoreboardType, YahtzeeScoreObject} from "@edelgames/types/src/modules/yahtzee/YTypes";
+import {getPointsFromDices} from "@edelgames/types/src/modules/yahtzee/YFunctions";
 
 interface IProps {
     api: ModuleApi,
     scoreboard: YahtzeeScoreboardType,
     activePlayerId?: string,
     allowCellClick?: boolean,
-    onCellClicked?: { (cellType: scoreCellIDs): void }
-}
-
-export enum scoreCellIDs {
-    ONE = 'one',
-    TWO = 'two',
-    THREE = 'three',
-    FOUR = 'four',
-    FIVE = 'five',
-    SIX = 'six',
-    THREE_OF_A_KIND = 'threeOfAKind',
-    FOUR_OF_A_KIND = 'fourOfAKind',
-    FIVE_OF_A_KIND = 'fiveOfAKind',
-    FULL_HOUSE = 'fullHouse',
-    SMALL_STRAIGHT = 'smallStraight',
-    LARGE_STRAIGHT = 'largeStraight',
-    CHANCE = 'chance',
+    onCellClicked?: { (cellType: ScoreCellIDs): void }
+    currentDiceValues?: number[]
 }
 
 export default class Scoreboard extends React.Component<IProps, {}> implements ModuleGameInterface {
@@ -97,32 +82,32 @@ export default class Scoreboard extends React.Component<IProps, {}> implements M
                     <ProfileImage picture={player.getPicture()} username={player.getUsername()} id={player.getId()}/>
                 </div>
                 {this.renderCell(playerScore.one, playerScore.one === null, undefined,
-                    clickListener, scoreCellIDs.ONE)}
+                    clickListener, ScoreCellIDs.ONE)}
                 {this.renderCell(playerScore.two, playerScore.two === null, undefined,
-                    clickListener, scoreCellIDs.TWO)}
+                    clickListener, ScoreCellIDs.TWO)}
                 {this.renderCell(playerScore.three, playerScore.three === null, undefined,
-                    clickListener, scoreCellIDs.THREE)}
+                    clickListener, ScoreCellIDs.THREE)}
                 {this.renderCell(playerScore.four, playerScore.four === null, undefined,
-                    clickListener, scoreCellIDs.FOUR)}
+                    clickListener, ScoreCellIDs.FOUR)}
                 {this.renderCell(playerScore.five, playerScore.five === null, undefined,
-                    clickListener, scoreCellIDs.FIVE)}
+                    clickListener, ScoreCellIDs.FIVE)}
                 {this.renderCell(playerScore.six, playerScore.six === null, undefined,
-                    clickListener, scoreCellIDs.SIX)}
+                    clickListener, ScoreCellIDs.SIX)}
                 {this.renderCell(totalFirstPart >= 63 ? 35 : 0, false)}
                 {this.renderCell(playerScore.threeOfAKind, playerScore.threeOfAKind === null, undefined,
-                    clickListener, scoreCellIDs.THREE_OF_A_KIND)}
+                    clickListener, ScoreCellIDs.THREE_OF_A_KIND)}
                 {this.renderCell(playerScore.fourOfAKind, playerScore.fourOfAKind === null, undefined,
-                    clickListener, scoreCellIDs.FOUR_OF_A_KIND)}
+                    clickListener, ScoreCellIDs.FOUR_OF_A_KIND)}
                 {this.renderCell(playerScore.fullHouse, playerScore.fullHouse === null, undefined,
-                    clickListener, scoreCellIDs.FULL_HOUSE)}
+                    clickListener, ScoreCellIDs.FULL_HOUSE)}
                 {this.renderCell(playerScore.smallStraight, playerScore.smallStraight === null, undefined,
-                    clickListener, scoreCellIDs.SMALL_STRAIGHT)}
+                    clickListener, ScoreCellIDs.SMALL_STRAIGHT)}
                 {this.renderCell(playerScore.largeStraight, playerScore.largeStraight === null, undefined,
-                    clickListener, scoreCellIDs.LARGE_STRAIGHT)}
+                    clickListener, ScoreCellIDs.LARGE_STRAIGHT)}
                 {this.renderCell(playerScore.fiveOfAKind, playerScore.fiveOfAKind === null, undefined,
-                    clickListener, scoreCellIDs.FIVE_OF_A_KIND)}
+                    clickListener, ScoreCellIDs.FIVE_OF_A_KIND)}
                 {this.renderCell(playerScore.chance, playerScore.chance === null, undefined,
-                    clickListener, scoreCellIDs.CHANCE)}
+                    clickListener, ScoreCellIDs.CHANCE)}
                 {this.renderCell('', false)}
                 {this.renderCell(playerScore.total, false)}
             </div>
@@ -134,7 +119,7 @@ export default class Scoreboard extends React.Component<IProps, {}> implements M
                isAvailable: boolean,
                title: string | undefined = undefined,
                onClick: Function | undefined = undefined,
-               cellIdentifier: number | string | undefined = undefined,
+               cellIdentifier: ScoreCellIDs | undefined = undefined,
     ): JSX.Element {
         let className = "yahtzee-tcell" +
             (isAvailable && this.props.allowCellClick ? ' is-available-cell' : '');
@@ -142,6 +127,18 @@ export default class Scoreboard extends React.Component<IProps, {}> implements M
             <div className={className}
                  title={title}
                  onClick={() => (onClick && isAvailable) ? onClick(cellIdentifier) : null}
+                 data-value={value}
+                 onMouseEnter={(event) => {
+                     if(cellIdentifier) {
+                        [1,2,3,4,5].reduce((prev, eyes) => {
+                            return prev + (eyes === 2 ? 2 : 0)
+                        });
+                        event.currentTarget.innerText = "" + getPointsFromDices(cellIdentifier, [1,2,3,4,5]);
+                     }
+                 }}
+                 onMouseLeave={(event) => {
+                     event.currentTarget.innerText = event.currentTarget.dataset.value || "";
+                 }}
             >{value}</div>
         );
     }

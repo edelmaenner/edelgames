@@ -4,37 +4,11 @@ import ModuleApi from "../../framework/modules/ModuleApi";
 import yahtzee from "./Yahtzee";
 import Scoreboard from "./components/Scoreboard";
 import DiceTable from "./components/DiceTable";
-
-type scoreType = number|null;
-export type YahtzeeScoreObject = {
-    playerId: string,
-    one: scoreType,
-    two: scoreType,
-    three: scoreType,
-    four: scoreType,
-    five: scoreType,
-    six: scoreType,
-    threeOfAKind: scoreType,
-    fourOfAKind: scoreType,
-    fiveOfAKind: scoreType,
-    fullHouse: scoreType,
-    smallStraight: scoreType,
-    largeStraight: scoreType,
-    chance: scoreType,
-    total: scoreType
-};
-export type YahtzeeScoreboardType = YahtzeeScoreObject[];
+import {gameState, possibleGameStates, YahtzeeScoreboardType} from "@edelgames/types/src/modules/yahtzee/YTypes";
 
 interface IState {
-    gameState: YahtzeeGameStates,
+    gameState: gameState,
     scoreboard: YahtzeeScoreboardType,
-}
-
-export enum YahtzeeGameStates {
-    PLAYER_ROLL_DICE_1 = 'PLAYER_ROLL_DICE_1', // first roll
-    PLAYER_ROLL_DICE_2 = 'PLAYER_ROLL_DICE_2', // second roll
-    PLAYER_ROLL_DICE_3 = 'PLAYER_ROLL_DICE_3', // last roll
-    PLAYER_SELECT_CELL = 'PLAYER_SELECT_CELL'
 }
 
 export default class YahtzeeGame extends React.Component<{}, IState> implements ModuleGameInterface {
@@ -42,7 +16,14 @@ export default class YahtzeeGame extends React.Component<{}, IState> implements 
     private readonly api: ModuleApi;
 
     state = {
-        gameState: YahtzeeGameStates.PLAYER_ROLL_DICE_1,
+        gameState: {
+            state: possibleGameStates.STARTUP,
+            activePlayerId: null,
+            remainingRolls: 0,
+            scores: [],
+            diceValues: [1,1,1,1,1],
+            diceMask: [false,false,false,false,false]
+        },
         scoreboard: [
             {
                 playerId: '',
@@ -79,12 +60,10 @@ export default class YahtzeeGame extends React.Component<{}, IState> implements 
                 <Scoreboard scoreboard={scoreboard}
                             api={this.api}
                             activePlayerId={scoreboard[0].playerId}
-                            allowCellClick={this.state.gameState === YahtzeeGameStates.PLAYER_SELECT_CELL}/>
+                            allowCellClick={true || this.state.gameState.state === possibleGameStates.PLAYER_SELECTS}/>
                 <DiceTable api={this.api}
                            isLocalPlayerActive={true}/>
             </div>
         );
     }
-
-
 }

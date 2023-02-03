@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 import Dice from './Dice';
 
 interface IProps {
@@ -105,11 +105,11 @@ export default class DiceBox extends Component<IProps, {}> {
 
         // generate new dice x/y positions
         if(!this.props.fixedDices) {
-            this.generateNewDicePositions(dicesToRoll);
+			this.generateNewDicePositions([...Array(diceCount)].map(() => false));
         }
 
 		return (
-			<div className={'dice-box'}>
+			<div className={'dice-box'} ref={this.diceBoxRef}>
 				{[...Array(diceCount)].map(this.renderDice.bind(this))}
 			</div>
 		);

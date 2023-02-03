@@ -4,3 +4,6 @@ export * as NotificationBubbleTypes from './src/app/components/NotificationBubbl
 
 export * as DAGTypes from './src/modules/drawAndGuess/DAGTypes';
 export * as SLFTypes from './src/modules/stadtLandFluss/SLFTypes';
+export * as YTypes from './src/modules/yahtzee/YTypes';
+
+export * as YFunctions from './src/modules/yahtzee/YFunctions';

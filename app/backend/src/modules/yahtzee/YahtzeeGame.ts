@@ -1,59 +1,16 @@
 import ModuleGameInterface from "../../framework/modules/ModuleGameInterface";
 import ModuleApi from "../../framework/modules/ModuleApi";
-import {EventDataObject} from "../../framework/modules/api/ModuleEventApi";
 import User from "../../framework/User";
+import {EventDataObject} from "@edelgames/types/src/app/ApiTypes";
+import {
+    gameState,
+    possibleGameStates,
+    ScoreCellIDs,
+    YahtzeeScoreboardType, YahtzeeScoreObject
+} from "@edelgames/types/src/modules/yahtzee/YTypes";
+import {getPointsFromDices} from "@edelgames/types/src/modules/yahtzee/YFunctions";
 
-type gameState = {
-    state: possibleGameStates,
-    activePlayerId: string|null,
-    remainingRolls: number,
-    scores: YahtzeeScoreboardType,
-    diceValues: number[],
-    diceMask: boolean[],
-}
 
-enum possibleGameStates {
-    STARTUP = 'startup',
-    PLAYER_ROLLS = 'player_rolls',
-    PLAYER_SELECTS = 'player_selects',
-    ENDING_SCORE = 'ending_score'
-}
-
-type scoreType = number|null;
-export type YahtzeeScoreObject = {
-    playerId: string,
-    one: scoreType,
-    two: scoreType,
-    three: scoreType,
-    four: scoreType,
-    five: scoreType,
-    six: scoreType,
-    threeOfAKind: scoreType,
-    fourOfAKind: scoreType,
-    fiveOfAKind: scoreType,
-    fullHouse: scoreType,
-    smallStraight: scoreType,
-    largeStraight: scoreType,
-    chance: scoreType,
-    total: scoreType
-};
-export type YahtzeeScoreboardType = YahtzeeScoreObject[];
-
-export enum scoreCellIDs {
-    ONE = 'one',
-    TWO = 'two',
-    THREE = 'three',
-    FOUR = 'four',
-    FIVE = 'five',
-    SIX = 'six',
-    THREE_OF_A_KIND = 'threeOfAKind',
-    FOUR_OF_A_KIND = 'fourOfAKind',
-    FIVE_OF_A_KIND = 'fiveOfAKind',
-    FULL_HOUSE = 'fullHouse',
-    SMALL_STRAIGHT = 'smallStraight',
-    LARGE_STRAIGHT = 'largeStraight',
-    CHANCE = 'chance',
-}
 
 /*
  * The actual game instance, that controls and manages the game
@@ -184,87 +141,13 @@ export default class YahtzeeGame implements ModuleGameInterface {
     }
 
     // returns, if the scores were updated successfully
-    updatePlayerScores(scoreType: scoreCellIDs, playerScores: YahtzeeScoreObject): boolean {
-
-        // shortcut, so i don't  have to type this in the switch below again and again
-        const updateHelperFunc = (cellId: scoreCellIDs, key: keyof YahtzeeScoreObject) => {
-            if(playerScores[key] !== null) {
-                return false; // "score already set" error
-            }
-            // todo remove ts-ignore
-            // @ts-ignore
-            playerScores[key] = this.getPointsFromDices(cellId, this.gameState.diceValues);
-            return true; // score successfully set
+    updatePlayerScores(scoreType: ScoreCellIDs, playerScores: YahtzeeScoreObject): boolean {
+        if(playerScores[scoreType] !== null) {
+            return false; // "score already set" error
         }
 
-        switch (scoreType) {
-            case scoreCellIDs.ONE:
-                return updateHelperFunc(scoreCellIDs.ONE, 'one');
-            case scoreCellIDs.TWO:
-                return updateHelperFunc(scoreCellIDs.TWO, 'two');
-            case scoreCellIDs.THREE:
-                return updateHelperFunc(scoreCellIDs.THREE, 'three');
-            case scoreCellIDs.FOUR:
-                return updateHelperFunc(scoreCellIDs.FOUR, 'four');
-            case scoreCellIDs.FIVE:
-                return updateHelperFunc(scoreCellIDs.FIVE, 'five');
-            case scoreCellIDs.SIX:
-                return updateHelperFunc(scoreCellIDs.SIX, 'six');
-            case scoreCellIDs.THREE_OF_A_KIND:
-                return updateHelperFunc(scoreCellIDs.THREE_OF_A_KIND, 'threeOfAKind');
-            case scoreCellIDs.FOUR_OF_A_KIND:
-                return updateHelperFunc(scoreCellIDs.FOUR_OF_A_KIND, 'fourOfAKind');
-            case scoreCellIDs.FIVE_OF_A_KIND:
-                return updateHelperFunc(scoreCellIDs.FIVE_OF_A_KIND, 'fiveOfAKind');
-            case scoreCellIDs.SMALL_STRAIGHT:
-                return updateHelperFunc(scoreCellIDs.SMALL_STRAIGHT, 'smallStraight');
-            case scoreCellIDs.LARGE_STRAIGHT:
-                return updateHelperFunc(scoreCellIDs.LARGE_STRAIGHT, 'largeStraight');
-            case scoreCellIDs.FULL_HOUSE:
-                return updateHelperFunc(scoreCellIDs.FULL_HOUSE, 'fullHouse');
-            case scoreCellIDs.CHANCE:
-                return updateHelperFunc(scoreCellIDs.CHANCE, 'chance');
-            default:
-                return false;
-        }
+        playerScores[scoreType] = getPointsFromDices(scoreType, this.gameState.diceValues);
+        return true;
     }
 
-    getPointsFromDices(scoreType: scoreCellIDs, diceValues: number[]): number {
-        switch(scoreType) {
-            case scoreCellIDs.ONE:
-                return diceValues.reduce((prev, eyes) => prev + (eyes === 1 ? 1 : 0));
-            case scoreCellIDs.TWO:
-                return diceValues.reduce((prev, eyes) => prev + (eyes === 2 ? 2 : 0));
-            case scoreCellIDs.THREE:
-                return diceValues.reduce((prev, eyes) => prev + (eyes === 3 ? 3 : 0));
-            case scoreCellIDs.FOUR:
-                return diceValues.reduce((prev, eyes) => prev + (eyes === 4 ? 4 : 0));
-            case scoreCellIDs.FIVE:
-                return diceValues.reduce((prev, eyes) => prev + (eyes === 5 ? 5 : 0));
-            case scoreCellIDs.SIX:
-                return diceValues.reduce((prev, eyes) => prev + (eyes === 6 ? 6 : 0));
-            case scoreCellIDs.THREE_OF_A_KIND:
-                // todo, when not three of a kind: return zero
-                return diceValues.reduce((prev, eyes) => prev + eyes);
-            case scoreCellIDs.FOUR_OF_A_KIND:
-                // todo, when not four of a kind: return zero
-                return diceValues.reduce((prev, eyes) => prev + eyes);
-            case scoreCellIDs.FIVE_OF_A_KIND:
-                // todo, when not five of a kind: return zero
-                return 50;
-            case scoreCellIDs.LARGE_STRAIGHT:
-                // todo, when not large straight: return zero
-                return 40;
-            case scoreCellIDs.SMALL_STRAIGHT:
-                // todo, when not small straight: return zero
-                return 30;
-            case scoreCellIDs.FULL_HOUSE:
-                // todo, when not small straight: return zero
-                return 25;
-            case scoreCellIDs.CHANCE:
-                return diceValues.reduce((prev, eyes) => prev + eyes);
-        }
-
-        return 0;
-    }
 }

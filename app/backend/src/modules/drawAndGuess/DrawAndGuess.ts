@@ -1,8 +1,8 @@
 import ModuleInterface from '../../framework/modules/ModuleInterface';
 import ModuleGameInterface from '../../framework/modules/ModuleGameInterface';
 import DrawAndGuessGame from './DrawAndGuessGame';
-import * as fs from 'fs';
 import { systemLogger } from '../../framework/util/Logger';
+import wordList from "./Wordlist";
 
 /*
  * This singleton is used to register the game to the ModuleList
@@ -24,9 +24,7 @@ class DrawAndGuess implements ModuleInterface {
 		}
 
 		try {
-			const fileContent = fs.readFileSync(__dirname + '/Wordlist.txt', 'utf8');
-			this.wordList = fileContent.split(/\r?\n/);
-			this.wordList = this.wordList.map((line) => line.trim().toLowerCase());
+			this.wordList = wordList.map((line) => line.trim().toLowerCase());
 			this.wordList = this.wordList.filter((line, index, self) => {
 				return line !== '' && self.indexOf(line) === index;
 			});

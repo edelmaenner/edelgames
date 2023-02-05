@@ -1,82 +1,65 @@
 import React, {ReactNode} from "react";
-import ModuleGameInterface from "../../../framework/modules/ModuleGameInterface";
 import ModuleApi from "../../../framework/modules/ModuleApi";
-import DiceBox, {getRandomDiceValue} from "../../../framework/components/DiceBox/DiceBox";
+import DiceBox from "../../../framework/components/DiceBox/DiceBox";
 
 
 interface IProps {
     api: ModuleApi,
-    isLocalPlayerActive: boolean
-}
-
-interface IState {
-    rollIndex: number,
+    isLocalPlayerActive: boolean,
     diceValues: number[],
-    selectedDice: boolean[],
+    lastRollTimeStamp: number|string,
+    remoteSelectedDice: boolean[],
     remainingRolls: number,
+    onDiceRollClicked: {(diceSelection: boolean[]): void}
+    onSelectedDiceChanged: {(newDiceSelection: boolean[]): void}
 }
 
-export default class DiceTable extends React.Component<IProps, IState> implements ModuleGameInterface {
+export default class DiceTable extends React.Component<IProps, {}> {
 
-    state = {
-        rollIndex: 0,
-        selectedDice: [false,false,false,false,false],
-        diceValues: [1,1,1,1,1],
-        remainingRolls: 3
-    }
-
-    componentDidMount() {
-        this.props.api.getEventApi().addEventHandler('diceValuesChanged', this.onDiceValuesChanged.bind(this));
-    }
-
-    componentWillUnmount() {
-        this.props.api.getEventApi().removeEvent('diceValuesChanged');
-    }
-
-    /* Remote Events */
-    onDiceValuesChanged(eventData: any): void {
-        this.setState({
-            rollIndex: (this.state.rollIndex + 1),
-            remainingRolls: 3,
-            diceValues: this.state.selectedDice.map((sel, index) => sel ? this.state.diceValues[index] : getRandomDiceValue())
-        })
-        // todo: if player is not active, also load the selected dice from the event
-    }
+    rollIndex: number = 0;
+    lastRollTimeStamp: number|string = -1;
 
     /* Locale Events */
-
     onDiceClicked(diceId: number): void {
         if(!this.props.isLocalPlayerActive) {
             return;
         }
 
-        let oldSelection = this.state.selectedDice;
-        oldSelection[diceId] = !oldSelection[diceId];
-        this.setState({
-            selectedDice: oldSelection
-        });
+        let diceSelectionTemp = [...this.props.remoteSelectedDice];
+        diceSelectionTemp[diceId] = !diceSelectionTemp[diceId];
+        if(diceSelectionTemp.every((mask) => mask)) {
+            return;
+        }
 
-        // todo tell server and other players
+        this.props.onSelectedDiceChanged(diceSelectionTemp);
+        this.setState({});
     }
 
-    onRollButtonClicked(): void {
-        this.onDiceValuesChanged({}); // todo: instead tell server to roll the dices
-    }
+    onRollRequested(): void {
+        if(!this.props.isLocalPlayerActive) {
+            return;
+        }
 
+        this.props.onDiceRollClicked(this.props.remoteSelectedDice);
+    }
 
     /* Rendering */
-
     render(): ReactNode {
+        if(this.props.lastRollTimeStamp !== this.lastRollTimeStamp) {
+            this.lastRollTimeStamp = this.props.lastRollTimeStamp;
+            this.rollIndex++;
+        }
+
         return (
             <div className={"yahtzee-dice-table"}>
-                <DiceBox rollIndex={this.state.rollIndex}
-                         nextRollResults={this.state.diceValues}
-                         highlightColors={this.state.selectedDice.map((el) => el ? 'red' : undefined)}
-                         diceToRollMask={this.state.selectedDice.map((el) => !el)}
+                <DiceBox rollIndex={this.rollIndex}
+                         nextRollResults={this.props.diceValues}
+                         highlightColors={this.props.remoteSelectedDice.map((el) => el ? '#bb33ff' : undefined)}
+                         diceToRollMask={this.props.remoteSelectedDice.map((el) => !el)}
                          onDicesClicked={this.onDiceClicked.bind(this)}
                 />
-                <button disabled={!this.props.isLocalPlayerActive}
-                        onClick={this.onRollButtonClicked.bind(this)}>Würfeln (noch {this.state.remainingRolls} mal)</button>
+                <button disabled={!this.props.isLocalPlayerActive || this.props.remainingRolls <= 0}
+                        onClick={this.onRollRequested.bind(this)}>Würfeln (noch {this.props.remainingRolls} mal)</button>
             </div>
         );
     }

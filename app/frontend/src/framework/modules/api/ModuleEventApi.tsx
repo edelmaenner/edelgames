@@ -80,7 +80,7 @@ export default class ModuleEventApi {
 
 	public sendMessageToServer(
 		messageTypeId: string,
-		eventData: { [key: string]: any }
+		eventData: EventDataObject
 	): void {
 		SocketManager.sendEvent('clientToServerGameMessage', {
 			messageTypeId: this.api.getGameId() + '_' + messageTypeId,

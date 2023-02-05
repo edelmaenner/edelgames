@@ -1,27 +1,24 @@
 import React, {ReactNode} from "react";
-import ModuleGameInterface from "../../../framework/modules/ModuleGameInterface";
-import ModuleApi from "../../../framework/modules/ModuleApi";
 import ProfileImage from "../../../framework/components/ProfileImage/ProfileImage";
 import {ScoreCellIDs, YahtzeeScoreboardType, YahtzeeScoreObject} from "@edelgames/types/src/modules/yahtzee/YTypes";
-import {getPointsFromDices} from "@edelgames/types/src/modules/yahtzee/YFunctions";
+import {getPointsFromDices, getTotalFirstPartPoints} from "@edelgames/types/src/modules/yahtzee/YFunctions";
+import ModulePlayerApi from "../../../framework/modules/api/ModulePlayerApi";
 
 interface IProps {
-    api: ModuleApi,
+    playerApi: ModulePlayerApi,
     scoreboard: YahtzeeScoreboardType,
-    activePlayerId?: string,
-    allowCellClick?: boolean,
-    onCellClicked?: { (cellType: ScoreCellIDs): void }
-    currentDiceValues?: number[]
+    onCellClicked: { (cellType: ScoreCellIDs): void }
+    currentDiceValues: number[],
+    remainingRolls: number,
+    activePlayerId?: string|null,
 }
 
-export default class Scoreboard extends React.Component<IProps, {}> implements ModuleGameInterface {
+export default class Scoreboard extends React.Component<IProps, {}> {
 
     render(): ReactNode {
         return (
             <div className={"yahtzee-scoreboard"}>
                 {this.renderIndex()}
-                {this.props.scoreboard.map(this.renderColumn.bind(this))}
-                {this.props.scoreboard.map(this.renderColumn.bind(this))}
                 {this.props.scoreboard.map(this.renderColumn.bind(this))}
             </div>
         );
@@ -53,87 +50,65 @@ export default class Scoreboard extends React.Component<IProps, {}> implements M
 
     renderColumn(playerScore: YahtzeeScoreObject): JSX.Element {
         const {playerId} = playerScore;
-
-        let playerApi = this.props.api.getPlayerApi();
-        let player = playerApi.getPlayerById(playerId);
+        
+        let player = this.props.playerApi.getPlayerById(playerId);
         if (!player) {
-            return (<span></span>);
+            return (<span key={playerId}></span>);
         }
-        let isLocalePlayer = playerApi.getLocalePlayer().getId() === player.getId();
+        let isLocalePlayer = this.props.playerApi.getLocalePlayer().getId() === player.getId();
         let isActivePlayer = this.props.activePlayerId === player.getId();
+        let allowSelection = isLocalePlayer && isActivePlayer && this.props.remainingRolls <= 2;
 
-        let totalFirstPart: number =
-            (playerScore.one||0) +
-            (playerScore.two||0) +
-            (playerScore.three||0) +
-            (playerScore.four||0) +
-            (playerScore.five||0) +
-            (playerScore.six||0);
-
-        let clickListener = isLocalePlayer ? this.props.onCellClicked : undefined;
+        let totalFirstPart = getTotalFirstPartPoints(playerScore);
 
         let className = 'yahtzee-scoreboard-column' +
             (isLocalePlayer ? ' yahtzee-local-col' : '') +
             (isActivePlayer ? ' yahtzee-active-col' : '');
 
         return (
-            <div className={className}>
+            <div className={className} key={playerId}>
                 <div className={"yahtzee-tcell"}>
                     <ProfileImage picture={player.getPicture()} username={player.getUsername()} id={player.getId()}/>
                 </div>
-                {this.renderCell(playerScore.one, playerScore.one === null, undefined,
-                    clickListener, ScoreCellIDs.ONE)}
-                {this.renderCell(playerScore.two, playerScore.two === null, undefined,
-                    clickListener, ScoreCellIDs.TWO)}
-                {this.renderCell(playerScore.three, playerScore.three === null, undefined,
-                    clickListener, ScoreCellIDs.THREE)}
-                {this.renderCell(playerScore.four, playerScore.four === null, undefined,
-                    clickListener, ScoreCellIDs.FOUR)}
-                {this.renderCell(playerScore.five, playerScore.five === null, undefined,
-                    clickListener, ScoreCellIDs.FIVE)}
-                {this.renderCell(playerScore.six, playerScore.six === null, undefined,
-                    clickListener, ScoreCellIDs.SIX)}
-                {this.renderCell(totalFirstPart >= 63 ? 35 : 0, false)}
-                {this.renderCell(playerScore.threeOfAKind, playerScore.threeOfAKind === null, undefined,
-                    clickListener, ScoreCellIDs.THREE_OF_A_KIND)}
-                {this.renderCell(playerScore.fourOfAKind, playerScore.fourOfAKind === null, undefined,
-                    clickListener, ScoreCellIDs.FOUR_OF_A_KIND)}
-                {this.renderCell(playerScore.fullHouse, playerScore.fullHouse === null, undefined,
-                    clickListener, ScoreCellIDs.FULL_HOUSE)}
-                {this.renderCell(playerScore.smallStraight, playerScore.smallStraight === null, undefined,
-                    clickListener, ScoreCellIDs.SMALL_STRAIGHT)}
-                {this.renderCell(playerScore.largeStraight, playerScore.largeStraight === null, undefined,
-                    clickListener, ScoreCellIDs.LARGE_STRAIGHT)}
-                {this.renderCell(playerScore.fiveOfAKind, playerScore.fiveOfAKind === null, undefined,
-                    clickListener, ScoreCellIDs.FIVE_OF_A_KIND)}
-                {this.renderCell(playerScore.chance, playerScore.chance === null, undefined,
-                    clickListener, ScoreCellIDs.CHANCE)}
-                {this.renderCell('', false)}
-                {this.renderCell(playerScore.total, false)}
+
+                {this.renderScoreCell(playerScore, ScoreCellIDs.ONE, allowSelection)}
+                {this.renderScoreCell(playerScore, ScoreCellIDs.TWO, allowSelection)}
+                {this.renderScoreCell(playerScore, ScoreCellIDs.THREE, allowSelection)}
+                {this.renderScoreCell(playerScore, ScoreCellIDs.FOUR, allowSelection)}
+                {this.renderScoreCell(playerScore, ScoreCellIDs.FIVE, allowSelection)}
+                {this.renderScoreCell(playerScore, ScoreCellIDs.SIX, allowSelection)}
+
+                <div className={'yahtzee-tcell'}>{totalFirstPart >= 63 ? 35 : 0}</div>
+
+                {this.renderScoreCell(playerScore, ScoreCellIDs.THREE_OF_A_KIND, allowSelection)}
+                {this.renderScoreCell(playerScore, ScoreCellIDs.FOUR_OF_A_KIND, allowSelection)}
+                {this.renderScoreCell(playerScore, ScoreCellIDs.FULL_HOUSE, allowSelection)}
+                {this.renderScoreCell(playerScore, ScoreCellIDs.SMALL_STRAIGHT, allowSelection)}
+                {this.renderScoreCell(playerScore, ScoreCellIDs.LARGE_STRAIGHT, allowSelection)}
+                {this.renderScoreCell(playerScore, ScoreCellIDs.FIVE_OF_A_KIND, allowSelection)}
+                {this.renderScoreCell(playerScore, ScoreCellIDs.CHANCE, allowSelection)}
+
+                <div className={'yahtzee-tcell'}>{/* Placeholder */}</div>
+                <div className={'yahtzee-tcell'}>{playerScore.total}</div>
             </div>
         );
     }
 
 
-    renderCell(value: number | string | null,
-               isAvailable: boolean,
-               title: string | undefined = undefined,
-               onClick: Function | undefined = undefined,
-               cellIdentifier: ScoreCellIDs | undefined = undefined,
-    ): JSX.Element {
-        let className = "yahtzee-tcell" +
-            (isAvailable && this.props.allowCellClick ? ' is-available-cell' : '');
+    renderScoreCell(playerScore: YahtzeeScoreObject,
+                    cellIdentifier: ScoreCellIDs,
+                    allowSelection: boolean): JSX.Element
+    {
+        let value = playerScore[cellIdentifier];
+        let isSelectable = value === null && allowSelection;
+
         return (
-            <div className={className}
-                 title={title}
-                 onClick={() => (onClick && isAvailable) ? onClick(cellIdentifier) : null}
+            <div className={"yahtzee-tcell " + (isSelectable ? ' is-available-cell' : '')}
+                 onClick={isSelectable ? () => this.props.onCellClicked(cellIdentifier) : undefined}
                  data-value={value}
                  onMouseEnter={(event) => {
-                     if(cellIdentifier) {
-                        [1,2,3,4,5].reduce((prev, eyes) => {
-                            return prev + (eyes === 2 ? 2 : 0)
-                        });
-                        event.currentTarget.innerText = "" + getPointsFromDices(cellIdentifier, [1,2,3,4,5]);
+                     if(isSelectable) {
+                        event.currentTarget.innerText = "" + getPointsFromDices(cellIdentifier, this.props.currentDiceValues);
                      }
                  }}
                  onMouseLeave={(event) => {

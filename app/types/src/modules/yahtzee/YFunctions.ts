@@ -1,4 +1,4 @@
-import {DiceDotCollection, ScoreCellIDs} from "./YTypes";
+import {DiceDotCollection, ScoreCellIDs, YahtzeeScoreObject} from "./YTypes";
 
 export function getPointsFromDices(scoreType: ScoreCellIDs, diceValues: number[]): number {
     const diceCollection = getDiceDotCollections(diceValues);
@@ -32,27 +32,46 @@ export function getPointsFromDices(scoreType: ScoreCellIDs, diceValues: number[]
             const hasFiveOfAKind = diceCollection.length === 1;
             return hasFiveOfAKind ? 50 : 0;
         case ScoreCellIDs.LARGE_STRAIGHT:
-            const hasLargeStraight = diceCollection.length === 5;
+            const hasLargeStraight = diceCollection.length >= 5 &&
+                diceCollection.find((entry) => entry.value === 2) &&
+                diceCollection.find((entry) => entry.value === 3) &&
+                diceCollection.find((entry) => entry.value === 4) &&
+                diceCollection.find((entry) => entry.value === 5);
             return hasLargeStraight ? 40 : 0;
         case ScoreCellIDs.SMALL_STRAIGHT:
-            const hasSmallStraight = diceCollection.length === 5 || (
-                diceCollection.length === 4 &&
-                diceCollection.find((entry => {
-                    return entry.count === 1 && (
-                        entry.value === 1 ||
-                        entry.value === 6
-                    )
-                }))
-            );
+            const hasSmallStraight = isSmallStraight(diceCollection);
             return hasSmallStraight ? 30 : 0;
         case ScoreCellIDs.FULL_HOUSE:
-            const hasFullHouse = diceValues.length === 2 && diceCollection.find((entry => entry.count === 3));
+            const hasFullHouse = diceCollection.length === 2 && diceCollection.find((entry => entry.count === 3));
             return hasFullHouse ? 25 : 0;
         case ScoreCellIDs.CHANCE:
             return diceValues.reduce((prev, eyes) => prev + eyes);
     }
 
     return 0;
+}
+
+function isSmallStraight(diceCollection: DiceDotCollection): boolean {
+    const numbers = [false,false,false,false,false];
+    for(let entry of diceCollection) {
+        numbers[entry.value-1] = true;
+    }
+
+    /*
+       1 2 3 4 _ _
+       _ 2 3 4 5 _
+       _ _ 3 4 5 6
+     */
+
+    return numbers[2] && numbers[3] && (
+        (
+            numbers[1] && (numbers[0] || numbers[4])
+        )
+        ||
+        (
+            numbers[4] && numbers[5]
+        )
+    );
 }
 
 export function getDiceDotCollections(diveValues: number[]): DiceDotCollection {
@@ -70,4 +89,13 @@ export function getDiceDotCollections(diveValues: number[]): DiceDotCollection {
         }
     }
     return diceDots;
+}
+
+export function getTotalFirstPartPoints(playerScore: YahtzeeScoreObject): number {
+    return (playerScore.one||0) +
+        (playerScore.two||0) +
+        (playerScore.three||0) +
+        (playerScore.four||0) +
+        (playerScore.five||0) +
+        (playerScore.six||0);
 }

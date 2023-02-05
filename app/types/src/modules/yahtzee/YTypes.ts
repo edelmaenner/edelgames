@@ -1,16 +1,11 @@
 export type gameState = {
     state: possibleGameStates;
     activePlayerId: string|null;
-    remainingRolls: number;
-    scores: YahtzeeScoreboardType;
-    diceValues: number[];
-    diceMask: boolean[];
 }
 
 export enum possibleGameStates {
     STARTUP = 'startup',
-    PLAYER_ROLLS = 'player_rolls',
-    PLAYER_SELECTS = 'player_selects',
+    PLAYER_ACTION = 'player_action',
     ENDING_SCORE = 'ending_score'
 }
 

@@ -18,12 +18,19 @@ export default class PageHeader extends React.Component<{}, IState> {
 		showRoomActionWindow: false,
 	};
 
-	constructor(props: object) {
-		super(props);
+	profileUpdatedListener = this.onProfileDataChanged.bind(this);
 
+	componentDidMount() {
 		eventManager.subscribe(
 			ProfileEventNames.profileUpdated,
-			this.onProfileDataChanged.bind(this)
+			this.profileUpdatedListener
+		);
+	}
+
+	componentWillUnmount() {
+		eventManager.unsubscribe(
+			ProfileEventNames.profileUpdated,
+			this.profileUpdatedListener
 		);
 	}
 

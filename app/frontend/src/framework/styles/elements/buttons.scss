@@ -6,14 +6,21 @@ button,
 	color: $white;
 	box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.1);
 	border: none;
-	cursor: pointer;
-
-	&:hover {
-		background-color: $backgroundDark;
-	}
 
 	&.secondary {
-		background-color: $backgroundLight;
+	  background-color: $backgroundLight;
+	}
+
+  	&:not(:disabled) {
+		cursor: pointer;
+
+		&:hover {
+			background-color: $backgroundDark;
+		}
+	}
+
+  	&:disabled {
+	 	background-color: $gray-700;
 	}
 }
 

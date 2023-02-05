@@ -63,6 +63,12 @@ export default class ModulePlayerApi {
 		);
 	}
 
+    public sendRoomBubble(message: string, type: 'info' | 'error' | 'success' | 'warning' = 'info'): void {
+        this.getRoomMembers().forEach((user) => {
+            this.sendPlayerBubble(user.getId(), message, type);
+        });
+    }
+
 	public getRoom(): Room {
 		return this.room;
 	}

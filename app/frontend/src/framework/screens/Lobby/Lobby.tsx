@@ -32,16 +32,6 @@ export default class Lobby extends React.Component {
 		return (
 			<div id="screenLobby">
 				<RoomListBox />
-
-				<div style={{ margin: '1rem' }}>
-					<DiceBox
-						rollIndex={this.state.rollIndex}
-						nextRollResults={this.state.results}
-						diceToRollMask={this.state.dicesToShuffle}
-						onDicesClicked={this.setNewResult.bind(this)}
-						highlightColors={['red', 'blue', 'purple']}
-					/>
-				</div>
 			</div>
 		);
 	}

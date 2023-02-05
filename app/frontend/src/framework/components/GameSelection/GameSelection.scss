@@ -6,7 +6,7 @@
 
 	.game-preview {
 		flex: 1 1 25%;
-		max-width: 33.33333%;
+		max-width: calc((100% - 2rem) / 3);
 		position: relative;
 		overflow: hidden;
 		border-radius: 4px;
@@ -16,6 +16,7 @@
 			width: 100%;
 			aspect-ratio: 1.5;
 			object-fit: cover;
+		  	border-radius: 4px;
 		}
 
 		.preview-hover {

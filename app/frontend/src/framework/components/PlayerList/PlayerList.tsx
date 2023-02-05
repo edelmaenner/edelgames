@@ -8,6 +8,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 interface IProps {
 	renderMemberFunction?: { (member: User): JSX.Element };
+	renderMemberRightFunction?: { (member: User): JSX.Element }; // will be replaced by the render function above, if both are set
+	renderMemberLeftFunction?: { (member: User): JSX.Element }; // will be replaced by the render function above, if both are set
+	renderMemberMiddleFunction?: { (member: User): JSX.Element }; // will be replaced by the render function above, if both are set
 }
 
 export default class PlayerList extends React.Component<IProps, {}> {
@@ -46,23 +49,30 @@ export default class PlayerList extends React.Component<IProps, {}> {
 	renderMember(member: User): JSX.Element {
 		return (
 			<div className="member-list-row" key={member.getId()}>
-				<ProfileImage
-					picture={member.getPicture()}
-					username={member.getUsername()}
-					id={member.getId()}
-				/>
-				{this.renderMemberData(member)}
+				{this.props.renderMemberLeftFunction ? this.props.renderMemberLeftFunction(member) : this.renderMemberLeft(member)}
+				<div className="member-data">
+					{this.props.renderMemberMiddleFunction ? this.props.renderMemberMiddleFunction(member) : this.renderMemberMiddle(member)}
+					{this.props.renderMemberRightFunction ? this.props.renderMemberRightFunction(member) : this.renderMemberRight()}
+				</div>
 			</div>
 		);
 	}
 
-	renderMemberData(member: User): JSX.Element {
-		let isLocaleUser = member.getId() === profileManager.getId();
-
+	renderMemberLeft(member: User): JSX.Element {
 		return (
-			<div className="member-data">
+			<ProfileImage
+				picture={member.getPicture()}
+				username={member.getUsername()}
+				id={member.getId()}
+			/>
+		);
+	}
+
+	renderMemberMiddle(member: User): JSX.Element {
+		return (
+			<span>
 				<span className="member-name">{member.getUsername()}</span>
-				{isLocaleUser ? <span>&nbsp;(You)</span> : null}
+				{profileManager.getId() === member.getId() ? <span>&nbsp;(You)</span> : null}
 				{member.isRoomMaster() ? (
 					<span className="error-text">
 						&nbsp;
@@ -73,7 +83,13 @@ export default class PlayerList extends React.Component<IProps, {}> {
 						/>
 					</span>
 				) : null}
-			</div>
+			</span>
+		);
+	}
+
+	renderMemberRight(): JSX.Element {
+		return (
+			<span></span>
 		);
 	}
 }

@@ -23,6 +23,9 @@ import {
 	drawingModes,
 	eventTypes,
 } from '@edelgames/types/src/app/components/DrawingCanvasTypes';
+import User from "../../framework/util/User";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+
 
 interface IState {
 	currentMode: string;
@@ -308,13 +311,15 @@ export default class DrawAndGuessGame
 			timestamp: timestamp || Date.now(),
 			coloring: coloring,
 		});
-		if (this.messageHistory.length > 50) {
-			this.messageHistory.shift(); // remove oldest element
-		}
+
 		// sort messages: oldest first
 		this.messageHistory = this.messageHistory.sort(
 			(a, b) => b.timestamp - a.timestamp
 		);
+
+		if (this.messageHistory.length > 50) {
+			this.messageHistory.pop(); // remove oldest element
+		}
 	}
 
 	/* ============== */
@@ -363,6 +368,23 @@ export default class DrawAndGuessGame
 		}
 	}
 
+	renderPlayerListMemberRight(member: User): JSX.Element {
+		return (
+			<span>
+				{
+					this.state.activePlayerId === member.getId() ?
+						<FontAwesomeIcon
+							icon={['fad', 'paintbrush-fine']}
+							size="1x"
+							title={'malt gerade'}
+						/> : null
+				}
+				&nbsp;
+				<span className={"member-score"}>{this.scoreboard[member.getId()] || 0}P</span>
+			</span>
+		);
+	}
+
 	render(): ReactNode {
 		let isActivePlayer = this.state.activePlayerId === ProfileManager.getId();
 		let allowDrawing =
@@ -372,7 +394,7 @@ export default class DrawAndGuessGame
 
 		return (
 			<div id={'drawAndGuess'} key={'drawAndGuess'}>
-				<PlayerList />
+				<PlayerList renderMemberRightFunction={this.renderPlayerListMemberRight.bind(this)} />
 
 				<div className={'drawing-board'}>
 					{this.renderDrawingBoardSpace(

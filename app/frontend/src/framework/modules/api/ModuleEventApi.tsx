@@ -5,6 +5,7 @@ import {
 	EventDataObject,
 	EventHandlerFunction,
 } from '@edelgames/types/src/app/ApiTypes';
+import EventBuffer from "../../util/EventBuffer";
 
 // is used to store the event handlers for each event
 type EventHandlerFunctionList = {
@@ -14,6 +15,7 @@ type EventHandlerFunctionList = {
 export default class ModuleEventApi {
 	private api: ModuleApi;
 	private eventListeners: EventHandlerFunctionList = {};
+	private eventBuffer: EventBuffer = new EventBuffer();
 
 	constructor(api: ModuleApi) {
 		this.api = api;
@@ -55,6 +57,11 @@ export default class ModuleEventApi {
 				alertedListenerCount++;
 			}
 		}
+
+		if(alertedListenerCount === 0) {
+			this.eventBuffer.addBufferedEvent(event, eventData);
+		}
+
 		return alertedListenerCount;
 	}
 
@@ -67,6 +74,10 @@ export default class ModuleEventApi {
 			this.eventListeners[event] = [];
 		}
 		this.eventListeners[event].push(handler);
+
+		for(let bufferedEvent of this.eventBuffer.getBufferedEvents(event)) {
+			handler(bufferedEvent);
+		}
 	}
 
 	public removeEvent(eventName: string): void {

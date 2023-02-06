@@ -4,6 +4,7 @@ import {
 	EventDataObject,
 	ListenerFunction,
 } from '@edelgames/types/src/app/ApiTypes';
+import EventBuffer from "./EventBuffer";
 
 // a list of functions for a specified event
 interface ListenerFunctionList {
@@ -18,6 +19,7 @@ interface MessageEventObject extends EventDataObject {
 
 class EventManager {
 	private eventListeners: ListenerFunctionList = {};
+	private eventBuffer: EventBuffer = new EventBuffer(5000, 10);
 
 	constructor() {
 		SocketManagerSingleton.subscribeEvent(
@@ -41,7 +43,14 @@ class EventManager {
 		}
 
 		this.eventListeners[event].push(listener);
-		clientLogger.debug('registered event subscription: ' + event);
+
+		// call buffered events
+		const bufferedEvents = this.eventBuffer.getBufferedEvents(event);
+		for(let bufferedEvent of bufferedEvents) {
+			listener(bufferedEvent);
+		}
+
+		clientLogger.debug(`registered event subscription: ${event} and applied ${bufferedEvents.length} buffered events`);
 	}
 
 	public unsubscribe(event: string, listener: ListenerFunction): void {
@@ -57,10 +66,17 @@ class EventManager {
 
 	public publish(event: string, eventData: EventDataObject = {}): void {
 		clientLogger.debug('publishing event: ' + event, eventData);
+
+		let foundListener = false;
 		if (this.eventListeners[event]) {
 			for (let listener of this.eventListeners[event]) {
 				listener(eventData);
+				foundListener = true;
 			}
+		}
+
+		if(!foundListener) {
+			this.eventBuffer.addBufferedEvent(event, eventData);
 		}
 	}
 }

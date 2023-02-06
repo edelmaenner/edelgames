@@ -255,7 +255,7 @@ const wordList: string[] = [
     'Panda',
     'Platzregen',
     'Parkplatz',
-    'Porträt',
+    'Portrait',
     'Polizei',
     'Politiker',
     'Politik',

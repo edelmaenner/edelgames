@@ -104,8 +104,8 @@ export default class XenforoApi {
 		try {
 			const jsonResponse: loginResponse = JSON.parse(responseText);
 			systemLogger.debug(
-				'Login was successfull:',
-				jsonResponse.login_successful
+				'Login was successful:',
+				!!jsonResponse.login_successful
 			);
 
 			if (!jsonResponse.login_successful) {

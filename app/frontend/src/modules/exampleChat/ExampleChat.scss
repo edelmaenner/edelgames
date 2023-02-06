@@ -4,6 +4,7 @@
 	display: flex;
 	flex-direction: column;
 	height: 100%;
+  	width: 100%;
 
 	.chat-history {
 		padding: 1rem;
@@ -15,6 +16,7 @@
 			border-radius: 0;
 			flex: 1 1 50%;
 			border: none;
+		  	overflow-wrap: anywhere;
 
 			&.own-message {
 				text-align: right;

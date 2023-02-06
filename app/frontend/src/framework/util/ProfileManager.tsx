@@ -50,11 +50,7 @@ class ProfileManager {
 		if (this.authSessionId !== data.authSessionId) {
 			// if we have received an authSessionId after successful login, we store it as a cookie
 			const cookies = new Cookies();
-			if (!data.authSessionId) {
-				cookies.remove('authSession');
-			} else {
-				cookies.set('authSession', data.authSessionId, { path: '/' });
-			}
+			cookies.set('authSession', data.authSessionId, { path: '/', sameSite: true});
 		}
 
 		this.id = data.id;
@@ -69,8 +65,7 @@ class ProfileManager {
 	public attemptAutomaticAuthLogin(): void {
 		const cookies = new Cookies();
 		let authSessionCookie = cookies.get('authSession');
-		if (this.authSessionId === null && authSessionCookie) {
-			// if we are not logged in, but have an authSessionCookie, we attempt a login with it
+		if (authSessionCookie) {
 			this.attemptAuthentication(true, '', authSessionCookie);
 		}
 	}
@@ -100,11 +95,13 @@ class ProfileManager {
 		username: string,
 		password: string
 	): void {
-		socketManager.sendEvent('userLoginAttempt', {
-			isAuthSessionId: isAuthSession,
-			username: username,
-			password: password,
-		});
+		if(password) {
+			socketManager.sendEvent('userLoginAttempt', {
+				isAuthSessionId: isAuthSession,
+				username: username,
+				password: password,
+			});
+		}
 	}
 }
 

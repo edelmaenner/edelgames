@@ -27,7 +27,7 @@ class SocketManager {
 		this.socket.on('connect', this.onConnectionStatusChanged.bind(this, true));
 		this.socket.on(
 			'disconnect',
-			this.onConnectionStatusChanged.bind(this, false)
+			this.onDisconnected.bind(this)
 		);
 		this.socket.on(
 			'connect_error',
@@ -42,11 +42,13 @@ class SocketManager {
 		});
 	}
 
+	protected onDisconnected(): void {
+		this.onConnectionStatusChanged(false);
+	}
+
 	protected onReconnected(): void {
 		this.onConnectionStatusChanged(true);
-		if (!ProfileManager.isVerified()) {
-			ProfileManager.attemptAutomaticAuthLogin();
-		}
+		ProfileManager.attemptAutomaticAuthLogin();
 	}
 
 	public isConnected(): boolean {

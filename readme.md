@@ -7,7 +7,7 @@
 ### With locale nodejs installation
 
 - Go into `app/backend` and run `npm install` then `npm run dev`
-- Go into `app/frontend` and run `npm install` then `npm run start`
+- Go into `app/frontend` and run `npm install` then `npm run dev`
 
 This will start both apps in the development mode (using hot reload and less ts compiler optimization, as well as more logging).
 The Frontend will be available at `http://localhost:3000/` and the backend at `http:/localhost:5000/`

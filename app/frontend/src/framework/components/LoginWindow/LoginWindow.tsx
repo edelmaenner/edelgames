@@ -1,5 +1,5 @@
 import logo_em from '../../../media/images/logo_em.png';
-import React, {KeyboardEvent, MouseEventHandler} from 'react';
+import React, { KeyboardEvent, MouseEventHandler } from 'react';
 import profileManager from '../../util/ProfileManager';
 
 type IProps = {
@@ -30,7 +30,7 @@ export default class LoginWindow extends React.Component<IProps, {}> {
 	}
 
 	onKeyDown(event: KeyboardEvent<HTMLInputElement>): void {
-		if(event.code === 'Enter') {
+		if (event.code === 'Enter') {
 			this.tryLogin();
 		}
 	}
@@ -47,8 +47,16 @@ export default class LoginWindow extends React.Component<IProps, {}> {
 
 					<div className="error-message"></div>
 
-					<input type="text" placeholder="Benutzername" onKeyDown={this.onKeyDown.bind(this)} />
-					<input type="password" placeholder="Passwort" onKeyDown={this.onKeyDown.bind(this)} />
+					<input
+						type="text"
+						placeholder="Benutzername"
+						onKeyDown={this.onKeyDown.bind(this)}
+					/>
+					<input
+						type="password"
+						placeholder="Passwort"
+						onKeyDown={this.onKeyDown.bind(this)}
+					/>
 
 					<div className="text-align-right">
 						<button onClick={this.tryLogin.bind(this)}>Login</button>

@@ -7,7 +7,7 @@ interface IProps {
 	backdropColor?: string;
 	onDiceRolled?: { (): void };
 	onDiceClicked?: { (diceId: number): void };
-    style?: React.CSSProperties;
+	style?: React.CSSProperties;
 }
 
 export default class Dice extends Component<IProps, {}> {
@@ -34,26 +34,30 @@ export default class Dice extends Component<IProps, {}> {
 		// switch between animations to cause a rapid spinning
 		let rollClass = this.lastRollCount % 2 === 0 ? 'even' : 'odd';
 
-        let displayFilter: React.CSSProperties = {
-            filter: this.props.backdropColor ? `drop-shadow(0 0 0.3rem ${this.props.backdropColor})` : 'initial'
-        };
+		let displayFilter: React.CSSProperties = {
+			filter: this.props.backdropColor
+				? `drop-shadow(0 0 0.3rem ${this.props.backdropColor})`
+				: 'initial',
+		};
 
-        return (
-            <div className={"dice " + (this.props.onDiceClicked ? 'clickable' : '')}
-                 style={{
-                     ...this.props.style,
-                     ...displayFilter
-                 }}
-                 onClick={this.onDiceClicked.bind(this)}
-            >
-                <ol className={`die-list ${rollClass}-roll`}
-                    data-roll={this.props.nextRollResult}
-                >
-                    {[...Array(6)].map((el, index) => this.renderSide(index+1))}
-                </ol>
-            </div>
-        );
-    }
+		return (
+			<div
+				className={'dice ' + (this.props.onDiceClicked ? 'clickable' : '')}
+				style={{
+					...this.props.style,
+					...displayFilter,
+				}}
+				onClick={this.onDiceClicked.bind(this)}
+			>
+				<ol
+					className={`die-list ${rollClass}-roll`}
+					data-roll={this.props.nextRollResult}
+				>
+					{[...Array(6)].map((el, index) => this.renderSide(index + 1))}
+				</ol>
+			</div>
+		);
+	}
 
 	renderSide(dotCount: number): JSX.Element {
 		return (

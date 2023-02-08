@@ -4,7 +4,7 @@ import {
 	EventDataObject,
 	ListenerFunction,
 } from '@edelgames/types/src/app/ApiTypes';
-import EventBuffer from "./EventBuffer";
+import EventBuffer from './EventBuffer';
 
 // a list of functions for a specified event
 interface ListenerFunctionList {
@@ -46,11 +46,13 @@ class EventManager {
 
 		// call buffered events
 		const bufferedEvents = this.eventBuffer.getBufferedEvents(event);
-		for(let bufferedEvent of bufferedEvents) {
+		for (let bufferedEvent of bufferedEvents) {
 			listener(bufferedEvent);
 		}
 
-		clientLogger.debug(`registered event subscription: ${event} and applied ${bufferedEvents.length} buffered events`);
+		clientLogger.debug(
+			`registered event subscription: ${event} and applied ${bufferedEvents.length} buffered events`
+		);
 	}
 
 	public unsubscribe(event: string, listener: ListenerFunction): void {
@@ -75,7 +77,7 @@ class EventManager {
 			}
 		}
 
-		if(!foundListener) {
+		if (!foundListener) {
 			this.eventBuffer.addBufferedEvent(event, eventData);
 		}
 	}

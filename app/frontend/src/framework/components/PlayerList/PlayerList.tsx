@@ -49,10 +49,16 @@ export default class PlayerList extends React.Component<IProps, {}> {
 	renderMember(member: User): JSX.Element {
 		return (
 			<div className="member-list-row" key={member.getId()}>
-				{this.props.renderMemberLeftFunction ? this.props.renderMemberLeftFunction(member) : this.renderMemberLeft(member)}
+				{this.props.renderMemberLeftFunction
+					? this.props.renderMemberLeftFunction(member)
+					: this.renderMemberLeft(member)}
 				<div className="member-data">
-					{this.props.renderMemberMiddleFunction ? this.props.renderMemberMiddleFunction(member) : this.renderMemberMiddle(member)}
-					{this.props.renderMemberRightFunction ? this.props.renderMemberRightFunction(member) : this.renderMemberRight()}
+					{this.props.renderMemberMiddleFunction
+						? this.props.renderMemberMiddleFunction(member)
+						: this.renderMemberMiddle(member)}
+					{this.props.renderMemberRightFunction
+						? this.props.renderMemberRightFunction(member)
+						: this.renderMemberRight()}
 				</div>
 			</div>
 		);
@@ -72,7 +78,9 @@ export default class PlayerList extends React.Component<IProps, {}> {
 		return (
 			<span>
 				<span className="member-name">{member.getUsername()}</span>
-				{profileManager.getId() === member.getId() ? <span>&nbsp;(You)</span> : null}
+				{profileManager.getId() === member.getId() ? (
+					<span>&nbsp;(You)</span>
+				) : null}
 				{member.isRoomMaster() ? (
 					<span className="error-text">
 						&nbsp;
@@ -88,8 +96,6 @@ export default class PlayerList extends React.Component<IProps, {}> {
 	}
 
 	renderMemberRight(): JSX.Element {
-		return (
-			<span></span>
-		);
+		return <span></span>;
 	}
 }

@@ -23,9 +23,8 @@ import {
 	drawingModes,
 	eventTypes,
 } from '@edelgames/types/src/app/components/DrawingCanvasTypes';
-import User from "../../framework/util/User";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-
+import User from '../../framework/util/User';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 interface IState {
 	currentMode: string;
@@ -371,16 +370,17 @@ export default class DrawAndGuessGame
 	renderPlayerListMemberRight(member: User): JSX.Element {
 		return (
 			<span>
-				{
-					this.state.activePlayerId === member.getId() ?
-						<FontAwesomeIcon
-							icon={['fad', 'paintbrush-fine']}
-							size="1x"
-							title={'malt gerade'}
-						/> : null
-				}
+				{this.state.activePlayerId === member.getId() ? (
+					<FontAwesomeIcon
+						icon={['fad', 'paintbrush-fine']}
+						size="1x"
+						title={'malt gerade'}
+					/>
+				) : null}
 				&nbsp;
-				<span className={"member-score"}>{this.scoreboard[member.getId()] || 0}P</span>
+				<span className={'member-score'}>
+					{this.scoreboard[member.getId()] || 0}P
+				</span>
 			</span>
 		);
 	}
@@ -394,7 +394,11 @@ export default class DrawAndGuessGame
 
 		return (
 			<div id={'drawAndGuess'} key={'drawAndGuess'}>
-				<PlayerList renderMemberRightFunction={this.renderPlayerListMemberRight.bind(this)} />
+				<PlayerList
+					renderMemberRightFunction={this.renderPlayerListMemberRight.bind(
+						this
+					)}
+				/>
 
 				<div className={'drawing-board'}>
 					{this.renderDrawingBoardSpace(

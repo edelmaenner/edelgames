@@ -8,3 +8,5 @@ export * as CNTypes from './src/modules/codenames/CNTypes';
 export * as YTypes from './src/modules/yahtzee/YTypes';
 
 export * as YFunctions from './src/modules/yahtzee/YFunctions';
+
+export * as YEvents from './src/modules/yahtzee/YEvents';

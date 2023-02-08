@@ -25,10 +25,7 @@ class SocketManager {
 
 		this.socket = io(DOMAIN + ':' + PORT);
 		this.socket.on('connect', this.onConnectionStatusChanged.bind(this, true));
-		this.socket.on(
-			'disconnect',
-			this.onDisconnected.bind(this)
-		);
+		this.socket.on('disconnect', this.onDisconnected.bind(this));
 		this.socket.on(
 			'connect_error',
 			this.onConnectionStatusChanged.bind(this, false)

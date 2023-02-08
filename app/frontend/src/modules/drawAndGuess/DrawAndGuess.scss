@@ -25,15 +25,15 @@
 		@import 'Components/GameStateBox';
 	}
 
-  	#memberList {
-	  	.member-list-row {
-		  position: relative;
-		  padding-right: 4rem;
+	#memberList {
+		.member-list-row {
+			position: relative;
+			padding-right: 4rem;
 
-		  .member-score {
-			position: absolute;
-			right: 0.5rem;
-		  }
+			.member-score {
+				position: absolute;
+				right: 0.5rem;
+			}
 		}
 	}
 }

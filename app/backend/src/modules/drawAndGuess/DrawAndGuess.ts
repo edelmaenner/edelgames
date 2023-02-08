@@ -2,7 +2,7 @@ import ModuleInterface from '../../framework/modules/ModuleInterface';
 import ModuleGameInterface from '../../framework/modules/ModuleGameInterface';
 import DrawAndGuessGame from './DrawAndGuessGame';
 import { systemLogger } from '../../framework/util/Logger';
-import wordList from "./Wordlist";
+import wordList from './Wordlist';
 
 /*
  * This singleton is used to register the game to the ModuleList

@@ -50,7 +50,10 @@ class ProfileManager {
 		if (this.authSessionId !== data.authSessionId) {
 			// if we have received an authSessionId after successful login, we store it as a cookie
 			const cookies = new Cookies();
-			cookies.set('authSession', data.authSessionId, { path: '/', sameSite: true});
+			cookies.set('authSession', data.authSessionId, {
+				path: '/',
+				sameSite: true,
+			});
 		}
 
 		this.id = data.id;
@@ -95,7 +98,7 @@ class ProfileManager {
 		username: string,
 		password: string
 	): void {
-		if(password) {
+		if (password) {
 			socketManager.sendEvent('userLoginAttempt', {
 				isAuthSessionId: isAuthSession,
 				username: username,

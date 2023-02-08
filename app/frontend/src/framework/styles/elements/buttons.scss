@@ -8,10 +8,10 @@ button,
 	border: none;
 
 	&.secondary {
-	  background-color: $backgroundLight;
+		background-color: $backgroundLight;
 	}
 
-  	&:not(:disabled) {
+	&:not(:disabled) {
 		cursor: pointer;
 
 		&:hover {
@@ -19,8 +19,8 @@ button,
 		}
 	}
 
-  	&:disabled {
-	 	background-color: $gray-700;
+	&:disabled {
+		background-color: $gray-700;
 	}
 }
 

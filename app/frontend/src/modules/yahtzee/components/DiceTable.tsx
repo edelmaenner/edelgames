@@ -54,7 +54,7 @@ export default class DiceTable extends React.Component<IProps, {}> {
 					rollIndex={this.rollIndex}
 					nextRollResults={this.props.diceValues}
 					highlightColors={this.props.remoteSelectedDice.map((el) =>
-						el ? '#bb33ff' : undefined
+						el ? '#f80000' : undefined
 					)}
 					diceToRollMask={this.props.remoteSelectedDice.map((el) => !el)}
 					onDicesClicked={this.onDiceClicked.bind(this)}

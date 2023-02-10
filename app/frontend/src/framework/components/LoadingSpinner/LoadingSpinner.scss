@@ -8,6 +8,13 @@
 	animation: 2s loading-spinner-rotation linear infinite;
 }
 
+.loadingHint {
+	max-width: 40rem;
+	padding: 1rem;
+	margin: auto;
+	text-align: center;
+}
+
 @keyframes loading-spinner-rotation {
 	from {
 		transform: rotate(0);

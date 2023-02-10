@@ -9,8 +9,10 @@ import socketManager, { SocketEventNames } from './util/SocketManager';
 import roomManager, { RoomEventNames } from './util/RoomManager';
 import profileManager from './util/ProfileManager';
 import { clientLogger } from './util/Logger';
+import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner";
 
 export default class Core extends React.Component {
+
 	constructor(props: object) {
 		super(props);
 
@@ -47,8 +49,8 @@ export default class Core extends React.Component {
 
 	render(): ReactNode {
 		// show loading spinner, until page is loaded
-		if (!socketManager.isConnected()) {
-			return <div className="loadingSpinner"></div>;
+		if (!socketManager.isConnected() ||true) {
+			return (<LoadingSpinner />);
 		}
 
 		return (

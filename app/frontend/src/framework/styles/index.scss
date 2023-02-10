@@ -10,7 +10,6 @@
 @import 'elements/frame';
 @import 'elements/buttons';
 @import 'elements/text-styles';
-@import 'elements/loading-spinner';
 
 /*
  * Component style files, containing specific styles for a single component
@@ -24,6 +23,7 @@
 @import 'src/framework/components/Inputs/RangeSlider';
 @import 'src/framework/components/PlayerList/PlayerList';
 @import 'src/framework/components/DiceBox/DiceBox';
+@import 'src/framework/components/LoadingSpinner/LoadingSpinner';
 
 /*
  * Screen style files, containing specific styles for a single page

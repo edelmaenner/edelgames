@@ -115,7 +115,8 @@ export default class XenforoApi {
 
 			let profileImage;
 			if (jsonResponse.gravatar) {
-				profileImage = `https://minotar.net/helm/${jsonResponse.minecraft_name}/128.png`;
+				profileImage = `https://cravatar.eu/helmavatar/${jsonResponse.minecraft_name}/64.png`
+				// profileImage = `https://minotar.net/helm/${jsonResponse.minecraft_name}/64.png`;
 			} else {
 				profileImage = `https://edelmaenner.net/data/avatars/m/${Math.floor(
 					jsonResponse.user_id / 1000

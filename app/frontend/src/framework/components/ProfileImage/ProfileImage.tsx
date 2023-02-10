@@ -6,14 +6,30 @@ type IProps = {
 	id: string;
 };
 
-export default class ProfileImage extends React.Component<IProps, {}> {
+interface IState {
+	hasPictureError: boolean
+}
+
+export default class ProfileImage extends React.Component<IProps, IState> {
+
+	state = {
+		hasPictureError: false
+	}
+
+	onPictureError(): void {
+		this.setState({hasPictureError: true});
+	}
+
 	render(): ReactNode {
 		let fallbackColorHue = parseInt(this.props.id, 36) % 360;
 
 		return (
 			<div className="profile-picture" title={this.props.username}>
-				{this.props.picture ? (
-					<img src={this.props.picture} alt={this.props.username} />
+				{this.props.picture && !this.state.hasPictureError ? (
+					<img src={this.props.picture}
+						 alt={this.props.username}
+						 onError={this.onPictureError.bind(this)}
+					/>
 				) : (
 					<div
 						className="profile-picture-anonymous"

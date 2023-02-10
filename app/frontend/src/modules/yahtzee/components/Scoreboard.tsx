@@ -85,15 +85,18 @@ export default class Scoreboard extends React.Component<IProps, {}> {
 	renderColumn(playerScore: YahtzeeScoreObject): JSX.Element {
 		const { playerId } = playerScore;
 
+		let isLocalePlayer = false;
+		let isActivePlayer = false;
+		let allowSelection = false;
+
 		let player = this.props.playerApi.getPlayerById(playerId);
-		if (!player) {
-			return <span key={playerId}></span>;
+		if (player) {
+			isLocalePlayer =
+				this.props.playerApi.getLocalePlayer().getId() === player.getId();
+			isActivePlayer = this.props.activePlayerId === player.getId();
+			allowSelection = isLocalePlayer && isActivePlayer && this.props.remainingRolls <= 2;
 		}
-		let isLocalePlayer =
-			this.props.playerApi.getLocalePlayer().getId() === player.getId();
-		let isActivePlayer = this.props.activePlayerId === player.getId();
-		let allowSelection =
-			isLocalePlayer && isActivePlayer && this.props.remainingRolls <= 2;
+
 
 		let totalFirstPart = getTotalFirstPartPoints(playerScore);
 
@@ -106,9 +109,9 @@ export default class Scoreboard extends React.Component<IProps, {}> {
 			<div className={className} key={playerId}>
 				<div className={'yahtzee-tcell'}>
 					<ProfileImage
-						picture={player.getPicture()}
-						username={player.getUsername()}
-						id={player.getId()}
+						picture={player?.getPicture() || null}
+						username={player?.getUsername() || playerScore.playerName}
+						id={player?.getId() || playerScore.playerId || '0'}
 					/>
 				</div>
 

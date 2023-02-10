@@ -15,7 +15,7 @@ export default class Room {
 
 	constructor(roomMaster: User | null) {
 		this.roomId = this.createIdHash();
-		this.roomName = 'room' + this.roomId;
+		this.roomName = `${roomMaster?.getUsername() || '???'}'s Raum`;
 		this.roomMaster = roomMaster;
 		if (roomMaster) this.roomMembers = [roomMaster];
 

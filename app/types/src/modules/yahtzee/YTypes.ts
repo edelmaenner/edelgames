@@ -28,6 +28,7 @@ export const enum ScoreCellIDs {
 export type scoreType = number | null;
 export type YahtzeeScoreObject = {
 	playerId: string;
+	playerName: string;
 	[ScoreCellIDs.ONE]: scoreType;
 	[ScoreCellIDs.TWO]: scoreType;
 	[ScoreCellIDs.THREE]: scoreType;

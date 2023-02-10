@@ -65,8 +65,13 @@ export default class PageHeader extends React.Component<{}, IState> {
 					<FontAwesomeIcon
 						icon={['fad', 'circle-chevron-down']}
 						size="1x"
+						style={{
+							transition: 'transform 0.2s ease-in-out',
+							transform: `rotate(${this.state.showRoomActionWindow ? 0 : -90}deg)`
+						}}
 						onClick={this.toggleRoomActionPanel.bind(this)}
 					/>
+
 				</div>
 
 				{this.state.showRoomActionWindow ? (

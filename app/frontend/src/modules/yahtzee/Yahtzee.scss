@@ -1,0 +1,9 @@
+#yahtzee {
+	display: flex;
+	flex-direction: row;
+	width: 100%;
+
+	@import 'components/Scoreboard';
+	@import 'components/DiceTable';
+	@import 'components/WinningScreen';
+}

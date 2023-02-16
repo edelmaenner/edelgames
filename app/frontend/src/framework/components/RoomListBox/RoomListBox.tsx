@@ -1,139 +1,183 @@
-import React from "react";
-import EventManager from "../../util/EventManager";
-import {RoomEventNames, ServerRoomMember} from "../../util/RoomManager";
-import AbstractComponent from "../AbstractComponent";
-import ProfileImage from "../ProfileImage/ProfileImage";
-import SocketManager from "../../util/SocketManager";
-import ProfileManager from "../../util/ProfileManager";
-import debug from "../../util/debug";
+import React, { ReactNode } from 'react';
+import ProfileImage from '../ProfileImage/ProfileImage';
+import eventManager from '../../util/EventManager';
+import { RoomEventNames } from '../../util/RoomManager';
+import socketManager from '../../util/SocketManager';
+import profileManager from '../../util/ProfileManager';
+import { clientLogger } from '../../util/Logger';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+	EventDataObject,
+	ServerRoomMember,
+} from '@edelgames/types/src/app/ApiTypes';
 
 type ForeignRoomObject = {
-    roomId: string;
-    roomName: string;
-    roomMembers: ServerRoomMember[];
-    roomUsePassword: boolean;
-}
+	roomId: string;
+	roomName: string;
+	requirePassphrase: boolean;
+	roomMembers: ServerRoomMember[];
+	allowJoin: boolean;
+};
+
+type ForeignRoomObjectList = {
+	rooms: ForeignRoomObject[];
+};
+
+type IState = {
+	rooms: ForeignRoomObject[];
+};
 
 /*
  * @description
  * Used for displaying infos about every available room and their members in the lobby
  */
 
-export default class RoomListBox extends AbstractComponent {
+export default class RoomListBox extends React.Component<{}, IState> {
+	updateInterval: NodeJS.Timer | number | null = null;
 
-    updateInterval: NodeJS.Timer|number|null = null;
+	state: IState = {
+		rooms: [],
+	};
 
-    constructor(props : any) {
-        super(props);
+	resetUpdateInterval(): void {
+		if (this.updateInterval) {
+			clearInterval(this.updateInterval);
+			this.updateInterval = null;
+		}
+	}
 
-        EventManager.subscribe(RoomEventNames.lobbyRoomsChangedEventNotified, this.onLobbyRoomsChangedEventNotified.bind(this));
-        this.state = {
-           rooms: []
-        };
+	componentDidMount(): void {
+		eventManager.subscribe(
+			RoomEventNames.lobbyRoomsChangedEventNotified,
+			this.onLobbyRoomsChangedEventNotified.bind(this)
+		);
+		this.resetUpdateInterval();
+		this.updateInterval = setInterval(this.onRefreshInterval.bind(this), 1000);
+	}
 
-        this.updateInterval = setInterval(this.onRefreshInterval.bind(this), 1000);
-    }
+	componentWillUnmount(): void {
+		eventManager.unsubscribe(
+			RoomEventNames.lobbyRoomsChangedEventNotified,
+			this.onLobbyRoomsChangedEventNotified.bind(this)
+		);
+		this.resetUpdateInterval();
+	}
 
-    componentWillUnmount() {
-        if(this.updateInterval) {
-            clearInterval(this.updateInterval);
-            this.updateInterval = null;
-        }
-    }
+	onRefreshInterval(): void {
+		if (this.state.rooms.length === 0) {
+			socketManager.sendEvent('refreshLobbyRoomData', {});
+		} else {
+			// seems like we have got info about the rooms, so we can stop the interval
+			this.resetUpdateInterval();
+		}
+	}
 
-    onRefreshInterval() {
-        if(this.state.rooms.length === 0) {
-            SocketManager.sendEvent('refreshLobbyRoomData', {});
-        }
-        else if(this.updateInterval) {
-            // seems like we have got info about the rooms, so we can stop the interval
-            clearInterval(this.updateInterval);
-            this.updateInterval = null;
-        }
-    }
+	onLobbyRoomsChangedEventNotified(data?: EventDataObject): void {
+		if (!data) {
+			return;
+		}
 
-    onLobbyRoomsChangedEventNotified(data: {rooms: ForeignRoomObject[]}) {
-        let roomList: ForeignRoomObject[] = data.rooms;
+		let roomList: ForeignRoomObject[] = (data as ForeignRoomObjectList).rooms;
 
-        this.setStateSafe({
-            rooms: roomList
-        });
-    }
+		this.setState({
+			rooms: roomList,
+		});
+	}
 
-    onCreateRoom() {
-        SocketManager.sendEvent('createNewRoom', {});
-    }
+	onCreateRoom(): void {
+		socketManager.sendEvent(RoomEventNames.createNewRoom, {});
+	}
 
-    onJoinRoom(roomId: string, usePassword: boolean) {
-        let passphrase = null;
-        if(usePassword) {
-            passphrase = prompt('Enter room password: ', '');
-        }
-        debug(`Attempting to join room ${roomId} with passphrase ${passphrase}`);
+	onJoinRoom(roomId: string, usePassword: boolean): void {
+		let passphrase = null;
+		if (usePassword) {
+			passphrase = prompt('Enter room password: ', '');
+		}
+		clientLogger.debug(
+			`Attempting to join room ${roomId} with passphrase ${passphrase}`
+		);
 
-        SocketManager.sendEvent('joinRoom', {
-            roomId: roomId,
-            password: passphrase
-        });
-    }
+		socketManager.sendEvent(RoomEventNames.joinRoom, {
+			roomId: roomId,
+			password: passphrase,
+		});
+	}
 
+	render(): ReactNode {
+		return (
+			<div id="roomListBox">
+				{this.state.rooms.map(this.renderRoom.bind(this))}
 
+				{!profileManager.isVerified() ? null : (
+					<div className="room-overview-box room-create-box">
+						<div className="room-overview-box--room-data">Create Room</div>
+						<div
+							className="room-overview-box--member-list"
+							onClick={this.onCreateRoom.bind(this)}
+						>
+							<FontAwesomeIcon icon={['fad', 'plus']} size="3x" />
+						</div>
+					</div>
+				)}
+			</div>
+		);
+	}
 
-    renderMember(member: ServerRoomMember) {
-        return (
-            <div key={member.id} className="member-list-row">
-                <ProfileImage picture={member.picture}
-                              username={member.username}
-                              id={member.id} />
-                {member.username}
-            </div>
-        );
-    }
+	renderRoom(room: ForeignRoomObject): ReactNode {
+		let roomColor =
+			room.roomId === 'lobby'
+				? '#3188c3'
+				: `hsl(${parseInt(room.roomId, 36) % 360},70%,30%)`;
 
-    renderRoom(room: ForeignRoomObject) {
-        let roomColor = room.roomId === 'lobby' ? '#3188c3' : `hsl(${(parseInt(room.roomId,36) % 360)},70%,50%)`;
+		return (
+			<div
+				className="room-overview-box"
+				key={room.roomId}
+				style={{ borderColor: roomColor }}
+			>
+				<div
+					className="room-overview-box--room-data"
+					style={{ backgroundColor: roomColor }}
+				>
+					<span className="text-align-left">
+						{room.roomName}
+						{room.requirePassphrase ? (
+							<FontAwesomeIcon icon={['fad', 'lock']} size="1x" />
+						) : null}
+					</span>
+					{room.roomId === 'lobby' || !room.allowJoin ? null : (
+						<span className="text-align-right">
+							<span
+								className="room-join-button"
+								onClick={this.onJoinRoom.bind(
+									this,
+									room.roomId,
+									room.requirePassphrase
+								)}
+							>
+								<FontAwesomeIcon icon={['fad', 'plus']} size="1x" />
+							</span>
+						</span>
+					)}
+				</div>
 
-        return (
-            <div className="room-overview-box"
-                 key={room.roomId}
-                 style={{borderColor: roomColor}}>
+				<div className="room-overview-box--member-list">
+					{room.roomMembers.map(this.renderMember.bind(this))}
+				</div>
+			</div>
+		);
+	}
 
-                <div className="room-overview-box--room-data"
-                     style={{backgroundColor: roomColor}}>
-                    <span className="text-align-left">{room.roomName}</span>
-                    {
-                        (room.roomId === 'lobby') ? null :
-                        <span className="text-align-right">
-                            <span className="room-join-button" onClick={this.onJoinRoom.bind(this, room.roomId, room.roomUsePassword)}>+</span>
-                            {room.roomUsePassword ? <span>l</span> : null}
-                        </span>
-                    }
-                </div>
-
-                <div className="room-overview-box--member-list">
-                    {room.roomMembers.map(this.renderMember.bind(this))}
-                </div>
-
-            </div>
-        );
-    }
-
-    render() {
-        return (
-            <div id="roomListBox">
-                {this.state.rooms.map(this.renderRoom.bind(this))}
-
-                {!ProfileManager.isVerified() ? null :
-                    <div className="room-overview-box room-create-box">
-
-                        <div className="room-overview-box--room-data">Create Room</div>
-                        <div className="room-overview-box--member-list"
-                             onClick={this.onCreateRoom.bind(this)}>+</div>
-
-                    </div>
-                }
-            </div>
-        );
-    }
-
+	renderMember(member: ServerRoomMember): ReactNode {
+		return (
+			<div key={member.id} className="member-list-row">
+				<ProfileImage
+					picture={member.picture}
+					username={member.username}
+					id={member.id}
+				/>
+				{member.username}
+			</div>
+		);
+	}
 }

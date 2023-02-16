@@ -1,0 +1,15 @@
+{
+	"name": "@edelgames/types",
+	"private": true,
+	"version": "1.0.0",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"devDependencies": {
+		"typescript": "^4.9.3"
+	},
+	"scripts": {
+		"prepublish": "npm run build",
+		"copyraw": "mkdir -p ./build/src && cp -r ./src ./build",
+		"build": "npm run copyraw && tsc -b"
+	}
+}

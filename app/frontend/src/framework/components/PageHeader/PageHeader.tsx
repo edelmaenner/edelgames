@@ -1,88 +1,119 @@
-import {ProfileEventNames} from "../../util/ProfileManager";
-import AbstractComponent from "../AbstractComponent";
-import ProfileImage from "../ProfileImage/ProfileImage";
-import EventManager from "../../util/EventManager";
-import ProfileManager from "../../util/ProfileManager";
-import RoomManager from "../../util/RoomManager";
-import LoginWindow from "../LoginWindow/LoginWindow";
-import SocketManager from "../../util/SocketManager";
+import profileManager, { ProfileEventNames } from '../../util/ProfileManager';
+import ProfileImage from '../ProfileImage/ProfileImage';
+import LoginWindow from '../LoginWindow/LoginWindow';
+import eventManager from '../../util/EventManager';
+import roomManager from '../../util/RoomManager';
+import React, { ReactNode } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import RoomActionPanel from './RoomActionPanel';
 
-type PageHeaderState = {
-    showLoginWindow: boolean
-}
+type IState = {
+	showLoginWindow: boolean;
+	showRoomActionWindow: boolean;
+};
 
-export default class PageHeader extends AbstractComponent {
+export default class PageHeader extends React.Component<{}, IState> {
+	state = {
+		showLoginWindow: false,
+		showRoomActionWindow: false,
+	};
 
-    state: PageHeaderState = {
-        showLoginWindow: false
-    };
+	profileUpdatedListener = this.onProfileDataChanged.bind(this);
 
-    constructor(props: object) {
-        super(props);
+	componentDidMount() {
+		eventManager.subscribe(
+			ProfileEventNames.profileUpdated,
+			this.profileUpdatedListener
+		);
+	}
 
-        EventManager.subscribe(ProfileEventNames.profileUpdated, this.onProfileDataChanged.bind(this));
-    }
+	componentWillUnmount() {
+		eventManager.unsubscribe(
+			ProfileEventNames.profileUpdated,
+			this.profileUpdatedListener
+		);
+	}
 
-    onProfileDataChanged() {
-        this.triggerRerender();
-    }
+	onProfileDataChanged(): void {
+		this.setState({});
+	}
 
-    onOpenLoginWindow() {
-        this.setState({
-            showLoginWindow: true
-        });
-        console.log('showing login window');
-    }
+	onOpenLoginWindow(): void {
+		this.setState({
+			showLoginWindow: true,
+		});
+	}
 
-    onCloseLoginWindow() {
-        this.setState({
-            showLoginWindow: false
-        });
-        console.log('hiding login window');
-    }
+	onCloseLoginWindow(): void {
+		this.setState({
+			showLoginWindow: false,
+		});
+	}
 
-    leaveRoom() {
-        SocketManager.sendEvent('returnToLobby', {});
-    }
+	toggleRoomActionPanel(): void {
+		this.setState({
+			showRoomActionWindow: !this.state.showRoomActionWindow,
+		});
+	}
 
-    render() {
-        return (
-            <div id="pageHeader">
+	renderRoomData(): ReactNode {
+		return (
+			<div className={'room-data'}>
+				<div className={'room-name'}>{roomManager.getRoomName()}</div>
 
-                <div className="text-align-left">
+				<div className={'room-actions'}>
+					<FontAwesomeIcon
+						icon={['fad', 'circle-chevron-down']}
+						size="1x"
+						style={{
+							transition: 'transform 0.2s ease-in-out',
+							transform: `rotate(${this.state.showRoomActionWindow ? 0 : -90}deg)`
+						}}
+						onClick={this.toggleRoomActionPanel.bind(this)}
+					/>
 
-                    <span id="userProfileInfoShort"
-                          onClick={this.onOpenLoginWindow.bind(this)}>
+				</div>
 
-                        <ProfileImage picture={ProfileManager.getPicture()}
-                                      username={ProfileManager.getUsername()}
-                                      id={ProfileManager.getId()}
-                        />
+				{this.state.showRoomActionWindow ? (
+					<RoomActionPanel
+						panelRemoteCloseCallback={this.toggleRoomActionPanel.bind(this)}
+					/>
+				) : null}
+			</div>
+		);
+	}
 
-                        <div className="profile-name">{ProfileManager.getUsername()}</div>
-                    </span>
+	render(): ReactNode {
+		return (
+			<div id="pageHeader">
+				<div className="text-align-left">
+					<span
+						id="userProfileInfoShort"
+						onClick={this.onOpenLoginWindow.bind(this)}
+					>
+						<ProfileImage
+							picture={profileManager.getPicture()}
+							username={profileManager.getUsername()}
+							id={profileManager.getId()}
+						/>
 
-                </div>
+						<div className="profile-name">{profileManager.getUsername()}</div>
+					</span>
+				</div>
 
-                <div className="text-align-center">
-                    Room: {RoomManager.getRoomName()}
-                    {
-                        (RoomManager.getRoomId() === 'lobby') ? null :
-                        <button className="secondary" onClick={this.leaveRoom.bind(this)}>Raum verlassen</button>
-                    }
-                </div>
+				<div className="text-align-center">
+					{roomManager.getRoomId() === 'lobby' ? null : this.renderRoomData()}
+				</div>
 
-                <div className="text-align-right">
+				<div className="text-align-right"></div>
 
-                </div>
-
-                {
-                    ProfileManager.isVerified() ? null :
-                        <LoginWindow show={this.state.showLoginWindow}
-                                     closeFunction={this.onCloseLoginWindow.bind(this)} />
-                }
-            </div>
-        );
-    }
-
+				{profileManager.isVerified() ? null : (
+					<LoginWindow
+						show={this.state.showLoginWindow}
+						closeFunction={this.onCloseLoginWindow.bind(this)}
+					/>
+				)}
+			</div>
+		);
+	}
 }

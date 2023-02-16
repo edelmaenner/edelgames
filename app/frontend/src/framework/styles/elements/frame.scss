@@ -1,14 +1,14 @@
 .frame {
-  padding: 1rem;
-  background-color: $background;
-  border-radius: 4px;
+	padding: 1rem;
+	background-color: $background;
+	border-radius: 4px;
 }
 
 .no-scrollbar {
-  // scrollbar - firefox
-  scrollbar-width: none;
-  // scrollbar - webkit
-  &::-webkit-scrollbar {
-    display: none;
-  }
+	// scrollbar - firefox
+	scrollbar-width: none;
+	// scrollbar - webkit
+	&::-webkit-scrollbar {
+		display: none;
+	}
 }

@@ -1,27 +1,44 @@
-import React from "react";
+import React, { ReactNode } from 'react';
 
-type ProfileImageProps = {
-    picture: string|null;
-    username: string;
-    id: string;
+type IProps = {
+	picture: string | null;
+	username: string;
+	id: string;
 };
 
+interface IState {
+	hasPictureError: boolean
+}
 
-export default class ProfileImage extends React.Component<ProfileImageProps> {
+export default class ProfileImage extends React.Component<IProps, IState> {
 
-    render() {
+	state = {
+		hasPictureError: false
+	}
 
-        return (
-            <div className="profile-picture" title={this.props.username}>
-                {
-                    (this.props.picture) ?
-                        <img src={this.props.picture}
-                             alt={this.props.username}/> :
-                        <div className="profile-picture-anonymous"
-                             style={{backgroundColor: `hsl(${parseInt(this.props.id,36) % 360},70%,70%)`}}>?</div>
-                }
-            </div>
-        );
-    }
+	onPictureError(): void {
+		this.setState({hasPictureError: true});
+	}
 
+	render(): ReactNode {
+		let fallbackColorHue = parseInt(this.props.id, 36) % 360;
+
+		return (
+			<div className="profile-picture" title={this.props.username}>
+				{this.props.picture && !this.state.hasPictureError ? (
+					<img src={this.props.picture}
+						 alt={this.props.username}
+						 onError={this.onPictureError.bind(this)}
+					/>
+				) : (
+					<div
+						className="profile-picture-anonymous"
+						style={{ backgroundColor: `hsl(${fallbackColorHue},60%,60%)` }}
+					>
+						?
+					</div>
+				)}
+			</div>
+		);
+	}
 }

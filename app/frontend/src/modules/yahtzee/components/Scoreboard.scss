@@ -1,0 +1,60 @@
+.yahtzee-scoreboard {
+	display: flex;
+
+	.yahtzee-tcell {
+		background-color: $backgroundDark;
+		white-space: nowrap;
+	}
+
+	// column of this user
+	.yahtzee-local-col {
+		.yahtzee-tcell.is-available-cell {
+			background-color: $backgroundLight;
+			cursor: pointer;
+		}
+	}
+
+	// column of the active player
+	.yahtzee-active-col {
+		.yahtzee-tcell:first-of-type {
+			background: $primary;
+		}
+	}
+
+	// left column
+	.yahtzee-scoreboard-index-column {
+		.yahtzee-tcell {
+			justify-content: left;
+		}
+	}
+
+	.yahtzee-scoreboard-column {
+		min-width: 2rem;
+	}
+
+	.yahtzee-scoreboard-index-column,
+	.yahtzee-scoreboard-column {
+		display: flex;
+		flex-direction: column;
+
+		&:not(:last-of-type) {
+			border-right: 2px solid $background;
+		}
+
+		.yahtzee-tcell {
+			height: 2rem;
+			padding: 0.5rem 1rem;
+			display: inline-flex;
+			justify-content: center;
+			align-items: center;
+
+			&:first-of-type {
+				min-height: 3rem;
+			}
+
+			&:not(:last-of-type) {
+				border-bottom: 2px solid $background;
+			}
+		}
+	}
+}

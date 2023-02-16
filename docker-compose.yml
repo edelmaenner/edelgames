@@ -1,29 +1,22 @@
-version: "2"
+version: '3'
 
 services:
-
   frontend:
-    image: "node:16"
-    working_dir: "/var/www/app/frontend"
-    volumes:
-      - "./app/frontend:/var/www/app/frontend"
+    build:
+      context: './app'
+      dockerfile: './frontend/Dockerfile'
     ports:
-      - "${REACT_HTTP_PORT}:${REACT_HTTP_PORT}"
-    expose:
-      - "${REACT_HTTP_PORT}"
-    command: "npm run dev"
+      - '${REACT_DOCKER_PORT}:3000'
     env_file:
       - ./.env
+    restart: unless-stopped
 
   backend:
-    image: "node:16"
-    working_dir: "/var/www/app/backend"
-    volumes:
-      - "./app/backend:/var/www/app/backend"
+    build:
+      context: './app'
+      dockerfile: './backend/Dockerfile'
     ports:
-      - "${API_HTTP_PORT}:${API_HTTP_PORT}"
-    expose:
-      - "${API_HTTP_PORT}"
-    command: "npm run dev"
+      - '${API_DOCKER_PORT}:${API_HTTP_PORT}'
     env_file:
       - ./.env
+    restart: unless-stopped

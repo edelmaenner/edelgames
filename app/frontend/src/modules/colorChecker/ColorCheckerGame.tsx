@@ -1,10 +1,14 @@
-import React, {ReactNode} from 'react';
+import React, { ReactNode } from 'react';
 import ModuleGameInterface from '../../framework/modules/ModuleGameInterface';
 import ModuleApi from '../../framework/modules/ModuleApi';
 import colorChecker from './ColorChecker';
 import DiceTable from './components/DiceTable';
 import ColorGridBox from './components/ColorGridBox';
-import {ColorGrid, defaultGrid, GridColorOptions,} from '@edelgames/types/src/modules/colorChecker/CCTypes';
+import {
+	ColorGrid,
+	defaultGrid,
+	GridColorOptions,
+} from '@edelgames/types/src/modules/colorChecker/CCTypes';
 import JokerList from './components/JokerList';
 
 interface IState {
@@ -40,7 +44,7 @@ export default class ColorCheckerGame
 						onCellClicked={(x, y) => console.log(x, y)}
 						allowSelection={true}
 						allowedColors={[GridColorOptions.GREEN]}
-						allowedNumbers={[2,4,5]}
+						allowedNumbers={[2, 4, 5]}
 					/>
 
 					<JokerList remainingJokers={10} onJokerUse={() => {}} />

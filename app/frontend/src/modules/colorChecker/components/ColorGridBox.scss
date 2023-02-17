@@ -20,6 +20,10 @@ $cellSize: 2rem;
 			flex: 0 0 $cellSize;
 			max-height: $cellSize;
 
+			&.selectable {
+				filter: grayscale(1);
+			}
+
 			&:first-of-type {
 				justify-content: center;
 				align-items: center;

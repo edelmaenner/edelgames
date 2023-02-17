@@ -9,7 +9,8 @@
 	},
 	"scripts": {
 		"prepublish": "npm run build",
-		"copyraw": "mkdir -p ./build/src && cp -r ./src ./build",
+		"dev": "nodemon -e ts --exec npm run build",
+		"copyraw": "mkdir -p ./build/src && cp -rf ./src ./build",
 		"build": "npm run copyraw && tsc -b"
 	}
 }

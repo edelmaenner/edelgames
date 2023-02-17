@@ -1,4 +1,10 @@
-export enum GridColorOptions {
+export const enum GameStates {
+	INIT = 'init',
+	ACTIVE_PLAYER_SELECTS = 'activePlayerSelects',
+	PASSIVE_PLAYERS_SELECTS = 'passivePlayersSelects',
+}
+
+export const enum GridColorOptions {
 	RED = '#ee3b69',
 	YELLOW = '#ff0',
 	ORANGE = '#fc8712',
@@ -13,6 +19,16 @@ export type ColorGridCell = {
 };
 export type ColorGridColumn = ColorGridCell[];
 export type ColorGrid = ColorGridColumn[];
+export type ColorGridCollection = {
+	playerId: string;
+	playerName: string;
+	grid: ColorGrid;
+}[];
+
+export type Coordinate = {
+	x: number;
+	y: number;
+};
 
 export const defaultGrid: ColorGrid = [
 	[

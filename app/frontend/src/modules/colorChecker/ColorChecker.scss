@@ -1,0 +1,16 @@
+#colorChecker {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	gap: 1rem;
+
+	@import "components/ColorGridBox";
+	@import "components/JokerList";
+	@import "components/Dice";
+
+	.color-checker-dice-table {
+		flex: 0 0 22rem;
+		width: 22rem;
+	}
+
+}

@@ -9,12 +9,9 @@ interface IProps {
 	onEveryDiceRolled?: { (): void }; // triggered once for every rolled dice
 	onDicesRolled?: { (): void }; // triggered once, when any dices changed
 	onDicesClicked?: { (diceId: number): void }; // triggered once, when any dices is clicked
-	fixedDices?: boolean; // disables the movement of the dice
-}
-
-export function getRandomDiceValue(min: number = 1, max: number = 6) {
-	let range = max - min;
-	return min + Math.floor(Math.random() * (range + 1));
+    fixedDices?: boolean // disables the movement of the dice,
+	diceComponent?: (typeof Dice)|(typeof Dice)[] // the type of dice to use (or an array with one entry for every dice)
+	diceComponentCustomProps?: {[key: string]: any} // some custom properties, that will be passed to each dice component
 }
 
 // massive credit and thank you for this incredible dice roll WITH PLAIN CSS and as little JavaScript as imaginable
@@ -119,8 +116,16 @@ export default class DiceBox extends Component<IProps, {}> {
 	}
 
 	renderDice(el: undefined, index: number): JSX.Element {
+		let DiceComp: typeof Dice = Dice;
+		if(this.props.diceComponent) {
+			DiceComp = Array.isArray(this.props.diceComponent) ?
+				this.props.diceComponent[index] :
+				this.props.diceComponent;
+		}
+
+
 		return (
-			<Dice
+			<DiceComp
 				key={index}
 				id={index}
 				nextRollResult={this.props.nextRollResults[index]}
@@ -137,6 +142,7 @@ export default class DiceBox extends Component<IProps, {}> {
 					left: this.dicePositions[index].x + 'px',
 					position: this.props.fixedDices ? 'static' : 'absolute',
 				}}
+				customProps={this.props.diceComponentCustomProps}
 			/>
 		);
 	}

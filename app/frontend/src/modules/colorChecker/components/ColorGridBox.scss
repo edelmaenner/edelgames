@@ -1,0 +1,45 @@
+$cellSize: 2rem;
+
+.color-checker-grid {
+	display: flex;
+	flex: 0 1 (15 * $cellSize);
+	max-height: (8 * $cellSize);
+
+	.color-checker-grid-column {
+		flex: 0 0 $cellSize;
+		max-width: $cellSize;
+		display: flex;
+		flex-direction: column;
+
+		&:not(:last-of-type) {
+			border-right: 1px solid $backgroundDark;
+		}
+
+		.color-checker-grid-cell {
+			display: flex;
+			flex: 0 0 $cellSize;
+			max-height: $cellSize;
+
+			&:first-of-type {
+				justify-content: center;
+				align-items: center;
+				background: $backgroundDark;
+			}
+
+			&:not(:last-of-type) {
+				border-bottom: 1px solid $backgroundDark;
+			}
+
+			svg {
+				width: 100%;
+				height: 100%;
+				color: $black;
+
+				&.fa-star {
+					opacity: 0.5;
+				}
+			}
+		}
+	}
+}
+

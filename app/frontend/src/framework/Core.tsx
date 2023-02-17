@@ -49,7 +49,7 @@ export default class Core extends React.Component {
 
 	render(): ReactNode {
 		// show loading spinner, until page is loaded
-		if (!socketManager.isConnected() ||true) {
+		if (!socketManager.isConnected()) {
 			return (<LoadingSpinner />);
 		}
 

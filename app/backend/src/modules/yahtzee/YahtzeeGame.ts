@@ -260,12 +260,13 @@ export default class YahtzeeGame implements ModuleGameInterface {
 	}
 
 	isGameFinished(): boolean {
-		let remainingMembers = this.api.getPlayerApi().getRoomMembers();
+		const remainingMembers = this.api.getPlayerApi().getRoomMembers();
 
 		for (let scores of this.scoreboard) {
-
-			let scoreOwner = remainingMembers.find((member) => member.getId() === scores.playerId);
-			if(scoreOwner === undefined) {
+			const scoreOwner = remainingMembers.find(
+				(member) => member.getId() === scores.playerId
+			);
+			if (scoreOwner === undefined) {
 				// if the player left the game, we don't need to check this scores
 				continue;
 			}
@@ -305,13 +306,13 @@ export default class YahtzeeGame implements ModuleGameInterface {
 			scores = scores as YahtzeeScoreObject;
 			const firstPart = getTotalFirstPartPoints(scores);
 			const secondPart =
-				(scores[ScoreCellIDs.THREE_OF_A_KIND]||0) +
-				(scores[ScoreCellIDs.FOUR_OF_A_KIND]||0) +
-				(scores[ScoreCellIDs.FIVE_OF_A_KIND]||0) +
-				(scores[ScoreCellIDs.CHANCE]||0) +
-				(scores[ScoreCellIDs.FULL_HOUSE]||0) +
-				(scores[ScoreCellIDs.SMALL_STRAIGHT]||0) +
-				(scores[ScoreCellIDs.SMALL_STRAIGHT]||0);
+				(scores[ScoreCellIDs.THREE_OF_A_KIND] || 0) +
+				(scores[ScoreCellIDs.FOUR_OF_A_KIND] || 0) +
+				(scores[ScoreCellIDs.FIVE_OF_A_KIND] || 0) +
+				(scores[ScoreCellIDs.CHANCE] || 0) +
+				(scores[ScoreCellIDs.FULL_HOUSE] || 0) +
+				(scores[ScoreCellIDs.SMALL_STRAIGHT] || 0) +
+				(scores[ScoreCellIDs.SMALL_STRAIGHT] || 0);
 
 			scores.total = firstPart + (firstPart >= 63 ? 35 : 0) + secondPart;
 

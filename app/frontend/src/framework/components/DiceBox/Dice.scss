@@ -1,15 +1,13 @@
 .dice {
-
-	&.dice-type-{
-
+	&.dice-type- {
 		&default .die-list .die-item {
 			display: grid;
 			grid-column: 1;
 			grid-row: 1;
 			grid-template-areas:
-					  'one two three'
-					  'four five six'
-					  'seven eight nine';
+				'one two three'
+				'four five six'
+				'seven eight nine';
 			grid-template-columns: repeat(3, 1fr);
 			grid-template-rows: repeat(3, 1fr);
 

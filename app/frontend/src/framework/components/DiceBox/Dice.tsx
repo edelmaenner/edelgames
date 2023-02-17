@@ -7,8 +7,8 @@ interface IProps {
 	backdropColor?: string;
 	onDiceRolled?: { (): void };
 	onDiceClicked?: { (diceId: number): void };
-    style?: React.CSSProperties;
-	customProps?: {[key: string]: any}
+	style?: React.CSSProperties;
+	customProps?: { [key: string]: any };
 }
 
 export default class Dice extends Component<IProps, {}> {
@@ -43,7 +43,7 @@ export default class Dice extends Component<IProps, {}> {
 				: 'initial',
 		};
 
-		let classes = ['dice', 'dice-type-'+this.diceType];
+		let classes = ['dice', 'dice-type-' + this.diceType];
 		if (this.props.onDiceClicked) {
 			classes.push('clickable');
 		}

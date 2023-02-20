@@ -16,11 +16,22 @@ import {
 	DiceSelectionChangedEventData,
 	GameStateChangedEventData,
 	RollRequestedEventData,
-	ScoresChangedEventData,
-	YahtzeeClientToServerEventNames,
-	YahtzeeServerToClientEventNames,
+	ScoresChangedEventData
 } from '@edelgames/types/src/modules/yahtzee/YEvents';
 import WinningScreen from './components/WinningScreen';
+
+
+enum YahtzeeServerToClientEventNames {
+	DICES_CHANGED = 'dicesChanged',
+	SCORES_CHANGED = 'scoresChanged',
+	GAME_STATE_CHANGED = 'gameStateChanged',
+}
+
+enum YahtzeeClientToServerEventNames {
+	ROLL_REQUESTED = 'rollRequested',
+	CELL_SELECTED = 'cellSelected',
+	DICE_SELECTION_CHANGED = 'diceSelectionChanged',
+}
 
 interface IState {
 	gameState: possibleGameStates;

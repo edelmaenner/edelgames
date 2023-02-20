@@ -1,4 +1,4 @@
-import { DiceDotCollection, ScoreCellIDs, YahtzeeScoreObject } from './YTypes';
+import {DiceDotCollection, ScoreCellIDs, YahtzeeScoreObject} from "@edelgames/types/src/modules/yahtzee/YTypes";
 
 export function getPointsFromDices(
 	scoreType: ScoreCellIDs,

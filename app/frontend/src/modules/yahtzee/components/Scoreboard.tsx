@@ -5,11 +5,8 @@ import {
 	YahtzeeScoreboardType,
 	YahtzeeScoreObject,
 } from '@edelgames/types/src/modules/yahtzee/YTypes';
-import {
-	getPointsFromDices,
-	getTotalFirstPartPoints,
-} from '@edelgames/types/src/modules/yahtzee/YFunctions';
 import ModulePlayerApi from '../../../framework/modules/api/ModulePlayerApi';
+import {getPointsFromDices, getTotalFirstPartPoints} from "./YahtzeeFunctions";
 
 interface IProps {
 	playerApi: ModulePlayerApi;

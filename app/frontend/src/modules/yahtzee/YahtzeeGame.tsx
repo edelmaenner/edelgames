@@ -16,10 +16,9 @@ import {
 	DiceSelectionChangedEventData,
 	GameStateChangedEventData,
 	RollRequestedEventData,
-	ScoresChangedEventData
+	ScoresChangedEventData,
 } from '@edelgames/types/src/modules/yahtzee/YEvents';
 import WinningScreen from './components/WinningScreen';
-
 
 enum YahtzeeServerToClientEventNames {
 	DICES_CHANGED = 'dicesChanged',

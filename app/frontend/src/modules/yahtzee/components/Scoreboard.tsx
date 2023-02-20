@@ -6,7 +6,10 @@ import {
 	YahtzeeScoreObject,
 } from '@edelgames/types/src/modules/yahtzee/YTypes';
 import ModulePlayerApi from '../../../framework/modules/api/ModulePlayerApi';
-import {getPointsFromDices, getTotalFirstPartPoints} from "./YahtzeeFunctions";
+import {
+	getPointsFromDices,
+	getTotalFirstPartPoints,
+} from './YahtzeeFunctions';
 
 interface IProps {
 	playerApi: ModulePlayerApi;
@@ -91,9 +94,9 @@ export default class Scoreboard extends React.Component<IProps, {}> {
 			isLocalePlayer =
 				this.props.playerApi.getLocalePlayer().getId() === player.getId();
 			isActivePlayer = this.props.activePlayerId === player.getId();
-			allowSelection = isLocalePlayer && isActivePlayer && this.props.remainingRolls <= 2;
+			allowSelection =
+				isLocalePlayer && isActivePlayer && this.props.remainingRolls <= 2;
 		}
-
 
 		let totalFirstPart = getTotalFirstPartPoints(playerScore);
 

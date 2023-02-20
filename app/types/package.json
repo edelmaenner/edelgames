@@ -9,7 +9,6 @@
 	},
 	"scripts": {
 		"prepublish": "npm run build",
-		"copyraw": "mkdir -p ./build/src && cp -r ./src ./build",
-		"build": "npm run copyraw && tsc -b"
+		"build": "tsc -b"
 	}
 }

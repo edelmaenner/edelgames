@@ -1,6 +1,6 @@
-import React, { ReactNode } from 'react';
+import React, {ReactNode} from 'react';
 import {
-	ColorGrid,
+	ColorGrid, ColorGridCell,
 	Coordinate,
 	GridColorOptions,
 } from '@edelgames/types/src/modules/colorChecker/CCTypes';
@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 interface IProps {
 	colorGrid: ColorGrid;
-	onCellClicked: { (x: number, y: number): void };
+	onCellSelectionChanged: { (cells: Coordinate[]): void };
 	allowSelection: boolean;
 	allowedColors?: GridColorOptions[];
 	allowedNumbers?: number[];
@@ -19,9 +19,13 @@ interface IState {
 }
 
 export default class ColorGridBox extends React.Component<IProps, IState> {
-	state = {
-		currentSelection: [{ x: 8, y: 3 }],
-	};
+
+	constructor(props: IProps) {
+		super(props);
+		this.state = {
+			currentSelection: []
+		}
+	}
 
 	render(): ReactNode {
 		return (
@@ -33,26 +37,10 @@ export default class ColorGridBox extends React.Component<IProps, IState> {
 
 	renderColumn(x: number): JSX.Element {
 		return (
-			<div className={'color-checker-grid-column'}>
+			<div className={'color-checker-grid-column'} key={"column_"+x}>
 				<div className={'color-checker-grid-cell'}>
 					{
-						[
-							'A',
-							'B',
-							'C',
-							'D',
-							'E',
-							'F',
-							'G',
-							'H',
-							'I',
-							'J',
-							'K',
-							'L',
-							'M',
-							'N',
-							'O',
-						][x]
+						['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O'][x]
 					}
 				</div>
 
@@ -61,27 +49,41 @@ export default class ColorGridBox extends React.Component<IProps, IState> {
 		);
 	}
 
-	renderCell(x: number, y: number): JSX.Element {
-		let cell = this.props.colorGrid[x][y] || {
+	getCellFromGrid(x: number, y: number): ColorGridCell {
+		const width = this.props.colorGrid.length;
+		const height = this.props.colorGrid[0].length;
+
+		if(x >= 0 && y >= 0 && x < width && y < height) {
+			return this.props.colorGrid[x][y];
+		}
+
+		return {
 			color: '#fff',
 			isSpecial: false,
 			checked: false,
 		};
+	}
 
-		const canBeSelected = this.canFieldBeSelected(
-			{ x: x, y: y },
-			[GridColorOptions.GREEN],
-			[2]
-		);
+	isCellInCurrentSelection(pos: Coordinate): boolean {
+		return this.state.currentSelection.find(el => (el.x === pos.x && el.y === pos.y)) !== undefined;
+	}
+
+	renderCell(x: number, y: number): JSX.Element {
+		let cell = this.getCellFromGrid(x,y);
+		let pos = {x: x, y: y};
 
 		let classes = ['color-checker-grid-cell'];
-		if (!cell.checked && canBeSelected) classes.push('clickable');
-		if (canBeSelected) classes.push('selectable');
+		if(this.isCellInCurrentSelection(pos)) {
+			classes.push('selected');
+		}
 
 		return (
 			<div
+				key={"column_"+x+"_"+y}
 				className={classes.join(' ')}
-				onClick={() => this.props.onCellClicked(x, y)}
+				onClick={this.onCellClicked.bind(this, pos)}
+				onMouseEnter={(event) => this.onMouseEnterCell(pos, event.currentTarget)}
+				onMouseLeave={(event) => this.onMouseLeaveCell(pos, event.currentTarget)}
 				style={{
 					backgroundColor: cell.color,
 				}}
@@ -96,6 +98,40 @@ export default class ColorGridBox extends React.Component<IProps, IState> {
 		);
 	}
 
+	onMouseEnterCell(pos: Coordinate, element: Element): void {
+		let isSelectable = this.canFieldBeSelected(
+			pos,
+			this.props.allowedColors ?? [],
+			this.props.allowedNumbers ?? []
+		);
+		if(isSelectable) {
+			element.classList.add('selectable');
+		}
+	}
+
+	onMouseLeaveCell(pos: Coordinate, element: Element): void {
+		element.classList.remove('selectable', 'clickable');
+	}
+
+	onCellClicked(pos: Coordinate): void {
+		let existingSelection = this.state.currentSelection.find(el => el.x === pos.x && el.y === pos.y);
+		let newSelection = this.state.currentSelection;
+
+		if(existingSelection !== undefined) {
+			// remove selection
+			newSelection.splice(this.state.currentSelection.indexOf(existingSelection), 1);
+		}
+		else if(this.canFieldBeSelected(pos, this.props.allowedColors??[], this.props.allowedNumbers??[])) {
+			// add selection
+			newSelection.push(pos);
+		}
+
+		this.setState({
+			currentSelection: newSelection
+		});
+		this.props.onCellSelectionChanged(newSelection);
+	}
+
 	canFieldBeSelected(
 		pos: Coordinate,
 		allowedColors: GridColorOptions[],
@@ -106,6 +142,12 @@ export default class ColorGridBox extends React.Component<IProps, IState> {
 
 		const requiredFieldCount =
 			allowedCounts.reduce((prev, curr) => (prev < curr ? prev : curr)) || 0;
+		const allowedFieldCount =
+			allowedCounts.reduce((prev, curr) => (prev > curr ? prev : curr)) || 0;
+
+		if(this.state.currentSelection.length >= allowedFieldCount) {
+			return false; // already selected the maximum
+		}
 
 		if (pos.x < 0 || pos.y < 0 || pos.x >= gridWidth || pos.y >= gridHeight) {
 			return false; // out of bounce
@@ -134,12 +176,21 @@ export default class ColorGridBox extends React.Component<IProps, IState> {
 			return false;
 		}
 
+		// if we don't have a selection yet, check if this cell is next to a selected one or the start column
+		if (this.state.currentSelection.length === 0 &&
+			pos.x !== 7 &&
+			!this.getCellFromGrid(pos.x-1,pos.y).checked &&
+			!this.getCellFromGrid(pos.x+1,pos.y).checked &&
+			!this.getCellFromGrid(pos.x,pos.y-1).checked &&
+			!this.getCellFromGrid(pos.x,pos.y+1).checked
+		) {
+			return false;
+		}
+
+
 		// now we have to find nearby empty fields with the same color. At least as many as requiredFieldCount
 		let nearbyFields: Coordinate[] = [];
 		let fieldsToCheck: Coordinate[] = [pos];
-
-		// todo prevent selecting more fields, once the requiredFieldCount is reached and the spot would not
-		// provide enough fields for a higher fieldCount
 
 		while (
 			fieldsToCheck.length > 0 &&
@@ -177,13 +228,6 @@ export default class ColorGridBox extends React.Component<IProps, IState> {
 			if (fieldToCheck.y < gridHeight - 1) {
 				fieldsToCheck.push({ x: fieldToCheck.x, y: fieldToCheck.y + 1 });
 			}
-		}
-
-		if (pos.x === 8 && pos.y == 3) {
-			console.log(
-				`${pos.x}|${pos.y} has ${nearbyFields.length} neighbours of ${requiredFieldCount}`,
-				nearbyFields
-			);
 		}
 
 		return nearbyFields.length >= requiredFieldCount;

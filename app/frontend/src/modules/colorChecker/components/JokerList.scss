@@ -1,8 +1,61 @@
 .joker-list {
 	display: flex;
-	gap: 1rem;
+	justify-content: space-around;
+	padding: 0.5rem;
+	background: $backgroundDark;
+	margin: 1rem 0;
+
+	.joker-list-summary {
+		display: flex;
+		align-items: center;
+	}
 
 	.joker-field {
 		display: inline-block;
+		position: relative;
+
+		&.joker-used {
+			position: relative;
+			color: black;
+
+			.joker-used-mark {
+				position: absolute;
+				left: 50%;
+				top: 50%;
+				transform: translate(-50%,-50%);
+				color: white;
+			}
+		}
+
+		&:not(.joker-used) {
+			cursor: pointer;
+		}
+
+		.joker-type-selection {
+			display: flex;
+			position: absolute;
+			bottom: calc(100% + 1rem);
+			left: 50%;
+			gap: 0.5rem;
+			padding: 0.5rem;
+			background: red;
+			transform: translateX(-50%);
+
+			&:before {
+				content: "";
+				width: 0;
+				height: 0;
+				border: 1rem solid transparent;
+				border-top-color: red;
+				position: absolute;
+				left: 50%;
+				transform: translateX(-50%);
+				top: 100%;
+			}
+
+			.btn {
+				min-width: 4rem;
+			}
+		}
 	}
 }

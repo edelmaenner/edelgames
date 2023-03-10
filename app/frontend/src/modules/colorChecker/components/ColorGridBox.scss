@@ -11,6 +11,13 @@ $cellSize: 2rem;
 		display: flex;
 		flex-direction: column;
 
+		&:nth-of-type(8) {
+			.color-checker-grid-cell:first-of-type {
+				background-color: #7d0c0c;
+			}
+		}
+
+
 		&:not(:last-of-type) {
 			border-right: 1px solid $backgroundDark;
 		}
@@ -20,8 +27,10 @@ $cellSize: 2rem;
 			flex: 0 0 $cellSize;
 			max-height: $cellSize;
 
+			&.selected,
 			&.selectable {
 				filter: grayscale(1);
+				cursor: pointer;
 			}
 
 			&:first-of-type {

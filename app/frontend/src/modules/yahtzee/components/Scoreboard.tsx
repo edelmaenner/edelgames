@@ -5,11 +5,11 @@ import {
 	YahtzeeScoreboardType,
 	YahtzeeScoreObject,
 } from '@edelgames/types/src/modules/yahtzee/YTypes';
+import ModulePlayerApi from '../../../framework/modules/api/ModulePlayerApi';
 import {
 	getPointsFromDices,
 	getTotalFirstPartPoints,
-} from '@edelgames/types/src/modules/yahtzee/YFunctions';
-import ModulePlayerApi from '../../../framework/modules/api/ModulePlayerApi';
+} from './YahtzeeFunctions';
 
 interface IProps {
 	playerApi: ModulePlayerApi;

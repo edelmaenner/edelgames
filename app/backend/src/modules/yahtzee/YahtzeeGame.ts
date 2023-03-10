@@ -9,19 +9,29 @@ import {
 	YahtzeeScoreObject,
 } from '@edelgames/types/src/modules/yahtzee/YTypes';
 import {
-	getPointsFromDices,
-	getTotalFirstPartPoints,
-} from '@edelgames/types/src/modules/yahtzee/YFunctions';
-import {
 	CellSelectedEventData,
 	DiceChangedEventData,
 	DiceSelectionChangedEventData,
 	GameStateChangedEventData,
 	RollRequestedEventData,
 	ScoresChangedEventData,
-	YahtzeeClientToServerEventNames,
-	YahtzeeServerToClientEventNames,
 } from '@edelgames/types/src/modules/yahtzee/YEvents';
+import {
+	getPointsFromDices,
+	getTotalFirstPartPoints,
+} from './YahtzeeFunctions';
+
+export enum YahtzeeServerToClientEventNames {
+	DICES_CHANGED = 'dicesChanged',
+	SCORES_CHANGED = 'scoresChanged',
+	GAME_STATE_CHANGED = 'gameStateChanged',
+}
+
+export enum YahtzeeClientToServerEventNames {
+	ROLL_REQUESTED = 'rollRequested',
+	CELL_SELECTED = 'cellSelected',
+	DICE_SELECTION_CHANGED = 'diceSelectionChanged',
+}
 
 /*
  * The actual game instance, that controls and manages the game

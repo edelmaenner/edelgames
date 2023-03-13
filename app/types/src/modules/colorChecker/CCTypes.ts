@@ -23,6 +23,9 @@ export type ColorGridCollection = {
 	playerId: string;
 	playerName: string;
 	grid: ColorGrid;
+	remainingJokers: number;
+	isUsingNumberJoker: boolean;
+	isUsingColorJoker: boolean;
 }[];
 
 export type Coordinate = {

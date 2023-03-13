@@ -20,7 +20,7 @@ import { EventDataObject } from '@edelgames/types/src/app/ApiTypes';
 import ScoreBoard from './components/ScoreBoard';
 import {
 	OnGameStateUpdateEventData,
-	OnGridChangedEventData,
+	OnGridChangedEventData, OnPlayerStateUpdateEventData,
 	S2CEvents,
 } from '@edelgames/types/src/modules/colorChecker/CCEvents';
 
@@ -80,16 +80,37 @@ export default class ColorCheckerGame
 				S2CEvents.ON_GRID_CHANGED,
 				this.onGridChangedEvent.bind(this)
 			);
+		this.api
+			.getEventApi()
+			.addEventHandler(
+				S2CEvents.ON_PLAYER_STATE_UPDATE,
+				this.onPlayerStateChangedEvent.bind(this)
+			);
 	}
 
 	componentWillUnmount() {
-		this.api.getEventApi().removeEvent(S2CEvents.ON_GAME_STATE_UPDATE);
 		this.api.getEventApi().removeEvent(S2CEvents.ON_GRID_CHANGED);
+		this.api.getEventApi().removeEvent(S2CEvents.ON_PLAYER_STATE_UPDATE);
+		this.api.getEventApi().removeEvent(S2CEvents.ON_GAME_STATE_UPDATE);
 	}
 
 	/*
 		Server to client events
 	 */
+	onPlayerStateChangedEvent(eventData: EventDataObject): void {
+		const {
+			usingColorJoker,
+			usingNumberJoker,
+			remainingJokers,
+		} = eventData as OnPlayerStateUpdateEventData;
+
+		this.setState({
+			usingColorJoker,
+			usingNumberJoker,
+			remainingJokers,
+		});
+	}
+
 	onGameStateChangedEvent(eventData: EventDataObject): void {
 		const {
 			gameState,
@@ -97,26 +118,17 @@ export default class ColorCheckerGame
 			reservedBonusPoints,
 			reservedColumnPoints,
 			currentDiceValues,
-			usingColorJoker,
-			usingNumberJoker,
 			activePlayerId,
-			remainingJokers,
 		} = eventData as OnGameStateUpdateEventData;
 
-		this.setState(
-			{
-				gameState,
-				reservedDiceIndices,
-				reservedBonusPoints,
-				reservedColumnPoints,
-				currentDiceValues,
-				usingColorJoker,
-				usingNumberJoker,
-				activePlayerId,
-				remainingJokers,
-			},
-			this.updateAllowedNumbersAndColors.bind(this)
-		);
+		this.setState({
+			gameState: gameState,
+			reservedDiceIndices: reservedDiceIndices,
+			reservedBonusPoints: reservedBonusPoints,
+			reservedColumnPoints: reservedColumnPoints,
+			currentDiceValues: currentDiceValues,
+			activePlayerId: activePlayerId,
+		}, this.updateAllowedNumbersAndColors.bind(this));
 	}
 
 	onGridChangedEvent(eventData: EventDataObject): void {
@@ -124,6 +136,7 @@ export default class ColorCheckerGame
 		this.setState({
 			grid: newGrid,
 		});
+		console.log('setting new grid');
 	}
 
 	/*

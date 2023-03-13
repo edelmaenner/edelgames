@@ -15,6 +15,7 @@ export type OnJokerRequestedEventData = {
 
 export const enum S2CEvents {
 	ON_GAME_STATE_UPDATE = 'onGameStateUpdate',
+	ON_PLAYER_STATE_UPDATE = 'onPlayerStateUpdate',
 	ON_GRID_CHANGED = 'onGridChanged',
 }
 
@@ -25,6 +26,9 @@ export type OnGameStateUpdateEventData = {
 	reservedDiceIndices: number[];
 	reservedBonusPoints: boolean[];
 	reservedColumnPoints: boolean[];
+};
+
+export type OnPlayerStateUpdateEventData = {
 	usingColorJoker: boolean;
 	usingNumberJoker: boolean;
 	remainingJokers: number;

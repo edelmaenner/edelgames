@@ -1,28 +1,27 @@
 .scoreboard {
-    flex: 1 1 auto;
-    background-color: $backgroundDark;
+	flex: 1 1 auto;
+	background-color: $backgroundDark;
 
-    .bonus-panel {
-        display: flex;
-        flex-direction: column;
-        padding: 1rem;
+	.bonus-panel {
+		display: flex;
+		flex-direction: column;
+		padding: 1rem;
 
-        .color-bonus-row {
-            display: flex;
-            gap: 1rem;
-            padding: 0.5rem;
-            background: $background;
-            border-bottom: 3px solid $backgroundDark;
+		.color-bonus-row {
+			display: flex;
+			gap: 1rem;
+			padding: 0.5rem;
+			background: $background;
+			border-bottom: 3px solid $backgroundDark;
 
-            .color-bonus-cell {
-                min-width: 3rem;
-                text-align: center;
-                position: relative;
-            }
+			.color-bonus-cell {
+				min-width: 3rem;
+				text-align: center;
+				position: relative;
+			}
 
-            .color-bonus-preview {
-
-            }
-        }
-    }
+			.color-bonus-preview {
+			}
+		}
+	}
 }

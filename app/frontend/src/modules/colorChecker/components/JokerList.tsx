@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 interface IProps {
@@ -18,7 +18,7 @@ interface IState {
 export default class JokerList extends Component<IProps, IState> {
 	state = {
 		usedUpJokers: [...Array(10)].fill(false),
-		currentJokerSelection: -1
+		currentJokerSelection: -1,
 	};
 
 	pageClickListener = this.onPageClicked.bind(this);
@@ -34,15 +34,15 @@ export default class JokerList extends Component<IProps, IState> {
 
 	onPageClicked(event: MouseEvent): void {
 		let jokerList = this.jokerListRef.current;
-		if(!jokerList || !(event.target instanceof Node) ) {
+		if (!jokerList || !(event.target instanceof Node)) {
 			return;
 		}
 		let isJokerListClick = jokerList.contains(event.target);
 
-		if(!isJokerListClick) {
+		if (!isJokerListClick) {
 			this.setState({
-				currentJokerSelection: -1
-			})
+				currentJokerSelection: -1,
+			});
 		}
 	}
 
@@ -50,28 +50,31 @@ export default class JokerList extends Component<IProps, IState> {
 		let jokers = this.state.usedUpJokers;
 		jokers[index] = true;
 		this.setState({
-			usedUpJokers: jokers
-		})
+			usedUpJokers: jokers,
+		});
 		this.props.onJokerUse(isNumber);
 	}
 
 	onJokerClicked(index: number): void {
-		const canUseJoker = this.props.canUseColorJoker || this.props.canUseNumberJoker;
+		const canUseJoker =
+			this.props.canUseColorJoker || this.props.canUseNumberJoker;
 
 		if (!this.state.usedUpJokers[index] && canUseJoker) {
 			this.setState({
-				currentJokerSelection: index
+				currentJokerSelection: index,
 			});
 		}
 	}
 
 	render() {
-		const isUsingJoker = this.props.usingColorJoker || this.props.usingNumberJoker;
+		const isUsingJoker =
+			this.props.usingColorJoker || this.props.usingNumberJoker;
 
 		return (
 			<div className={'joker-list'} ref={this.jokerListRef}>
 				<div className={'joker-list-summary'}>
-					{this.props.remainingJokers - (isUsingJoker ? 1 : 0)}/{this.state.usedUpJokers.length}
+					{this.props.remainingJokers - (isUsingJoker ? 1 : 0)}/
+					{this.state.usedUpJokers.length}
 				</div>
 				{this.state.usedUpJokers.map(this.renderJoker.bind(this))}
 			</div>
@@ -80,33 +83,31 @@ export default class JokerList extends Component<IProps, IState> {
 
 	renderJoker(isUsed: boolean, index: number): JSX.Element {
 		let classes = ['joker-field'];
-		if(isUsed) {
+		if (isUsed) {
 			classes.push('joker-used');
 			classes.push('clickable');
-		}
-		else if(this.props.canUseNumberJoker || this.props.canUseColorJoker) {
+		} else if (this.props.canUseNumberJoker || this.props.canUseColorJoker) {
 			classes.push('clickable');
 		}
 
 		return (
-			<div className={classes.join(' ')}
-				 key={'joker_' + index}
-				 onClick={this.onJokerClicked.bind(this, index)}
+			<div
+				className={classes.join(' ')}
+				key={'joker_' + index}
+				onClick={this.onJokerClicked.bind(this, index)}
 			>
-				{this.state.currentJokerSelection === index ? this.renderJokerTypeSelection(index) : null}
+				{this.state.currentJokerSelection === index
+					? this.renderJokerTypeSelection(index)
+					: null}
 
-				<FontAwesomeIcon
-					icon={['fad', 'circle-exclamation']}
-					size="2x"
-				/>
-				{
-					isUsed ?
+				<FontAwesomeIcon icon={['fad', 'circle-exclamation']} size="2x" />
+				{isUsed ? (
 					<FontAwesomeIcon
 						className={'joker-used-mark'}
 						icon={['fad', 'xmark']}
 						size="2x"
-					/> : null
-				}
+					/>
+				) : null}
 			</div>
 		);
 	}
@@ -114,24 +115,22 @@ export default class JokerList extends Component<IProps, IState> {
 	renderJokerTypeSelection(index: number): JSX.Element {
 		return (
 			<div className={'joker-type-selection'}>
-				{
-					this.props.canUseNumberJoker ?
-						<button
-							className={'btn btn-secondary'}
-							onClick={this.onJokerSelected.bind(this, index, true)}
-						>
-							Zahl
-						</button> : null
-				}
-				{
-					this.props.canUseColorJoker ?
-						<button
-							className={'btn btn-secondary'}
-							onClick={this.onJokerSelected.bind(this, index, false)}
-						>
-							Farbe
-						</button> : null
-				}
+				{this.props.canUseNumberJoker ? (
+					<button
+						className={'btn btn-secondary'}
+						onClick={this.onJokerSelected.bind(this, index, true)}
+					>
+						Zahl
+					</button>
+				) : null}
+				{this.props.canUseColorJoker ? (
+					<button
+						className={'btn btn-secondary'}
+						onClick={this.onJokerSelected.bind(this, index, false)}
+					>
+						Farbe
+					</button>
+				) : null}
 			</div>
 		);
 	}

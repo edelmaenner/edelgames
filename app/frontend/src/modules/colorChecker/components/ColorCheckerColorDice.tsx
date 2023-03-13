@@ -1,6 +1,6 @@
 import React from 'react';
 import Dice from '../../../framework/components/DiceBox/Dice';
-import {SelectableColors} from "./ColorGridBox";
+import { SelectableColors } from './ColorGridBox';
 
 const ColoredDiceMap = [...SelectableColors, '#000000'];
 

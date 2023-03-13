@@ -14,14 +14,13 @@
 		width: 30rem;
 	}
 
-
-
-	.striked, .circled {
+	.striked,
+	.circled {
 		position: relative;
 	}
 
 	.striked:after {
-		content: "";
+		content: '';
 		position: absolute;
 		left: 50%;
 		top: 50%;
@@ -31,7 +30,7 @@
 		background-color: $signature;
 	}
 	.circled:after {
-		content: "";
+		content: '';
 		position: absolute;
 		top: 50%;
 		left: 50%;

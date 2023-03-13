@@ -27,10 +27,6 @@
 			}
 		}
 
-		&:not(.joker-used) {
-			cursor: pointer;
-		}
-
 		.joker-type-selection {
 			display: flex;
 			position: absolute;

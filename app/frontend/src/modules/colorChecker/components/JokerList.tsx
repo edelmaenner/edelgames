@@ -1,4 +1,4 @@
-import React, {Component, MouseEventHandler, Ref} from 'react';
+import React, {Component} from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 interface IProps {
@@ -34,10 +34,10 @@ export default class JokerList extends Component<IProps, IState> {
 
 	onPageClicked(event: MouseEvent): void {
 		let jokerList = this.jokerListRef.current;
-		if(!jokerList || !(event.currentTarget instanceof Node) ) {
+		if(!jokerList || !(event.target instanceof Node) ) {
 			return;
 		}
-		let isJokerListClick = jokerList.contains(event.currentTarget);
+		let isJokerListClick = jokerList.contains(event.target);
 
 		if(!isJokerListClick) {
 			this.setState({
@@ -57,6 +57,7 @@ export default class JokerList extends Component<IProps, IState> {
 
 	onJokerClicked(index: number): void {
 		const canUseJoker = this.props.canUseColorJoker || this.props.canUseNumberJoker;
+
 		if (!this.state.usedUpJokers[index] && canUseJoker) {
 			this.setState({
 				currentJokerSelection: index
@@ -65,10 +66,12 @@ export default class JokerList extends Component<IProps, IState> {
 	}
 
 	render() {
+		const isUsingJoker = this.props.usingColorJoker || this.props.usingNumberJoker;
+
 		return (
 			<div className={'joker-list'} ref={this.jokerListRef}>
 				<div className={'joker-list-summary'}>
-					{this.props.remainingJokers}/10
+					{this.props.remainingJokers - (isUsingJoker ? 1 : 0)}/{this.state.usedUpJokers.length}
 				</div>
 				{this.state.usedUpJokers.map(this.renderJoker.bind(this))}
 			</div>
@@ -79,6 +82,10 @@ export default class JokerList extends Component<IProps, IState> {
 		let classes = ['joker-field'];
 		if(isUsed) {
 			classes.push('joker-used');
+			classes.push('clickable');
+		}
+		else if(this.props.canUseNumberJoker || this.props.canUseColorJoker) {
+			classes.push('clickable');
 		}
 
 		return (

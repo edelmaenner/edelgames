@@ -1,14 +1,8 @@
 import React from 'react';
 import Dice from '../../../framework/components/DiceBox/Dice';
+import {SelectableColors} from "./ColorGridBox";
 
-const ColoredDiceMap = [
-	'#c9437a',
-	'#2cc52c',
-	'#3f63b9',
-	'#f9f917',
-	'#ee7500',
-	'#000000',
-];
+const ColoredDiceMap = [...SelectableColors, '#000000'];
 
 export default class ColorCheckerColorDice extends Dice {
 	diceType: string = 'colorCheckerColor';

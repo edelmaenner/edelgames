@@ -2,8 +2,9 @@ $cellSize: 2rem;
 
 .color-checker-grid {
 	display: flex;
-	flex: 0 1 (15 * $cellSize);
-	max-height: (8 * $cellSize);
+	flex: 0 0 (15 * $cellSize);
+	max-height: (10 * $cellSize);
+	min-width: (15 * $cellSize);
 
 	.color-checker-grid-column {
 		flex: 0 0 $cellSize;
@@ -52,6 +53,18 @@ $cellSize: 2rem;
 					opacity: 0.5;
 				}
 			}
+		}
+
+
+		.points {
+			background-color: $backgroundLight;
+			border-radius: 0.5rem;
+			width: 2rem;
+			height: 2rem;
+			border: 1px solid $background;
+			display: flex;
+			justify-content: center;
+			align-items: center;
 		}
 	}
 }

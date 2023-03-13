@@ -1,6 +1,7 @@
 import React, {ReactNode} from 'react';
 import {
-	ColorGrid, ColorGridCell,
+	ColorGrid,
+	ColorGridCell,
 	Coordinate,
 	GridColorOptions,
 } from '@edelgames/types/src/modules/colorChecker/CCTypes';
@@ -8,10 +9,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 interface IProps {
 	colorGrid: ColorGrid;
-	onCellSelectionChanged: { (cells: Coordinate[]): void };
+	onCellSelectionChanged: { (cells: Coordinate[], cellColor?: GridColorOptions): void };
 	allowSelection: boolean;
 	allowedColors?: GridColorOptions[];
 	allowedNumbers?: number[];
+	reservedColumnPoints: boolean[],
 }
 
 interface IState {
@@ -30,23 +32,43 @@ export default class ColorGridBox extends React.Component<IProps, IState> {
 	render(): ReactNode {
 		return (
 			<div className={'color-checker-grid'}>
-				{[...Array(15)].map((el, index) => this.renderColumn(index))}
+				{[...Array(ColumnIdentifiers.length)].map((el, index) => this.renderColumn(index))}
 			</div>
 		);
 	}
 
 	renderColumn(x: number): JSX.Element {
+		const isColumnFinished = this.isColumnFinished(x);
+
 		return (
 			<div className={'color-checker-grid-column'} key={"column_"+x}>
 				<div className={'color-checker-grid-cell'}>
 					{
-						['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O'][x]
+						ColumnIdentifiers[x]
 					}
 				</div>
 
-				{[...Array(7)].map((el, index) => this.renderCell(x, index))}
+				{[...Array(RowIdentifiers.length)].map((el, index) => this.renderCell(x, index))}
+
+				<div className={"points " + (this.props.reservedColumnPoints[x] ? 'striked' : (isColumnFinished ? 'circled' : ''))}>
+					{ColumnPoints[x][0]}
+				</div>
+				<div className={"points " + (this.props.reservedColumnPoints[x] && isColumnFinished ? 'circled' : '')}>
+					{ColumnPoints[x][1]}
+				</div>
+
 			</div>
 		);
+	}
+
+	isColumnFinished(x: number): boolean {
+		for(let cell of this.props.colorGrid[x]) {
+			if(!cell.checked) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	getCellFromGrid(x: number, y: number): ColorGridCell {
@@ -57,11 +79,7 @@ export default class ColorGridBox extends React.Component<IProps, IState> {
 			return this.props.colorGrid[x][y];
 		}
 
-		return {
-			color: '#fff',
-			isSpecial: false,
-			checked: false,
-		};
+		return EmptyCell;
 	}
 
 	isCellInCurrentSelection(pos: Coordinate): boolean {
@@ -115,21 +133,80 @@ export default class ColorGridBox extends React.Component<IProps, IState> {
 
 	onCellClicked(pos: Coordinate): void {
 		let existingSelection = this.state.currentSelection.find(el => el.x === pos.x && el.y === pos.y);
-		let newSelection = this.state.currentSelection;
+		let newSelection = [...this.state.currentSelection];
 
 		if(existingSelection !== undefined) {
 			// remove selection
 			newSelection.splice(this.state.currentSelection.indexOf(existingSelection), 1);
+			if(!this.isSelectionValid(newSelection)) {
+				return; // abort this change, as it invalidates the selection
+			}
 		}
 		else if(this.canFieldBeSelected(pos, this.props.allowedColors??[], this.props.allowedNumbers??[])) {
 			// add selection
 			newSelection.push(pos);
 		}
+		else {
+			// do nothing
+			return;
+		}
 
 		this.setState({
 			currentSelection: newSelection
 		});
-		this.props.onCellSelectionChanged(newSelection);
+
+		let selectedColor = newSelection.length > 0 ? this.getCellFromGrid(newSelection[0].x, newSelection[0].y).color : undefined;
+		this.props.onCellSelectionChanged(newSelection, selectedColor === '#fff' ? undefined : selectedColor);
+	}
+
+	isSelectionValid(selection: Coordinate[]): boolean {
+		let selectionToCheck = [...selection];
+		let validSelectedFields: Coordinate[] = [];
+
+		let continueCheck = true;
+		while(continueCheck) {
+			continueCheck = false;
+
+			// try to find a valid selection
+			for(let i = 0; i < selectionToCheck.length; i++) {
+				let pos = selectionToCheck[i];
+				let isValid = false;
+				if (validSelectedFields.length === 0) {
+					// start by searching a cell next to a checked field or the start column
+					isValid = (pos.x === 7 || this.doesCellHasCheckedNeighbour(pos));
+				}
+				else {
+					// require additional selections to be next to an existing selection
+					isValid = this.getSelectedNeighbourOfCell(pos, validSelectedFields) !== undefined;
+				}
+
+				if(isValid) {
+					validSelectedFields.push(pos);
+					selectionToCheck.splice(i, 1);
+					continueCheck = true;
+					break;
+				}
+			}
+		}
+
+		return validSelectedFields.length === selection.length;
+	}
+
+	doesCellHasCheckedNeighbour(pos: Coordinate): boolean {
+		return (
+			this.getCellFromGrid(pos.x-1,pos.y).checked ||
+			this.getCellFromGrid(pos.x+1,pos.y).checked ||
+			this.getCellFromGrid(pos.x,pos.y-1).checked ||
+			this.getCellFromGrid(pos.x,pos.y+1).checked
+		);
+	}
+
+	getSelectedNeighbourOfCell(pos: Coordinate, selection: Coordinate[]): Coordinate|undefined {
+		return selection.find(
+			(other) =>
+				(Math.abs(other.x - pos.x) === 1 && other.y === pos.y) ||
+				(other.x === pos.x && Math.abs(other.y - pos.y) === 1)
+		);
 	}
 
 	canFieldBeSelected(
@@ -161,29 +238,32 @@ export default class ColorGridBox extends React.Component<IProps, IState> {
 			return false; // placeholder color or color not allowed
 		}
 
-		// if we already have a selection, check if this field is neighboring one of them and not one of them
-		if (
-			this.state.currentSelection.length > 0 &&
-			(!this.state.currentSelection.find(
-				(other) =>
-					(Math.abs(other.x - pos.x) === 1 && other.y === pos.y) ||
-					(other.x === pos.x && Math.abs(other.y - pos.y) === 1)
-			) ||
-				this.state.currentSelection.find(
-					(other) => other.x === pos.x && other.y === pos.y
-				))
-		) {
-			return false;
-		}
+		// if we already have a selection
+		if(this.state.currentSelection.length > 0) {
+			// check if this field is already selected and thus valid
+			const isCellAlreadySelected = this.state.currentSelection.find(
+				(other) => other.x === pos.x && other.y === pos.y
+			);
+			if(isCellAlreadySelected) {
+				return true;
+			}
 
-		// if we don't have a selection yet, check if this cell is next to a selected one or the start column
-		if (this.state.currentSelection.length === 0 &&
+			// check if this field is neighboring one of them
+			const existingNeighbour = this.getSelectedNeighbourOfCell(pos, this.state.currentSelection);
+			if(!existingNeighbour) {
+				return false;
+			}
+
+			// check if the neighbouring cell has the same color
+			if(targetField.color !== this.getCellFromGrid(existingNeighbour.x, existingNeighbour.y).color) {
+				return false;
+			}
+		}
+		else if (
 			pos.x !== 7 &&
-			!this.getCellFromGrid(pos.x-1,pos.y).checked &&
-			!this.getCellFromGrid(pos.x+1,pos.y).checked &&
-			!this.getCellFromGrid(pos.x,pos.y-1).checked &&
-			!this.getCellFromGrid(pos.x,pos.y+1).checked
+			!this.doesCellHasCheckedNeighbour(pos)
 		) {
+			// we dont have any checked, neighbouring cells and are not in the starting column
 			return false;
 		}
 
@@ -233,3 +313,37 @@ export default class ColorGridBox extends React.Component<IProps, IState> {
 		return nearbyFields.length >= requiredFieldCount;
 	}
 }
+
+
+export const ColumnIdentifiers = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O'];
+export const RowIdentifiers = [0,1,2,3,4,5,6];
+export const ColumnPoints = [
+	[5,3],
+	[3,2],
+	[3,2],
+	[3,2],
+	[2,1],
+	[2,1],
+	[2,1],
+	[1,0],
+	[2,1],
+	[2,1],
+	[2,1],
+	[3,2],
+	[3,2],
+	[3,2],
+	[5,3],
+];
+export const SelectableColors = [
+	GridColorOptions.RED,
+	GridColorOptions.YELLOW,
+	GridColorOptions.ORANGE,
+	GridColorOptions.GREEN,
+	GridColorOptions.BLUE
+];
+export const EmptyCell: ColorGridCell = {
+	checked: false,
+	color: "#fff",
+	isSpecial: false
+}
+export const EmptyGrid = ColumnIdentifiers.map(() => RowIdentifiers.map(() => EmptyCell));

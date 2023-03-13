@@ -6,15 +6,12 @@ import ColorCheckerColorDice from './ColorCheckerColorDice';
 interface IProps {
 	lastRollTimeStamp: number | string;
 	diceValues: number[];
-	diceSelections: string[];
+	diceSelections: boolean[];
 }
 
 export default class DiceTable extends React.Component<IProps, {}> {
 	rollIndex: number = 0;
 	lastRollTimeStamp: number | string = -1;
-
-	/* Locale Events */
-	onDiceClicked(diceId: number): void {}
 
 	/* Rendering */
 	render(): ReactNode {
@@ -28,17 +25,9 @@ export default class DiceTable extends React.Component<IProps, {}> {
 				<DiceBox
 					rollIndex={this.rollIndex}
 					nextRollResults={this.props.diceValues}
-					highlightColors={this.props.diceSelections.map((el) => {
-						switch (el) {
-							case 'own':
-								return '#0edc07';
-							case 'blocked':
-								return '#dc0727';
-						}
-						return undefined;
-					})}
-					diceToRollMask={[true, true, true, true, true]}
-					onDicesClicked={this.onDiceClicked.bind(this)}
+					highlightColors={this.props.diceSelections.map((el) => el ? '#dc0727' : undefined)}
+					diceToRollMask={[true, true, true, true, true, true]}
+					onDicesClicked={() => undefined}
 					diceComponent={[
 						ColorCheckerNumberDice,
 						ColorCheckerNumberDice,

@@ -20,7 +20,8 @@ import { EventDataObject } from '@edelgames/types/src/app/ApiTypes';
 import ScoreBoard from './components/ScoreBoard';
 import {
 	OnGameStateUpdateEventData,
-	OnGridChangedEventData, OnPlayerStateUpdateEventData,
+	OnGridChangedEventData,
+	OnPlayerStateUpdateEventData,
 	S2CEvents,
 } from '@edelgames/types/src/modules/colorChecker/CCEvents';
 
@@ -98,11 +99,8 @@ export default class ColorCheckerGame
 		Server to client events
 	 */
 	onPlayerStateChangedEvent(eventData: EventDataObject): void {
-		const {
-			usingColorJoker,
-			usingNumberJoker,
-			remainingJokers,
-		} = eventData as OnPlayerStateUpdateEventData;
+		const { usingColorJoker, usingNumberJoker, remainingJokers } =
+			eventData as OnPlayerStateUpdateEventData;
 
 		this.setState({
 			usingColorJoker,
@@ -121,14 +119,17 @@ export default class ColorCheckerGame
 			activePlayerId,
 		} = eventData as OnGameStateUpdateEventData;
 
-		this.setState({
-			gameState: gameState,
-			reservedDiceIndices: reservedDiceIndices,
-			reservedBonusPoints: reservedBonusPoints,
-			reservedColumnPoints: reservedColumnPoints,
-			currentDiceValues: currentDiceValues,
-			activePlayerId: activePlayerId,
-		}, this.updateAllowedNumbersAndColors.bind(this));
+		this.setState(
+			{
+				gameState: gameState,
+				reservedDiceIndices: reservedDiceIndices,
+				reservedBonusPoints: reservedBonusPoints,
+				reservedColumnPoints: reservedColumnPoints,
+				currentDiceValues: currentDiceValues,
+				activePlayerId: activePlayerId,
+			},
+			this.updateAllowedNumbersAndColors.bind(this)
+		);
 	}
 
 	onGridChangedEvent(eventData: EventDataObject): void {

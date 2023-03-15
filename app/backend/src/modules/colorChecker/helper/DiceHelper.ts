@@ -5,6 +5,7 @@ export default class DiceHelper {
 	diceValues: number[] = [1, 1, 1, 1, 1, 1];
 	reservedNumberDiceIndex = -1;
 	reservedColorDiceIndex = -1;
+	lastRollTimestamp = -1;
 
 	roll(): void {
 		this.diceValues[0] = this.getRandomDiceValue();
@@ -13,6 +14,7 @@ export default class DiceHelper {
 		this.diceValues[3] = this.getRandomDiceValue();
 		this.diceValues[4] = this.getRandomDiceValue();
 		this.diceValues[5] = this.getRandomDiceValue();
+		this.lastRollTimestamp = Date.now();
 	}
 
 	getRandomDiceValue(min = 1, max = 6) {

@@ -1,31 +1,29 @@
-import React, { ReactNode } from 'react';
+import React, {ReactNode} from 'react';
 import ModuleGameInterface from '../../framework/modules/ModuleGameInterface';
 import ModuleApi from '../../framework/modules/ModuleApi';
 import colorChecker from './ColorChecker';
 import DiceTable from './components/DiceTable';
-import ColorGridBox, {
-	ColumnIdentifiers,
-	EmptyGrid,
-	SelectableColors,
-} from './components/ColorGridBox';
+import ColorGridBox, {ColumnIdentifiers, EmptyGrid, SelectableColors,} from './components/ColorGridBox';
 import {
 	ColorGrid,
 	Coordinate,
 	GameStates,
 	GridColorOptions,
+	GridScoreboard,
 } from '@edelgames/types/src/modules/colorChecker/CCTypes';
 import JokerList from './components/JokerList';
-import { EventDataObject } from '@edelgames/types/src/app/ApiTypes';
+import {EventDataObject} from '@edelgames/types/src/app/ApiTypes';
 import ScoreBoard from './components/ScoreBoard';
 import {
 	C2SEvents,
 	OnGameStateUpdateEventData,
 	OnGridChangedEventData,
 	OnJokerRequestedEventData,
-	OnPlayerStateUpdateEventData,
+	OnPlayerStateUpdateEventData, OnScoresCalculatedEventData,
 	OnSelectionMadeEventData,
 	S2CEvents,
 } from '@edelgames/types/src/modules/colorChecker/CCEvents';
+import WinningScreen from "./components/WinningScreen";
 
 interface IState {
 	grid: ColorGrid;
@@ -44,6 +42,9 @@ interface IState {
 	isPlayerWaiting: boolean;
 	finishedColors: boolean[];
 	finishedColumns: boolean[];
+	remainingPlayers: number;
+	lastRollTimestamp: number;
+	scoreboard: GridScoreboard|undefined
 }
 
 export default class ColorCheckerGame
@@ -72,6 +73,9 @@ export default class ColorCheckerGame
 			isPlayerWaiting: false,
 			finishedColumns: Array(15).fill(false),
 			finishedColors: Array(5).fill(false),
+			remainingPlayers: 0,
+			scoreboard: undefined,
+			lastRollTimestamp: -1,
 		};
 	}
 
@@ -95,17 +99,31 @@ export default class ColorCheckerGame
 				S2CEvents.ON_PLAYER_STATE_UPDATE,
 				this.onPlayerStateChangedEvent.bind(this)
 			);
+		this.api
+			.getEventApi()
+			.addEventHandler(
+				S2CEvents.ON_SCORES_CALCULATED,
+				this.onScoresCalculatedEvent.bind(this)
+			);
 	}
 
 	componentWillUnmount() {
 		this.api.getEventApi().removeEvent(S2CEvents.ON_GRID_CHANGED);
 		this.api.getEventApi().removeEvent(S2CEvents.ON_PLAYER_STATE_UPDATE);
 		this.api.getEventApi().removeEvent(S2CEvents.ON_GAME_STATE_UPDATE);
+		this.api.getEventApi().removeEvent(S2CEvents.ON_SCORES_CALCULATED);
 	}
 
 	/*
 		Server to client events
 	 */
+	onScoresCalculatedEvent(eventData: EventDataObject): void {
+		const {points} = eventData as OnScoresCalculatedEventData;
+		this.setState({
+			scoreboard: points
+		})
+	}
+
 	onPlayerStateChangedEvent(eventData: EventDataObject): void {
 		const {
 			usingColorJoker,
@@ -134,6 +152,8 @@ export default class ColorCheckerGame
 			reservedColumnPoints,
 			currentDiceValues,
 			activePlayerId,
+			remainingPlayers,
+			lastRollTimestamp,
 		} = eventData as OnGameStateUpdateEventData;
 
 		const localePlayerId = this.api.getPlayerApi().getLocalePlayer().getId();
@@ -149,6 +169,8 @@ export default class ColorCheckerGame
 				),
 				currentDiceValues: currentDiceValues,
 				activePlayerId: activePlayerId,
+				remainingPlayers: remainingPlayers,
+				lastRollTimestamp: lastRollTimestamp,
 			},
 			this.updateAllowedNumbersAndColors.bind(this)
 		);
@@ -280,6 +302,18 @@ export default class ColorCheckerGame
 	}
 
 	render(): ReactNode {
+		if(this.state.gameState === GameStates.ENDING_SCREEN && this.state.scoreboard !== undefined) {
+			return (
+				<div id={'colorChecker'}>
+					<WinningScreen
+						scoreboard={this.state.scoreboard}
+						playerApi={this.api.getPlayerApi()}
+					/>
+				</div>
+			);
+		}
+
+
 		const isPlayerActive = this.isPlayerActive();
 		const allowSelection =
 			(this.state.gameState === GameStates.ACTIVE_PLAYER_SELECTS &&
@@ -354,10 +388,12 @@ export default class ColorCheckerGame
 					reservedBonusPoints={this.state.reservedBonusPoints}
 					finishedColors={this.state.finishedColors}
 					grid={this.state.grid}
+					gameState={this.state.gameState}
+					remainingPlayers={this.state.remainingPlayers}
 				/>
 
 				<DiceTable
-					lastRollTimeStamp={-1}
+					lastRollTimeStamp={this.state.lastRollTimestamp}
 					diceValues={this.state.currentDiceValues}
 					diceSelections={[false, false, false, false, false, false].map(
 						(el, index) => this.state.reservedDiceIndices.indexOf(index) !== -1

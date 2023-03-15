@@ -27,7 +27,9 @@ export type OnScoresCalculatedEventData = {
 export type OnGameStateUpdateEventData = {
 	gameState: GameStates;
 	activePlayerId?: string;
+	remainingPlayers: number;
 	currentDiceValues: number[];
+	lastRollTimestamp: number;
 	reservedDiceIndices: number[];
 	reservedBonusPoints: (string | undefined)[];
 	reservedColumnPoints: (string | undefined)[];

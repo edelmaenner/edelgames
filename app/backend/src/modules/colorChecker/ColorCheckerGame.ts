@@ -255,6 +255,7 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 				return {
 					player: playerData.playerId,
 					score: playerData.getScore(this.columnOwners, this.bonusOwners),
+					grid: playerData.grid,
 				};
 			})
 			.sort((a, b) => (a.score > b.score ? -1 : 1));
@@ -293,8 +294,12 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 			activePlayerId: this.activePlayerId,
 			reservedColumnPoints: this.columnOwners,
 			currentDiceValues: this.diceHelper.diceValues,
+			lastRollTimestamp: this.diceHelper.lastRollTimestamp,
 			reservedBonusPoints: this.bonusOwners,
 			reservedDiceIndices: this.diceHelper.getReservedDiceIndices(),
+			remainingPlayers:
+				this.playerHelper.players.length -
+				this.playerHelper.readyPlayers.length,
 		};
 		this.api
 			.getEventApi()
@@ -303,6 +308,11 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 
 	onPlayerLeft(eventData: EventDataObject): void {
 		const removedUser = eventData.removedUser as User;
+
+		if (this.api.getPlayerApi().getRoomMembers().length === 0) {
+			this.api.cancelGame();
+			return;
+		}
 
 		const wasActivePlayer = removedUser.getId() === this.activePlayerId;
 		// remove player from list

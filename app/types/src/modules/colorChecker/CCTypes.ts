@@ -21,10 +21,13 @@ export type GridScore = {
 	total: number;
 };
 
-export type GridScoreboard = {
+export type GridPlayerScore = {
 	player: string;
 	score: GridScore;
-}[];
+	grid: ColorGrid;
+};
+
+export type GridScoreboard = GridPlayerScore[];
 
 export type ColorGridCell = {
 	color: GridColorOptions | '#fff';

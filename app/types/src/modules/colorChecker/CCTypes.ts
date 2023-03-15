@@ -13,6 +13,19 @@ export const enum GridColorOptions {
 	BLUE = '#4993a8',
 }
 
+export type GridScore = {
+	bonus: number;
+	columns: number;
+	stars: number;
+	jokers: number;
+	total: number;
+};
+
+export type GridScoreboard = {
+	player: string;
+	score: GridScore;
+}[];
+
 export type ColorGridCell = {
 	color: GridColorOptions | '#fff';
 	isSpecial: boolean;
@@ -30,7 +43,6 @@ export type ColorGridDefinition = {
 	finishedColors: boolean[];
 	finishedColumns: boolean[];
 };
-export type ColorGridCollection = ColorGridDefinition[];
 
 export type Coordinate = {
 	x: number;

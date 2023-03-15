@@ -1,4 +1,4 @@
-import { ColorGrid, Coordinate, GameStates, GridColorOptions } from './CCTypes';
+import { ColorGrid, Coordinate, GameStates, GridScoreboard } from './CCTypes';
 
 export const enum C2SEvents {
 	ON_SELECTION_MADE = 'onSelectionMade',
@@ -17,7 +17,12 @@ export const enum S2CEvents {
 	ON_GAME_STATE_UPDATE = 'onGameStateUpdate',
 	ON_PLAYER_STATE_UPDATE = 'onPlayerStateUpdate',
 	ON_GRID_CHANGED = 'onGridChanged',
+	ON_SCORES_CALCULATED = 'onScoresCalculated',
 }
+
+export type OnScoresCalculatedEventData = {
+	points: GridScoreboard;
+};
 
 export type OnGameStateUpdateEventData = {
 	gameState: GameStates;

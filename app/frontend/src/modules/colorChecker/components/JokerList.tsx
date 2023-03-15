@@ -68,9 +68,6 @@ export default class JokerList extends Component<IProps, IState> {
 	}
 
 	render() {
-		const isUsingJoker =
-			this.props.usingColorJoker || this.props.usingNumberJoker;
-
 		return (
 			<div className={'joker-list'} ref={this.jokerListRef}>
 				<div className={'joker-list-summary'}>

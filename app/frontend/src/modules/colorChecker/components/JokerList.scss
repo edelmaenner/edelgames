@@ -34,7 +34,8 @@
 			left: 50%;
 			gap: 0.5rem;
 			padding: 0.5rem;
-			background: red;
+			background: $background;
+			border: 1px solid $primary;
 			transform: translateX(-50%);
 
 			&:before {
@@ -42,7 +43,7 @@
 				width: 0;
 				height: 0;
 				border: 1rem solid transparent;
-				border-top-color: red;
+				border-top-color: $primary;
 				position: absolute;
 				left: 50%;
 				transform: translateX(-50%);

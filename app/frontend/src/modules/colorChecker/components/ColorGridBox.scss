@@ -1,4 +1,4 @@
-$cellSize: 2rem;
+$cellSize: 2.3rem;
 
 .color-checker-grid {
 	display: flex;
@@ -57,8 +57,8 @@ $cellSize: 2rem;
 		.points {
 			background-color: $backgroundLight;
 			border-radius: 0.5rem;
-			width: 2rem;
-			height: 2rem;
+			width: $cellSize;
+			height: $cellSize;
 			border: 1px solid $background;
 			display: flex;
 			justify-content: center;

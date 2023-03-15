@@ -12,7 +12,7 @@ class ColorChecker implements ModuleInterface {
 	}
 
 	getTitle(): string {
-		return 'Color-Checker';
+		return 'Farb-Check';
 	}
 
 	getUniqueId(): string {

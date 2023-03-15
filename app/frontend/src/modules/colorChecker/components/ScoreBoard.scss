@@ -1,6 +1,7 @@
 .scoreboard {
 	flex: 1 1 auto;
 	background-color: $backgroundDark;
+	max-width: 20rem;
 
 	.bonus-panel {
 		display: flex;

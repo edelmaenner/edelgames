@@ -9,13 +9,8 @@ interface IProps {
 }
 
 export default class ScoreBoard extends Component<IProps, {}> {
-
 	render() {
-		return (
-			<div className={'scoreboard'}>
-				{this.renderBonusPanel()}
-			</div>
-		);
+		return <div className={'scoreboard'}>{this.renderBonusPanel()}</div>;
 	}
 
 	renderBonusPanel(): JSX.Element {

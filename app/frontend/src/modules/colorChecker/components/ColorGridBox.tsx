@@ -6,7 +6,7 @@ import {
 	GridColorOptions,
 } from '@edelgames/types/src/modules/colorChecker/CCTypes';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import ModuleEventApi from "../../../framework/modules/api/ModuleEventApi";
+import ModuleEventApi from '../../../framework/modules/api/ModuleEventApi';
 
 interface IProps {
 	colorGrid: ColorGrid;
@@ -34,7 +34,10 @@ export default class ColorGridBox extends React.Component<IProps, IState> {
 	}
 
 	componentDidMount() {
-		this.props.eventApi.addEventHandler('clearGridSelection', this.onClearGridSelection.bind(this));
+		this.props.eventApi.addEventHandler(
+			'clearGridSelection',
+			this.onClearGridSelection.bind(this)
+		);
 	}
 
 	componentWillUnmount() {
@@ -43,8 +46,8 @@ export default class ColorGridBox extends React.Component<IProps, IState> {
 
 	onClearGridSelection(): void {
 		this.setState({
-			currentSelection: []
-		})
+			currentSelection: [],
+		});
 	}
 
 	render(): ReactNode {

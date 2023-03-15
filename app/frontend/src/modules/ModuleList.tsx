@@ -4,6 +4,7 @@ import drawAndGuess from './drawAndGuess/DrawAndGuess';
 import stadtLandFluss from './stadtLandFluss/StadtLandFluss';
 import codenames from './codenames/Codenames';
 import yahtzee from './yahtzee/Yahtzee';
+import colorChecker from './colorChecker/ColorChecker';
 
 export const ModuleList: ModuleInterface[] = [
 	exampleChat,
@@ -11,4 +12,5 @@ export const ModuleList: ModuleInterface[] = [
 	stadtLandFluss,
 	codenames,
 	yahtzee,
+	colorChecker,
 ];

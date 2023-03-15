@@ -1,9 +1,13 @@
-import React, {ReactNode} from 'react';
+import React, { ReactNode } from 'react';
 import ModuleGameInterface from '../../framework/modules/ModuleGameInterface';
 import ModuleApi from '../../framework/modules/ModuleApi';
 import colorChecker from './ColorChecker';
 import DiceTable from './components/DiceTable';
-import ColorGridBox, {ColumnIdentifiers, EmptyGrid, SelectableColors,} from './components/ColorGridBox';
+import ColorGridBox, {
+	ColumnIdentifiers,
+	EmptyGrid,
+	SelectableColors,
+} from './components/ColorGridBox';
 import {
 	ColorGrid,
 	Coordinate,
@@ -12,18 +16,19 @@ import {
 	GridScoreboard,
 } from '@edelgames/types/src/modules/colorChecker/CCTypes';
 import JokerList from './components/JokerList';
-import {EventDataObject} from '@edelgames/types/src/app/ApiTypes';
+import { EventDataObject } from '@edelgames/types/src/app/ApiTypes';
 import ScoreBoard from './components/ScoreBoard';
 import {
 	C2SEvents,
 	OnGameStateUpdateEventData,
 	OnGridChangedEventData,
 	OnJokerRequestedEventData,
-	OnPlayerStateUpdateEventData, OnScoresCalculatedEventData,
+	OnPlayerStateUpdateEventData,
+	OnScoresCalculatedEventData,
 	OnSelectionMadeEventData,
 	S2CEvents,
 } from '@edelgames/types/src/modules/colorChecker/CCEvents';
-import WinningScreen from "./components/WinningScreen";
+import WinningScreen from './components/WinningScreen';
 
 interface IState {
 	grid: ColorGrid;
@@ -44,7 +49,7 @@ interface IState {
 	finishedColumns: boolean[];
 	remainingPlayers: number;
 	lastRollTimestamp: number;
-	scoreboard: GridScoreboard|undefined
+	scoreboard: GridScoreboard | undefined;
 }
 
 export default class ColorCheckerGame
@@ -118,10 +123,10 @@ export default class ColorCheckerGame
 		Server to client events
 	 */
 	onScoresCalculatedEvent(eventData: EventDataObject): void {
-		const {points} = eventData as OnScoresCalculatedEventData;
+		const { points } = eventData as OnScoresCalculatedEventData;
 		this.setState({
-			scoreboard: points
-		})
+			scoreboard: points,
+		});
 	}
 
 	onPlayerStateChangedEvent(eventData: EventDataObject): void {
@@ -302,7 +307,10 @@ export default class ColorCheckerGame
 	}
 
 	render(): ReactNode {
-		if(this.state.gameState === GameStates.ENDING_SCREEN && this.state.scoreboard !== undefined) {
+		if (
+			this.state.gameState === GameStates.ENDING_SCREEN &&
+			this.state.scoreboard !== undefined
+		) {
 			return (
 				<div id={'colorChecker'}>
 					<WinningScreen
@@ -312,7 +320,6 @@ export default class ColorCheckerGame
 				</div>
 			);
 		}
-
 
 		const isPlayerActive = this.isPlayerActive();
 		const allowSelection =

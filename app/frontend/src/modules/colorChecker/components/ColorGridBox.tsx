@@ -6,6 +6,7 @@ import {
 	GridColorOptions,
 } from '@edelgames/types/src/modules/colorChecker/CCTypes';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import ModuleEventApi from "../../../framework/modules/api/ModuleEventApi";
 
 interface IProps {
 	colorGrid: ColorGrid;
@@ -16,6 +17,8 @@ interface IProps {
 	allowedColors?: GridColorOptions[];
 	allowedNumbers?: number[];
 	reservedColumnPoints: boolean[];
+	finishedColumns: boolean[];
+	eventApi: ModuleEventApi;
 }
 
 interface IState {
@@ -30,6 +33,20 @@ export default class ColorGridBox extends React.Component<IProps, IState> {
 		};
 	}
 
+	componentDidMount() {
+		this.props.eventApi.addEventHandler('clearGridSelection', this.onClearGridSelection.bind(this));
+	}
+
+	componentWillUnmount() {
+		this.props.eventApi.removeEvent('clearGridSelection');
+	}
+
+	onClearGridSelection(): void {
+		this.setState({
+			currentSelection: []
+		})
+	}
+
 	render(): ReactNode {
 		return (
 			<div className={'color-checker-grid'}>
@@ -41,7 +58,7 @@ export default class ColorGridBox extends React.Component<IProps, IState> {
 	}
 
 	renderColumn(x: number): JSX.Element {
-		const isColumnFinished = this.isColumnFinished(x);
+		const isColumnFinished = this.props.finishedColumns[x];
 
 		return (
 			<div className={'color-checker-grid-column'} key={'column_' + x}>
@@ -75,16 +92,6 @@ export default class ColorGridBox extends React.Component<IProps, IState> {
 				</div>
 			</div>
 		);
-	}
-
-	isColumnFinished(x: number): boolean {
-		for (let cell of this.props.colorGrid[x]) {
-			if (!cell.checked) {
-				return false;
-			}
-		}
-
-		return true;
 	}
 
 	getCellFromGrid(x: number, y: number): ColorGridCell {

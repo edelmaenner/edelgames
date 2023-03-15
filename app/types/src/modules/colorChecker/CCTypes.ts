@@ -2,6 +2,7 @@ export const enum GameStates {
 	INIT = 'init',
 	ACTIVE_PLAYER_SELECTS = 'activePlayerSelects',
 	PASSIVE_PLAYERS_SELECTS = 'passivePlayersSelects',
+	ENDING_SCREEN = 'endingScreen',
 }
 
 export const enum GridColorOptions {
@@ -19,154 +20,19 @@ export type ColorGridCell = {
 };
 export type ColorGridColumn = ColorGridCell[];
 export type ColorGrid = ColorGridColumn[];
-export type ColorGridCollection = {
+export type ColorGridDefinition = {
 	playerId: string;
 	playerName: string;
 	grid: ColorGrid;
 	remainingJokers: number;
 	isUsingNumberJoker: boolean;
 	isUsingColorJoker: boolean;
-}[];
+	finishedColors: boolean[];
+	finishedColumns: boolean[];
+};
+export type ColorGridCollection = ColorGridDefinition[];
 
 export type Coordinate = {
 	x: number;
 	y: number;
 };
-
-export const defaultGrid: ColorGrid = [
-	[
-		{ color: GridColorOptions.GREEN, isSpecial: false, checked: false },
-		{ color: GridColorOptions.ORANGE, isSpecial: false, checked: false },
-		{ color: GridColorOptions.BLUE, isSpecial: true, checked: false },
-		{ color: GridColorOptions.BLUE, isSpecial: false, checked: false },
-		{ color: GridColorOptions.RED, isSpecial: false, checked: false },
-		{ color: GridColorOptions.RED, isSpecial: false, checked: false },
-		{ color: GridColorOptions.YELLOW, isSpecial: false, checked: false },
-	],
-	[
-		{ color: GridColorOptions.GREEN, isSpecial: false, checked: false },
-		{ color: GridColorOptions.GREEN, isSpecial: false, checked: false },
-		{ color: GridColorOptions.GREEN, isSpecial: false, checked: false },
-		{ color: GridColorOptions.RED, isSpecial: false, checked: false },
-		{ color: GridColorOptions.ORANGE, isSpecial: false, checked: false },
-		{ color: GridColorOptions.BLUE, isSpecial: true, checked: false },
-		{ color: GridColorOptions.YELLOW, isSpecial: false, checked: false },
-	],
-	[
-		{ color: GridColorOptions.GREEN, isSpecial: false, checked: false },
-		{ color: GridColorOptions.YELLOW, isSpecial: true, checked: false },
-		{ color: GridColorOptions.RED, isSpecial: false, checked: false },
-		{ color: GridColorOptions.RED, isSpecial: false, checked: false },
-		{ color: GridColorOptions.ORANGE, isSpecial: false, checked: false },
-		{ color: GridColorOptions.BLUE, isSpecial: false, checked: false },
-		{ color: GridColorOptions.BLUE, isSpecial: false, checked: false },
-	],
-	[
-		{ color: GridColorOptions.YELLOW, isSpecial: false, checked: false },
-		{ color: GridColorOptions.GREEN, isSpecial: false, checked: false },
-		{ color: GridColorOptions.GREEN, isSpecial: false, checked: false },
-		{ color: GridColorOptions.GREEN, isSpecial: false, checked: false },
-		{ color: GridColorOptions.ORANGE, isSpecial: false, checked: false },
-		{ color: GridColorOptions.RED, isSpecial: true, checked: false },
-		{ color: GridColorOptions.BLUE, isSpecial: false, checked: false },
-	],
-	[
-		{ color: GridColorOptions.YELLOW, isSpecial: false, checked: false },
-		{ color: GridColorOptions.YELLOW, isSpecial: true, checked: false },
-		{ color: GridColorOptions.GREEN, isSpecial: false, checked: false },
-		{ color: GridColorOptions.ORANGE, isSpecial: false, checked: false },
-		{ color: GridColorOptions.ORANGE, isSpecial: false, checked: false },
-		{ color: GridColorOptions.RED, isSpecial: false, checked: false },
-		{ color: GridColorOptions.BLUE, isSpecial: false, checked: false },
-	],
-	[
-		{ color: GridColorOptions.YELLOW, isSpecial: false, checked: false },
-		{ color: GridColorOptions.YELLOW, isSpecial: false, checked: false },
-		{ color: GridColorOptions.GREEN, isSpecial: false, checked: false },
-		{ color: GridColorOptions.ORANGE, isSpecial: true, checked: false },
-		{ color: GridColorOptions.RED, isSpecial: false, checked: false },
-		{ color: GridColorOptions.RED, isSpecial: false, checked: false },
-		{ color: GridColorOptions.BLUE, isSpecial: false, checked: false },
-	],
-	[
-		{ color: GridColorOptions.YELLOW, isSpecial: false, checked: false },
-		{ color: GridColorOptions.ORANGE, isSpecial: false, checked: false },
-		{ color: GridColorOptions.GREEN, isSpecial: true, checked: false },
-		{ color: GridColorOptions.BLUE, isSpecial: false, checked: false },
-		{ color: GridColorOptions.BLUE, isSpecial: false, checked: false },
-		{ color: GridColorOptions.RED, isSpecial: false, checked: false },
-		{ color: GridColorOptions.RED, isSpecial: false, checked: false },
-	],
-	[
-		{ color: GridColorOptions.GREEN, isSpecial: true, checked: false },
-		{ color: GridColorOptions.ORANGE, isSpecial: false, checked: false },
-		{ color: GridColorOptions.RED, isSpecial: false, checked: false },
-		{ color: GridColorOptions.BLUE, isSpecial: false, checked: false },
-		{ color: GridColorOptions.BLUE, isSpecial: false, checked: false },
-		{ color: GridColorOptions.YELLOW, isSpecial: false, checked: false },
-		{ color: GridColorOptions.YELLOW, isSpecial: false, checked: false },
-	],
-	[
-		{ color: GridColorOptions.BLUE, isSpecial: false, checked: false },
-		{ color: GridColorOptions.RED, isSpecial: false, checked: false },
-		{ color: GridColorOptions.RED, isSpecial: false, checked: false },
-		{ color: GridColorOptions.GREEN, isSpecial: false, checked: false },
-		{ color: GridColorOptions.ORANGE, isSpecial: false, checked: false },
-		{ color: GridColorOptions.YELLOW, isSpecial: true, checked: false },
-		{ color: GridColorOptions.YELLOW, isSpecial: false, checked: false },
-	],
-	[
-		{ color: GridColorOptions.BLUE, isSpecial: false, checked: false },
-		{ color: GridColorOptions.BLUE, isSpecial: true, checked: false },
-		{ color: GridColorOptions.RED, isSpecial: false, checked: false },
-		{ color: GridColorOptions.GREEN, isSpecial: false, checked: false },
-		{ color: GridColorOptions.ORANGE, isSpecial: false, checked: false },
-		{ color: GridColorOptions.ORANGE, isSpecial: false, checked: false },
-		{ color: GridColorOptions.YELLOW, isSpecial: false, checked: false },
-	],
-	[
-		{ color: GridColorOptions.BLUE, isSpecial: false, checked: false },
-		{ color: GridColorOptions.BLUE, isSpecial: false, checked: false },
-		{ color: GridColorOptions.YELLOW, isSpecial: false, checked: false },
-		{ color: GridColorOptions.YELLOW, isSpecial: false, checked: false },
-		{ color: GridColorOptions.ORANGE, isSpecial: false, checked: false },
-		{ color: GridColorOptions.RED, isSpecial: true, checked: false },
-		{ color: GridColorOptions.GREEN, isSpecial: false, checked: false },
-	],
-	[
-		{ color: GridColorOptions.ORANGE, isSpecial: true, checked: false },
-		{ color: GridColorOptions.ORANGE, isSpecial: false, checked: false },
-		{ color: GridColorOptions.YELLOW, isSpecial: false, checked: false },
-		{ color: GridColorOptions.YELLOW, isSpecial: false, checked: false },
-		{ color: GridColorOptions.RED, isSpecial: false, checked: false },
-		{ color: GridColorOptions.BLUE, isSpecial: false, checked: false },
-		{ color: GridColorOptions.GREEN, isSpecial: false, checked: false },
-	],
-	[
-		{ color: GridColorOptions.YELLOW, isSpecial: false, checked: false },
-		{ color: GridColorOptions.ORANGE, isSpecial: false, checked: false },
-		{ color: GridColorOptions.ORANGE, isSpecial: false, checked: false },
-		{ color: GridColorOptions.ORANGE, isSpecial: false, checked: false },
-		{ color: GridColorOptions.RED, isSpecial: false, checked: false },
-		{ color: GridColorOptions.BLUE, isSpecial: false, checked: false },
-		{ color: GridColorOptions.GREEN, isSpecial: true, checked: false },
-	],
-	[
-		{ color: GridColorOptions.YELLOW, isSpecial: false, checked: false },
-		{ color: GridColorOptions.GREEN, isSpecial: false, checked: false },
-		{ color: GridColorOptions.GREEN, isSpecial: false, checked: false },
-		{ color: GridColorOptions.RED, isSpecial: true, checked: false },
-		{ color: GridColorOptions.RED, isSpecial: false, checked: false },
-		{ color: GridColorOptions.BLUE, isSpecial: false, checked: false },
-		{ color: GridColorOptions.ORANGE, isSpecial: false, checked: false },
-	],
-	[
-		{ color: GridColorOptions.YELLOW, isSpecial: false, checked: false },
-		{ color: GridColorOptions.GREEN, isSpecial: false, checked: false },
-		{ color: GridColorOptions.GREEN, isSpecial: false, checked: false },
-		{ color: GridColorOptions.BLUE, isSpecial: false, checked: false },
-		{ color: GridColorOptions.RED, isSpecial: false, checked: false },
-		{ color: GridColorOptions.ORANGE, isSpecial: true, checked: false },
-		{ color: GridColorOptions.ORANGE, isSpecial: false, checked: false },
-	],
-];

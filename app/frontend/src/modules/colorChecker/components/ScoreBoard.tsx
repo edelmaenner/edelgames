@@ -4,38 +4,18 @@ import { ColorGrid } from '@edelgames/types/src/modules/colorChecker/CCTypes';
 
 interface IProps {
 	reservedBonusPoints: boolean[];
+	finishedColors: boolean[];
 	grid: ColorGrid;
 }
 
 export default class ScoreBoard extends Component<IProps, {}> {
-	finishedColors: boolean[] = Array(SelectableColors.length);
-
-	updateFinishedColors(): void {
-		for (let i = 0; i < SelectableColors.length; i++) {
-			let color = SelectableColors[i];
-			let isColorFinished = true;
-
-			for (let row of this.props.grid) {
-				for (let column of row) {
-					if (column.color === color && !column.checked) {
-						isColorFinished = false;
-						break;
-					}
-				}
-
-				if (!isColorFinished) {
-					break;
-				}
-			}
-
-			this.finishedColors[i] = isColorFinished;
-		}
-	}
 
 	render() {
-		this.updateFinishedColors();
-
-		return <div className={'scoreboard'}>{this.renderBonusPanel()}</div>;
+		return (
+			<div className={'scoreboard'}>
+				{this.renderBonusPanel()}
+			</div>
+		);
 	}
 
 	renderBonusPanel(): JSX.Element {
@@ -48,7 +28,7 @@ export default class ScoreBoard extends Component<IProps, {}> {
 
 	renderBonusPanelRow(color: string, index: number): JSX.Element {
 		const isReserved = this.props.reservedBonusPoints[index];
-		const isReached = this.props.reservedBonusPoints[index];
+		const isReached = this.props.finishedColors[index];
 
 		return (
 			<div className={'color-bonus-row'} key={'color-bonus-' + color}>

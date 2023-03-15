@@ -11,7 +11,6 @@ import ColorGridBox, {
 import {
 	ColorGrid,
 	Coordinate,
-	defaultGrid,
 	GameStates,
 	GridColorOptions,
 } from '@edelgames/types/src/modules/colorChecker/CCTypes';
@@ -19,9 +18,10 @@ import JokerList from './components/JokerList';
 import { EventDataObject } from '@edelgames/types/src/app/ApiTypes';
 import ScoreBoard from './components/ScoreBoard';
 import {
+	C2SEvents,
 	OnGameStateUpdateEventData,
-	OnGridChangedEventData,
-	OnPlayerStateUpdateEventData,
+	OnGridChangedEventData, OnJokerRequestedEventData,
+	OnPlayerStateUpdateEventData, OnSelectionMadeEventData,
 	S2CEvents,
 } from '@edelgames/types/src/modules/colorChecker/CCEvents';
 
@@ -39,6 +39,9 @@ interface IState {
 	usingColorJoker: boolean;
 	usingNumberJoker: boolean;
 	remainingJokers: number;
+	isPlayerWaiting: boolean;
+	finishedColors: boolean[];
+	finishedColumns: boolean[];
 }
 
 export default class ColorCheckerGame
@@ -64,6 +67,9 @@ export default class ColorCheckerGame
 			usingColorJoker: false,
 			usingNumberJoker: false,
 			remainingJokers: 10,
+			isPlayerWaiting: false,
+			finishedColumns: Array(15).fill(false),
+			finishedColors: Array(5).fill(false),
 		};
 	}
 
@@ -99,13 +105,16 @@ export default class ColorCheckerGame
 		Server to client events
 	 */
 	onPlayerStateChangedEvent(eventData: EventDataObject): void {
-		const { usingColorJoker, usingNumberJoker, remainingJokers } =
+		const { usingColorJoker, usingNumberJoker, remainingJokers, isPlayerWaiting, finishedColors, finishedColumns } =
 			eventData as OnPlayerStateUpdateEventData;
 
 		this.setState({
 			usingColorJoker,
 			usingNumberJoker,
 			remainingJokers,
+			isPlayerWaiting,
+			finishedColors,
+			finishedColumns
 		});
 	}
 
@@ -119,12 +128,13 @@ export default class ColorCheckerGame
 			activePlayerId,
 		} = eventData as OnGameStateUpdateEventData;
 
+		const localePlayerId = this.api.getPlayerApi().getLocalePlayer().getId();
 		this.setState(
 			{
 				gameState: gameState,
 				reservedDiceIndices: reservedDiceIndices,
-				reservedBonusPoints: reservedBonusPoints,
-				reservedColumnPoints: reservedColumnPoints,
+				reservedBonusPoints: reservedBonusPoints.map(player => !!(player && player !== localePlayerId)),
+				reservedColumnPoints: reservedColumnPoints.map(player => !!(player && player !== localePlayerId)),
 				currentDiceValues: currentDiceValues,
 				activePlayerId: activePlayerId,
 			},
@@ -134,10 +144,11 @@ export default class ColorCheckerGame
 
 	onGridChangedEvent(eventData: EventDataObject): void {
 		const { newGrid } = eventData as OnGridChangedEventData;
+		this.api.getEventApi().alertEvent('clearGridSelection');
 		this.setState({
 			grid: newGrid,
+			currentSelection: []
 		});
-		console.log('setting new grid');
 	}
 
 	/*
@@ -148,17 +159,19 @@ export default class ColorCheckerGame
 		let dices = this.state.currentDiceValues;
 
 		let allowedNumbers: number[] = [];
-		for (let value of [dices[0], dices[1], dices[2]]) {
-			if (value === 6 || allowedNumbers.indexOf(value) !== -1) {
+		for (let i = 0; i < 3; i++) {
+			let value = dices[i];
+			if (value === 6 || this.state.reservedDiceIndices[0] === i || allowedNumbers.indexOf(value) !== -1) {
 				continue;
 			}
 			allowedNumbers.push(value);
 		}
 
 		let allowedColors: GridColorOptions[] = [];
-		for (let value of [dices[3], dices[4], dices[5]]) {
+		for (let i = 3; i < 6; i++) {
+			let value = dices[i];
 			let colorValue = SelectableColors[value - 1];
-			if (value === 6 || allowedColors.indexOf(colorValue) !== -1) {
+			if (value === 6 || this.state.reservedDiceIndices[1] === i || allowedColors.indexOf(colorValue) !== -1) {
 				continue;
 			}
 			allowedColors.push(colorValue);
@@ -171,15 +184,26 @@ export default class ColorCheckerGame
 	}
 
 	onSelectionConfirmed(): void {
-		// todo send selection to server
+		if ( (this.isPlayerActive() && this.state.gameState === GameStates.ACTIVE_PLAYER_SELECTS) ||
+			 (!this.isPlayerActive() && this.state.gameState === GameStates.PASSIVE_PLAYERS_SELECTS))
+		{
+
+			const eventData: OnSelectionMadeEventData = {
+				cells: this.state.currentSelection
+			};
+			this.api.getEventApi().sendMessageToServer(C2SEvents.ON_SELECTION_MADE, eventData);
+		}
 	}
 
 	onJokerSelectionChanged(isNumber: boolean): void {
-		this.setState({
-			usingNumberJoker: this.state.usingNumberJoker || isNumber,
-			usingColorJoker: this.state.usingColorJoker || !isNumber,
-		});
-		// todo request joker usage on server
+		if ( (isNumber && !this.state.usingNumberJoker) ||
+			(!isNumber && !this.state.usingColorJoker))
+		{
+			const eventData: OnJokerRequestedEventData = {
+				type: isNumber ? 'number' : 'color'
+			}
+			this.api.getEventApi().sendMessageToServer(C2SEvents.ON_JOKER_REQUESTED, eventData);
+		}
 	}
 
 	onCellSelectionChanged(
@@ -197,10 +221,12 @@ export default class ColorCheckerGame
 			this.state.usingColorJoker
 				? 6
 				: selectedColor
-				? SelectableColors.indexOf(selectedColor)
-				: -1
+				? SelectableColors.indexOf(selectedColor)+1
+				: -1,
+			3
 		);
-		const numberDiceIndex = this.state.currentDiceValues.indexOf(
+
+		const numberDiceIndex = this.state.currentDiceValues.slice(0,3).indexOf(
 			this.state.usingNumberJoker ? 6 : cells.length
 		);
 
@@ -218,8 +244,10 @@ export default class ColorCheckerGame
 	}
 
 	isFittingSelection(): boolean {
-		return this.state.allowedNumbers.includes(
-			this.state.currentSelection.length
+		return (
+			this.state.currentSelection.length === 0 ||
+			(this.state.allowedNumbers.includes(this.state.currentSelection.length) && this.state.currentSelection.length < 6) ||
+			this.state.usingNumberJoker
 		);
 	}
 
@@ -257,6 +285,7 @@ export default class ColorCheckerGame
 						colorGrid={this.state.grid}
 						onCellSelectionChanged={this.onCellSelectionChanged.bind(this)}
 						reservedColumnPoints={this.state.reservedColumnPoints}
+						finishedColumns={this.state.finishedColumns}
 						allowSelection={allowSelection}
 						allowedColors={
 							this.state.usingColorJoker
@@ -268,6 +297,7 @@ export default class ColorCheckerGame
 								? [1, 2, 3, 4, 5]
 								: this.state.allowedNumbers
 						}
+						eventApi={this.api.getEventApi()}
 					/>
 
 					<JokerList
@@ -284,8 +314,7 @@ export default class ColorCheckerGame
 							className={'btn btn-primary '}
 							onClick={this.onSelectionConfirmed.bind(this)}
 							disabled={
-								!this.isFittingSelection() &&
-								this.state.currentSelection.length !== 0
+								!this.isFittingSelection()
 							}
 						>
 							{this.state.currentSelection.length !== 0
@@ -297,6 +326,7 @@ export default class ColorCheckerGame
 
 				<ScoreBoard
 					reservedBonusPoints={this.state.reservedBonusPoints}
+					finishedColors={this.state.finishedColors}
 					grid={this.state.grid}
 				/>
 

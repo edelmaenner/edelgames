@@ -24,14 +24,17 @@ export type OnGameStateUpdateEventData = {
 	activePlayerId?: string;
 	currentDiceValues: number[];
 	reservedDiceIndices: number[];
-	reservedBonusPoints: boolean[];
-	reservedColumnPoints: boolean[];
+	reservedBonusPoints: (string | undefined)[];
+	reservedColumnPoints: (string | undefined)[];
 };
 
 export type OnPlayerStateUpdateEventData = {
 	usingColorJoker: boolean;
 	usingNumberJoker: boolean;
 	remainingJokers: number;
+	isPlayerWaiting: boolean;
+	finishedColors: boolean[];
+	finishedColumns: boolean[];
 };
 
 export type OnGridChangedEventData = {

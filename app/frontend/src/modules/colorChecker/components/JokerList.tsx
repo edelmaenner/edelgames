@@ -51,6 +51,7 @@ export default class JokerList extends Component<IProps, IState> {
 		jokers[index] = true;
 		this.setState({
 			usedUpJokers: jokers,
+			currentJokerSelection: -1
 		});
 		this.props.onJokerUse(isNumber);
 	}
@@ -73,7 +74,7 @@ export default class JokerList extends Component<IProps, IState> {
 		return (
 			<div className={'joker-list'} ref={this.jokerListRef}>
 				<div className={'joker-list-summary'}>
-					{this.props.remainingJokers - (isUsingJoker ? 1 : 0)}/
+					{this.props.remainingJokers} /
 					{this.state.usedUpJokers.length}
 				</div>
 				{this.state.usedUpJokers.map(this.renderJoker.bind(this))}

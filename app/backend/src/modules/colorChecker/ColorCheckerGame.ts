@@ -4,9 +4,11 @@ import User from '../../framework/User';
 import { EventDataObject } from '@edelgames/types/src/app/ApiTypes';
 import {
 	ColorGrid,
+	ColorGridCell,
 	ColorGridCollection,
+	ColorGridColumn,
+	ColorGridDefinition,
 	Coordinate,
-	defaultGrid,
 	GameStates,
 	GridColorOptions,
 } from '@edelgames/types/src/modules/colorChecker/CCTypes';
@@ -19,6 +21,7 @@ import {
 	OnSelectionMadeEventData,
 	S2CEvents,
 } from '@edelgames/types/src/modules/colorChecker/CCEvents';
+import { defaultGrid } from './gridTemplates/default';
 
 /*
  * The actual game instance, that controls and manages the game
@@ -63,19 +66,52 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 			return; // this player has already made a selection or could not be found
 		}
 
-		if (this.validatePlayerSelection(cells, playerData.grid)) {
-			let selectedColor: GridColorOptions | '#fff';
+		const isActivePlayerPlaying =
+			this.gameState === GameStates.ACTIVE_PLAYER_SELECTS &&
+			this.activePlayerId === playerData.playerId;
+		const isPassivePlayerPlaying =
+			this.gameState === GameStates.PASSIVE_PLAYERS_SELECTS &&
+			this.activePlayerId !== playerData.playerId;
+		if (!isActivePlayerPlaying && !isPassivePlayerPlaying) {
+			return; // somehow a player did a move, but was not supposed to
+		}
+
+		if (
+			this.validatePlayerSelection(
+				cells,
+				playerData.grid,
+				playerData.isUsingNumberJoker,
+				playerData.isUsingColorJoker
+			)
+		) {
+			let selectedColor: GridColorOptions | '#fff' = '#fff';
 			for (const cell of cells) {
+				console.log('writing to grid of player ', playerData.playerName);
 				playerData.grid[cell.x][cell.y].checked = true;
 				selectedColor = playerData.grid[cell.x][cell.y].color;
 			}
 			this.playersReady.push(senderId);
+
+			if (selectedColor !== '#fff' && cells.length > 0) {
+				this.checkColorForCompletion(selectedColor, playerData);
+				const checkedColumns: number[] = [];
+				for (const cell of cells) {
+					if (!checkedColumns.includes(cell.x)) {
+						checkedColumns.push(cell.x);
+						this.checkColumnForCompletion(cell.x, playerData);
+					}
+				}
+			}
+			this.updateClientPlayerGrid(playerData.playerId, playerData.grid);
 			this.updateClientPlayerState(playerData.playerId);
 
 			if (
-				this.activePlayerId === playerData.playerId &&
-				this.gameState === GameStates.ACTIVE_PLAYER_SELECTS
+				this.playersReady.length >=
+				this.api.getPlayerApi().getRoomMembers().length
 			) {
+				// this was probably a passive or a single player. If all of them made their turn, start the next round
+				this.startNewRound();
+			} else if (isActivePlayerPlaying) {
 				// this was the first player, now the others can make their turn, but without the selected dices
 
 				const usedNumberValue = playerData.isUsingNumberJoker
@@ -84,18 +120,17 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 				const usedColorValue =
 					playerData.isUsingColorJoker || selectedColor === '#fff'
 						? 6
-						: SelectableColors.indexOf(selectedColor);
-				this.reservedNumberDiceIndex = this.diceValues.indexOf(usedNumberValue);
-				this.reservedColorDiceIndex = this.diceValues.indexOf(usedColorValue);
+						: SelectableColors.indexOf(selectedColor) + 1;
+				this.reservedNumberDiceIndex = this.diceValues
+					.slice(0, 3)
+					.indexOf(usedNumberValue);
+				this.reservedColorDiceIndex = this.diceValues.indexOf(
+					usedColorValue,
+					3
+				);
 
 				this.gameState = GameStates.PASSIVE_PLAYERS_SELECTS;
 				this.updateClientGameStates();
-			} else if (
-				this.playersReady.length ===
-				this.api.getPlayerApi().getRoomMembers().length
-			) {
-				// this was a passive player. If all of them made their turn, start the next round
-				this.startNewRound();
 			}
 		} else {
 			this.api
@@ -109,18 +144,25 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 		const { type } = event as OnJokerRequestedEventData;
 		const playerData = this.playerGrids.find((el) => el.playerId === senderId);
 
-		if (
-			this.playersReady.indexOf(senderId) !== -1 ||
-			!playerData ||
-			playerData.remainingJokers <= 0
-		) {
+		if (this.playersReady.indexOf(senderId) !== -1 || !playerData) {
 			return; // this player has already made a selection, is not found or has no jokers remaining
+		}
+
+		if (playerData.remainingJokers <= 0) {
+			this.api
+				.getEventApi()
+				.sendPlayerBubble(
+					playerData.playerId,
+					'Du hast keine Joker mehr übrig!',
+					'warning'
+				);
+			return;
 		}
 
 		if (
 			type === 'color' &&
 			!playerData.isUsingColorJoker &&
-			this.canUserUseNumberDice(6)
+			this.canUserUseColorDice(6)
 		) {
 			playerData.isUsingColorJoker = true;
 			playerData.remainingJokers--;
@@ -128,11 +170,63 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 		} else if (
 			type === 'number' &&
 			!playerData.isUsingNumberJoker &&
-			this.canUserUseColorDice(6)
+			this.canUserUseNumberDice(6)
 		) {
 			playerData.isUsingNumberJoker = true;
 			playerData.remainingJokers--;
 			this.updateClientPlayerState(playerData.playerId);
+		} else {
+			this.api
+				.getEventApi()
+				.sendPlayerBubble(
+					playerData.playerId,
+					'Du kannst diesen Joker nicht benutzen',
+					'warning'
+				);
+		}
+	}
+
+	checkColorForCompletion(
+		color: GridColorOptions,
+		playerData: ColorGridDefinition
+	): void {
+		const colorIndex = SelectableColors.indexOf(color);
+		let isComplete = true;
+
+		for (const row of playerData.grid) {
+			for (const cell of row) {
+				if (cell.color === color && !cell.checked) {
+					isComplete = false;
+					break;
+				}
+			}
+			if (!isComplete) {
+				break;
+			}
+		}
+
+		if (isComplete) {
+			playerData.finishedColors[colorIndex] = true;
+			if (!this.bonusOwners[colorIndex]) {
+				this.bonusOwners[colorIndex] = playerData.playerId;
+			}
+		}
+	}
+
+	checkColumnForCompletion(x: number, playerData: ColorGridDefinition): void {
+		let isComplete = true;
+		for (const cell of playerData.grid[x]) {
+			if (!cell.checked) {
+				isComplete = false;
+				break;
+			}
+		}
+
+		if (isComplete) {
+			playerData.finishedColumns[x] = true;
+			if (!this.columnOwners[x]) {
+				this.columnOwners[x] = playerData.playerId;
+			}
 		}
 	}
 
@@ -146,13 +240,18 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 
 	canUserUseColorDice(col: number): boolean {
 		return (
-			(this.diceValues[3] === col && this.reservedNumberDiceIndex !== 3) ||
-			(this.diceValues[4] === col && this.reservedNumberDiceIndex !== 4) ||
-			(this.diceValues[5] === col && this.reservedNumberDiceIndex !== 5)
+			(this.diceValues[3] === col && this.reservedColorDiceIndex !== 3) ||
+			(this.diceValues[4] === col && this.reservedColorDiceIndex !== 4) ||
+			(this.diceValues[5] === col && this.reservedColorDiceIndex !== 5)
 		);
 	}
 
-	validatePlayerSelection(selection: Coordinate[], grid: ColorGrid): boolean {
+	validatePlayerSelection(
+		selection: Coordinate[],
+		grid: ColorGrid,
+		isUsingNumberJoker: boolean,
+		isUsingColorJoker: boolean
+	): boolean {
 		const selectionToCheck = [...selection];
 		const validSelectedFields: Coordinate[] = [];
 
@@ -162,12 +261,25 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 
 		// check, if the user can select this number and color
 		const selectedColor = grid[selection[0].x][selection[0].y].color;
+		if (selection.length > 5) {
+			return false;
+		}
+
 		if (
 			selectedColor === '#fff' ||
-			!this.canUserUseNumberDice(selection.length) ||
-			!this.canUserUseColorDice(SelectableColors.indexOf(selectedColor) + 1)
+			!this.canUserUseNumberDice(isUsingNumberJoker ? 6 : selection.length) ||
+			!this.canUserUseColorDice(
+				isUsingColorJoker ? 6 : SelectableColors.indexOf(selectedColor) + 1
+			)
 		) {
 			return false;
+		}
+
+		// check if all fields have the same color
+		for (const pos of selection) {
+			if (grid[pos.x][pos.y].color !== selectedColor) {
+				return false;
+			}
 		}
 
 		let continueCheck = true;
@@ -200,12 +312,19 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 		return validSelectedFields.length === selection.length;
 	}
 
+	getCellFromGrid(x: number, y: number, grid: ColorGrid): ColorGridCell {
+		if (x >= 0 && y >= 0 && x < grid.length && y < grid[0].length) {
+			return grid[x][y];
+		}
+		return EmptyCell;
+	}
+
 	doesCellHasCheckedNeighbour(pos: Coordinate, grid: ColorGrid): boolean {
 		return (
-			grid[pos.x - 1][pos.y].checked ||
-			grid[pos.x + 1][pos.y].checked ||
-			grid[pos.x][pos.y - 1].checked ||
-			grid[pos.x][pos.y + 1].checked
+			this.getCellFromGrid(pos.x - 1, pos.y, grid).checked ||
+			this.getCellFromGrid(pos.x + 1, pos.y, grid).checked ||
+			this.getCellFromGrid(pos.x, pos.y - 1, grid).checked ||
+			this.getCellFromGrid(pos.x, pos.y + 1, grid).checked
 		);
 	}
 
@@ -222,32 +341,63 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 
 	initPlayerGrids(): void {
 		const grids: ColorGridCollection = [];
+
 		for (const member of this.api.getPlayerApi().getRoomMembers()) {
-			const newGridData: OnGridChangedEventData = {
-				newGrid: [...defaultGrid],
-			};
-			grids.push({
+			const newGrid: ColorGrid = this.createNewGrid();
+			const newCollection = {
 				playerId: member.getId(),
 				playerName: member.getUsername(),
-				grid: newGridData.newGrid,
+				grid: newGrid,
 				remainingJokers: 10,
 				isUsingColorJoker: false,
 				isUsingNumberJoker: false,
-			});
+				finishedColors: Array(SelectableColors.length).fill(false),
+				finishedColumns: Array(newGrid.length).fill(false),
+			};
+			grids.push(newCollection);
 
-			// notify player
-			this.api
-				.getEventApi()
-				.sendPlayerMessage(
-					member.getId(),
-					S2CEvents.ON_GRID_CHANGED,
-					newGridData
-				);
+			this.updateClientPlayerGrid(member.getId(), newGrid);
 		}
 		this.playerGrids = grids;
 	}
 
+	createNewGrid(): ColorGrid {
+		const templateGrid = defaultGrid;
+
+		const grid: ColorGrid = [];
+		for (let x = 0; x < templateGrid.length; x++) {
+			const column: ColorGridColumn = [];
+			for (let y = 0; y < templateGrid[0].length; y++) {
+				const templateCell = templateGrid[x][y];
+				column.push({
+					color: templateCell.color,
+					checked: templateCell.checked,
+					isSpecial: templateCell.isSpecial,
+				});
+			}
+			grid.push(column);
+		}
+
+		return grid;
+	}
+
+	updateClientPlayerGrid(playerId: string, grid: ColorGrid): void {
+		const newGridData: OnGridChangedEventData = {
+			newGrid: grid,
+		};
+		// notify player
+		console.log('update grid of player', playerId);
+		this.api
+			.getEventApi()
+			.sendPlayerMessage(playerId, S2CEvents.ON_GRID_CHANGED, newGridData);
+	}
+
 	startNewRound(advancePlayer = true): void {
+		if (this.isGameFinished()) {
+			this.initiateEndGame();
+			return;
+		}
+
 		const roomMembers = this.api.getPlayerApi().getRoomMembers();
 		if (advancePlayer) {
 			this.playerIndex++;
@@ -264,6 +414,8 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 		this.diceValues[5] = this.getRandomDiceValue();
 
 		this.resetPlayerJokerUsage();
+		this.reservedColorDiceIndex = -1;
+		this.reservedNumberDiceIndex = -1;
 		this.gameState = GameStates.ACTIVE_PLAYER_SELECTS;
 		this.updateClientGameStates();
 		this.playersReady = [];
@@ -273,10 +425,32 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 		}
 	}
 
+	/*
+		The game is finished, if one player has at least two colors fully checked
+	 */
+	isGameFinished(): boolean {
+		for (const playerData of this.playerGrids) {
+			const finishedColors = playerData.finishedColors.filter(
+				(el) => el
+			).length;
+			if (finishedColors >= 2) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	initiateEndGame(): void {
+		this.gameState = GameStates.ENDING_SCREEN;
+		const points = [];
+		this.updateClientGameStates();
+		this.api.getEventApi();
+	}
+
 	resetPlayerJokerUsage(): void {
 		for (const grid of this.playerGrids) {
 			grid.isUsingNumberJoker = false;
-			grid.isUsingNumberJoker = false;
+			grid.isUsingColorJoker = false;
 		}
 	}
 
@@ -290,6 +464,9 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 			usingNumberJoker: playerData.isUsingNumberJoker,
 			usingColorJoker: playerData.isUsingColorJoker,
 			remainingJokers: playerData.remainingJokers,
+			isPlayerWaiting: this.playersReady.indexOf(playerId) !== -1,
+			finishedColors: playerData.finishedColors,
+			finishedColumns: playerData.finishedColumns,
 		};
 		this.api
 			.getEventApi()
@@ -300,9 +477,9 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 		const eventData: OnGameStateUpdateEventData = {
 			gameState: this.gameState,
 			activePlayerId: this.activePlayerId,
-			reservedColumnPoints: this.columnOwners.map((el) => !!el),
+			reservedColumnPoints: this.columnOwners,
 			currentDiceValues: this.diceValues,
-			reservedBonusPoints: this.bonusOwners.map((el) => !!el),
+			reservedBonusPoints: this.bonusOwners,
 			reservedDiceIndices: [
 				this.reservedNumberDiceIndex,
 				this.reservedColorDiceIndex,
@@ -316,12 +493,34 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 	onPlayerLeft(eventData: EventDataObject): void {
 		const removedUser = eventData.removedUser as User;
 
+		const wasActivePlayer = removedUser.getId() === this.activePlayerId;
+		// remove player from list
+		this.playersReady.filter((player) => player !== removedUser.getId());
+
 		if (
-			removedUser.getId() === this.activePlayerId &&
-			this.playersReady.indexOf(removedUser.getId()) === -1
+			wasActivePlayer &&
+			this.gameState === GameStates.ACTIVE_PLAYER_SELECTS
 		) {
 			// we need a new active player
 			this.startNewRound(false);
+		} else if (
+			wasActivePlayer &&
+			this.gameState === GameStates.PASSIVE_PLAYERS_SELECTS
+		) {
+			// do nothing, let the players finish this round
+		} else if (
+			!wasActivePlayer &&
+			this.gameState === GameStates.ACTIVE_PLAYER_SELECTS
+		) {
+			// do nothing, let the players finish this round
+		} else if (
+			!wasActivePlayer &&
+			this.gameState === GameStates.PASSIVE_PLAYERS_SELECTS &&
+			this.playersReady.length >=
+				this.api.getPlayerApi().getRoomMembers().length
+		) {
+			// seems like all other players have already finished
+			this.startNewRound(true);
 		}
 
 		this.api
@@ -342,3 +541,9 @@ export const SelectableColors = [
 	GridColorOptions.GREEN,
 	GridColorOptions.BLUE,
 ];
+
+export const EmptyCell: ColorGridCell = {
+	checked: false,
+	color: '#fff',
+	isSpecial: false,
+};

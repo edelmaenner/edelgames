@@ -106,6 +106,12 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 				) {
 					const colorIndex = SelectableColors.indexOf(selectedColor);
 					playerData.finishedColors[colorIndex] = true;
+					this.api
+						.getPlayerApi()
+						.sendRoomBubble(
+							`${playerData.playerName} hat eine Farbe vervollständigt!`,
+							'info'
+						);
 					if (!this.bonusOwners[colorIndex]) {
 						this.bonusOwners[colorIndex] = playerData.playerId;
 					}
@@ -120,6 +126,12 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 					checkedColumns.push(cell.x);
 					if (GridHelper.checkIfColumnIsCompleted(cell.x, playerData.grid)) {
 						playerData.finishedColumns[cell.x] = true;
+						this.api
+							.getPlayerApi()
+							.sendRoomBubble(
+								`${playerData.playerName} hat eine Spalte vervollständigt!`,
+								'info'
+							);
 						if (!this.columnOwners[cell.x]) {
 							this.columnOwners[cell.x] = playerData.playerId;
 						}

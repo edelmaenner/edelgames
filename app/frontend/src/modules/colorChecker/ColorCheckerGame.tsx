@@ -322,10 +322,12 @@ export default class ColorCheckerGame
 		}
 
 		const isPlayerActive = this.isPlayerActive();
-		const allowSelection = !this.state.isPlayerWaiting && (
-			(this.state.gameState === GameStates.ACTIVE_PLAYER_SELECTS && isPlayerActive) ||
-			(this.state.gameState === GameStates.PASSIVE_PLAYERS_SELECTS && !isPlayerActive)
-		);
+		const allowSelection =
+			!this.state.isPlayerWaiting &&
+			((this.state.gameState === GameStates.ACTIVE_PLAYER_SELECTS &&
+				isPlayerActive) ||
+				(this.state.gameState === GameStates.PASSIVE_PLAYERS_SELECTS &&
+					!isPlayerActive));
 
 		const canUseNumberJoker =
 			!this.state.usingNumberJoker &&
@@ -341,8 +343,13 @@ export default class ColorCheckerGame
 					i > 2 && el === 6 && this.state.reservedDiceIndices.indexOf(i) === -1
 			) !== undefined;
 
-		const activePlayerName = (this.state.activePlayerId ?
-			this.api.getPlayerApi().getPlayerById(this.state.activePlayerId)?.getUsername() : '') || '';
+		const activePlayerName =
+			(this.state.activePlayerId
+				? this.api
+						.getPlayerApi()
+						.getPlayerById(this.state.activePlayerId)
+						?.getUsername()
+				: '') || '';
 
 		return (
 			<div id={'colorChecker'}>

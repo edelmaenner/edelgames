@@ -33,7 +33,7 @@ export default class ScoreBoard extends Component<IProps, {}> {
 				<div className={'status-board'}>
 					<div className={'bold'}>Aktiver Spieler:</div>
 					<div>{this.props.activePlayerName}</div>
-					<br/>
+					<br />
 					<div className={'bold'}>Status:</div>
 					{this.getGameStateMessage()}
 				</div>

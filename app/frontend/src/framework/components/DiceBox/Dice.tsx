@@ -39,7 +39,7 @@ export default class Dice extends Component<IProps, {}> {
 
 		let displayFilter: React.CSSProperties = {
 			filter: this.props.backdropColor
-				? `drop-shadow(0 0 0.3rem ${this.props.backdropColor})`
+				? `drop-shadow(0 0 0.8rem ${this.props.backdropColor})`
 				: 'initial',
 		};
 

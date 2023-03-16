@@ -258,7 +258,7 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 					grid: playerData.grid,
 				};
 			})
-			.sort((a, b) => (a.score > b.score ? -1 : 1));
+			.sort((a, b) => (a.score.total > b.score.total ? -1 : 1));
 
 		this.updateClientGameStates();
 		const eventData: OnScoresCalculatedEventData = {

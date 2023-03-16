@@ -11,6 +11,7 @@ interface IProps {
 	grid: ColorGrid;
 	gameState: GameStates;
 	remainingPlayers: number;
+	activePlayerName: string;
 }
 
 export default class ScoreBoard extends Component<IProps, {}> {
@@ -30,6 +31,9 @@ export default class ScoreBoard extends Component<IProps, {}> {
 				</div>
 
 				<div className={'status-board'}>
+					<div className={'bold'}>Aktiver Spieler:</div>
+					<div>{this.props.activePlayerName}</div>
+					<br />
 					<div className={'bold'}>Status:</div>
 					{this.getGameStateMessage()}
 				</div>
@@ -42,7 +46,7 @@ export default class ScoreBoard extends Component<IProps, {}> {
 			case GameStates.ACTIVE_PLAYER_SELECTS:
 				return 'Der aktive Spieler darf zuerst seinen Zug machen';
 			case GameStates.PASSIVE_PLAYERS_SELECTS:
-				return `Alle nicht aktiven Spielern, dürfen ihren Zug mit den übrigen Würfeln machen. ${this.props.remainingPlayers} verbleibend`;
+				return `Alle nicht aktiven Spieler, dürfen ihren Zug mit den übrigen Würfeln machen. ${this.props.remainingPlayers} verbleibend`;
 		}
 		return '';
 	}

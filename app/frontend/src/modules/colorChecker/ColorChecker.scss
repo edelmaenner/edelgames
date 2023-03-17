@@ -9,36 +9,36 @@
 	@import 'components/Dice';
 	@import 'components/ScoreBoard';
 	@import 'components/WinningScreen';
+	@import 'components/ColorGridBoxAnimation';
 
 	.color-checker-dice-table {
 		flex: 1 0 22rem;
 		width: 30rem;
 	}
 
-	.striked,
-	.circled {
-		position: relative;
+	.striked {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		color: $signature;
+		font-size: 2rem;
+		--fa-secondary-opacity: 1;
 	}
 
-	.striked:after {
-		content: '';
-		position: absolute;
-		left: 50%;
-		top: 50%;
-		transform: translateX(-50%);
-		width: 2rem;
-		height: 2px;
-		background-color: $signature;
-	}
-	.circled:after {
-		content: '';
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		width: 2rem;
-		height: 2rem;
-		border: 2px solid $signature;
-		border-radius: 100%;
+	.circled {
+		position: relative;
+
+		&:after {
+			content: '';
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			width: 1.5rem;
+			height: 1.5rem;
+			border: 4px solid $signature;
+			border-radius: 100%;
+		}
 	}
 }

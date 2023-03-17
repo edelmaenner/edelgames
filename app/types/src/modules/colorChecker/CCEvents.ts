@@ -18,7 +18,12 @@ export const enum S2CEvents {
 	ON_PLAYER_STATE_UPDATE = 'onPlayerStateUpdate',
 	ON_GRID_CHANGED = 'onGridChanged',
 	ON_SCORES_CALCULATED = 'onScoresCalculated',
+	ON_REMAINING_PLAYERS_CHANGED = 'onRemainingPlayersChanged',
 }
+
+export type OnRemainingPlayersChangedEventData = {
+	remainingPlayers: number;
+};
 
 export type OnScoresCalculatedEventData = {
 	points: GridScoreboard;

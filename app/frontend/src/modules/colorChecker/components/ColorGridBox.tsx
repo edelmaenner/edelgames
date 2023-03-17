@@ -74,13 +74,19 @@ export default class ColorGridBox extends React.Component<IProps, IState> {
 				<div
 					className={
 						'points ' +
-						(this.props.reservedColumnPoints[x]
-							? 'striked'
-							: isColumnFinished
+						(isColumnFinished && !this.props.reservedColumnPoints[x]
 							? 'circled'
 							: '')
 					}
 				>
+					{this.props.reservedColumnPoints[x] ? (
+						<FontAwesomeIcon
+							icon={['fad', 'xmark']}
+							size="1x"
+							className={'striked'}
+						/>
+					) : null}
+
 					{ColumnPoints[x][0]}
 				</div>
 				<div

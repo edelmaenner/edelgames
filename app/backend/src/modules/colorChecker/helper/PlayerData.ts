@@ -1,5 +1,6 @@
 import {
 	ColorGrid,
+	Coordinate,
 	GridScore,
 } from '@edelgames/types/src/modules/colorChecker/CCTypes';
 import { SelectableColors } from '../ColorCheckerGame';
@@ -15,12 +16,17 @@ export default class PlayerData {
 	remainingJokers = 10;
 	isUsingNumberJoker = false;
 	isUsingColorJoker = false;
+	cellHistory: Coordinate[] = [];
 
 	constructor(player: User, gridTemplate: ColorGrid) {
 		this.playerId = player.getId();
 		this.playerName = player.getUsername();
 		this.grid = GridHelper.createNewGrid(gridTemplate);
 		this.finishedColumns = Array(this.grid.length).fill(false);
+	}
+
+	addCellsToHistory(cells: Coordinate[]): void {
+		this.cellHistory.push(...cells);
 	}
 
 	getScore(

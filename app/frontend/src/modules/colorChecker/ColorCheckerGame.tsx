@@ -24,6 +24,7 @@ import {
 	OnGridChangedEventData,
 	OnJokerRequestedEventData,
 	OnPlayerStateUpdateEventData,
+	OnRemainingPlayersChangedEventData,
 	OnScoresCalculatedEventData,
 	OnSelectionMadeEventData,
 	S2CEvents,
@@ -110,6 +111,12 @@ export default class ColorCheckerGame
 				S2CEvents.ON_SCORES_CALCULATED,
 				this.onScoresCalculatedEvent.bind(this)
 			);
+		this.api
+			.getEventApi()
+			.addEventHandler(
+				S2CEvents.ON_REMAINING_PLAYERS_CHANGED,
+				this.onRemainingPlayersChangedEvent.bind(this)
+			);
 	}
 
 	componentWillUnmount() {
@@ -126,6 +133,14 @@ export default class ColorCheckerGame
 		const { points } = eventData as OnScoresCalculatedEventData;
 		this.setState({
 			scoreboard: points,
+		});
+	}
+
+	onRemainingPlayersChangedEvent(eventData: EventDataObject): void {
+		const { remainingPlayers } =
+			eventData as OnRemainingPlayersChangedEventData;
+		this.setState({
+			remainingPlayers: remainingPlayers,
 		});
 	}
 

@@ -1,9 +1,10 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 import { SelectableColors } from './ColorGridBox';
 import {
 	ColorGrid,
 	GameStates,
 } from '@edelgames/types/src/modules/colorChecker/CCTypes';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 interface IProps {
 	reservedBonusPoints: boolean[];
@@ -46,7 +47,7 @@ export default class ScoreBoard extends Component<IProps, {}> {
 			case GameStates.ACTIVE_PLAYER_SELECTS:
 				return 'Der aktive Spieler darf zuerst seinen Zug machen';
 			case GameStates.PASSIVE_PLAYERS_SELECTS:
-				return `Alle nicht aktiven Spieler, dürfen ihren Zug mit den übrigen Würfeln machen. ${this.props.remainingPlayers} verbleibend`;
+				return `Alle nicht aktiven Spieler, dürfen ihren Zug mit den übrigen Würfeln machen. ${this.props.remainingPlayers} Spieler verbleibend`;
 		}
 		return '';
 	}
@@ -64,9 +65,14 @@ export default class ScoreBoard extends Component<IProps, {}> {
 					}}
 				></div>
 				<div className={'color-bonus-cell'}>
-					<span className={isReserved ? 'striked' : isReached ? 'circled' : ''}>
-						5
-					</span>
+					<span className={!isReserved && isReached ? 'circled' : ''}>5</span>
+					{isReserved ? (
+						<FontAwesomeIcon
+							icon={['fad', 'xmark']}
+							size="1x"
+							className={'striked'}
+						/>
+					) : null}
 				</div>
 				<div className={'color-bonus-cell'}>
 					<span className={isReserved && isReached ? 'circled' : ''}>3</span>

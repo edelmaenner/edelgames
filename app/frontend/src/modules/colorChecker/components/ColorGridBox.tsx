@@ -79,10 +79,13 @@ export default class ColorGridBox extends React.Component<IProps, IState> {
 							: '')
 					}
 				>
-					{
-						this.props.reservedColumnPoints[x] ?
-							<FontAwesomeIcon icon={['fad', 'xmark']} size="1x" className={'striked'}/> : null
-					}
+					{this.props.reservedColumnPoints[x] ? (
+						<FontAwesomeIcon
+							icon={['fad', 'xmark']}
+							size="1x"
+							className={'striked'}
+						/>
+					) : null}
 
 					{ColumnPoints[x][0]}
 				</div>

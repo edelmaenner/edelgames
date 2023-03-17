@@ -23,7 +23,8 @@ import {
 	OnGameStateUpdateEventData,
 	OnGridChangedEventData,
 	OnJokerRequestedEventData,
-	OnPlayerStateUpdateEventData, OnRemainingPlayersChangedEventData,
+	OnPlayerStateUpdateEventData,
+	OnRemainingPlayersChangedEventData,
 	OnScoresCalculatedEventData,
 	OnSelectionMadeEventData,
 	S2CEvents,
@@ -136,10 +137,11 @@ export default class ColorCheckerGame
 	}
 
 	onRemainingPlayersChangedEvent(eventData: EventDataObject): void {
-		const {remainingPlayers} = eventData as OnRemainingPlayersChangedEventData;
+		const { remainingPlayers } =
+			eventData as OnRemainingPlayersChangedEventData;
 		this.setState({
-			remainingPlayers: remainingPlayers
-		})
+			remainingPlayers: remainingPlayers,
+		});
 	}
 
 	onPlayerStateChangedEvent(eventData: EventDataObject): void {

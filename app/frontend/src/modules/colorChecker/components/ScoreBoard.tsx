@@ -4,7 +4,7 @@ import {
 	ColorGrid,
 	GameStates,
 } from '@edelgames/types/src/modules/colorChecker/CCTypes';
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 interface IProps {
 	reservedBonusPoints: boolean[];
@@ -65,13 +65,14 @@ export default class ScoreBoard extends Component<IProps, {}> {
 					}}
 				></div>
 				<div className={'color-bonus-cell'}>
-					<span className={!isReserved && isReached ? 'circled' : ''}>
-						5
-					</span>
-					{
-						isReserved ?
-							<FontAwesomeIcon icon={['fad', 'xmark']} size="1x" className={'striked'}/> : null
-					}
+					<span className={!isReserved && isReached ? 'circled' : ''}>5</span>
+					{isReserved ? (
+						<FontAwesomeIcon
+							icon={['fad', 'xmark']}
+							size="1x"
+							className={'striked'}
+						/>
+					) : null}
 				</div>
 				<div className={'color-bonus-cell'}>
 					<span className={isReserved && isReached ? 'circled' : ''}>3</span>

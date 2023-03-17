@@ -16,12 +16,11 @@
 		width: 30rem;
 	}
 
-
 	.striked {
 		position: absolute;
 		left: 50%;
 		top: 50%;
-		transform: translate(-50%,-50%);
+		transform: translate(-50%, -50%);
 		color: $signature;
 		font-size: 2rem;
 		--fa-secondary-opacity: 1;

@@ -6,7 +6,7 @@ import {
 import ProfileImage from '../../../framework/components/ProfileImage/ProfileImage';
 import ModulePlayerApi from '../../../framework/modules/api/ModulePlayerApi';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import ColorGridBoxAnimation from "./ColorGridBoxAnimation";
+import ColorGridBoxAnimation from './ColorGridBoxAnimation';
 
 interface IProps {
 	scoreboard: GridScoreboard;
@@ -121,7 +121,6 @@ export default class WinningScreen extends Component<IProps, IState> {
 					animationSpeed={500}
 					key={score.player}
 				/>
-
 			</div>
 		);
 	}

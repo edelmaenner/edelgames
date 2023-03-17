@@ -25,6 +25,7 @@ export type GridPlayerScore = {
 	player: string;
 	score: GridScore;
 	grid: ColorGrid;
+	history: Coordinate[];
 };
 
 export type GridScoreboard = GridPlayerScore[];

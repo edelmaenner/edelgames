@@ -6,6 +6,7 @@ import {
 import ProfileImage from '../../../framework/components/ProfileImage/ProfileImage';
 import ModulePlayerApi from '../../../framework/modules/api/ModulePlayerApi';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import ColorGridBoxAnimation from "./ColorGridBoxAnimation";
 
 interface IProps {
 	scoreboard: GridScoreboard;
@@ -113,31 +114,14 @@ export default class WinningScreen extends Component<IProps, IState> {
 		return (
 			<div className={'grid-image-container'}>
 				<div className={'grid-title'}>{user ? user.getUsername() : '???'}</div>
-				<div className={'grid-image'}>
-					{score.grid.map((column, index) => (
-						<div
-							className={'grid-image-column'}
-							key={'grid-image-column-' + index}
-						>
-							{column.map((cell, index) => (
-								<div
-									className={'grid-image-cell'}
-									key={'grid-image-cell-' + index}
-									style={{
-										backgroundColor: cell.color,
-									}}
-								>
-									{cell.checked ? (
-										<FontAwesomeIcon icon={['fad', 'xmark']} size="1x" />
-									) : null}
-									{cell.isSpecial && !cell.checked ? (
-										<FontAwesomeIcon icon={['fad', 'star']} size="1x" />
-									) : null}
-								</div>
-							))}
-						</div>
-					))}
-				</div>
+
+				<ColorGridBoxAnimation
+					grid={score.grid}
+					animationSteps={score.history}
+					animationSpeed={500}
+					key={score.player}
+				/>
+
 			</div>
 		);
 	}

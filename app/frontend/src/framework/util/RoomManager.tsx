@@ -4,9 +4,10 @@
 import User from './User';
 import eventManager from './EventManager';
 import {
-	EventDataObject, ServerRoomObject,
+	EventDataObject,
+	ServerRoomObject,
 } from '@edelgames/types/src/app/ApiTypes';
-import {NativeConfiguration} from "@edelgames/types/src/app/ConfigurationTypes";
+import { NativeConfiguration } from '@edelgames/types/src/app/ConfigurationTypes';
 
 export const RoomEventNames = {
 	roomChangedEventNotified: 'roomChangedEventNotified',

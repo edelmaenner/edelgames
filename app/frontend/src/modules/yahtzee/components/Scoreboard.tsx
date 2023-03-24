@@ -122,8 +122,11 @@ export default class Scoreboard extends React.Component<IProps, {}> {
 				{this.renderScoreCell(playerScore, ScoreCellIDs.FIVE, allowSelection)}
 				{this.renderScoreCell(playerScore, ScoreCellIDs.SIX, allowSelection)}
 
-				<div className={'yahtzee-tcell'}
-					 title={totalFirstPart < 63 ? `noch ${63-totalFirstPart}` : undefined}
+				<div
+					className={'yahtzee-tcell'}
+					title={
+						totalFirstPart < 63 ? `noch ${63 - totalFirstPart}` : undefined
+					}
 				>
 					{totalFirstPart >= 63 ? 35 : 0}
 				</div>

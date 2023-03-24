@@ -10,7 +10,7 @@ import roomManager, { RoomEventNames } from './util/RoomManager';
 import profileManager from './util/ProfileManager';
 import { clientLogger } from './util/Logger';
 import LoadingSpinner from './components/LoadingSpinner/LoadingSpinner';
-import ConfigRoom from "./screens/ConfigRoom/ConfigRoom";
+import ConfigRoom from './screens/ConfigRoom/ConfigRoom';
 
 export default class Core extends React.Component {
 	constructor(props: object) {
@@ -74,12 +74,13 @@ export default class Core extends React.Component {
 		if (roomManager.getCurrentGameId()) {
 			const config = roomManager.getCurrentGameConfig();
 
-			if(config && config.isFullyConfigured && roomManager.isInConfigEditingMode()) {
-				return <ConfigRoom
-					configuration={config}
-				/>
-			}
-			else {
+			if (
+				config &&
+				config.isFullyConfigured &&
+				roomManager.isInConfigEditingMode()
+			) {
+				return <ConfigRoom configuration={config} />;
+			} else {
 				return <GameRoom />;
 			}
 		}

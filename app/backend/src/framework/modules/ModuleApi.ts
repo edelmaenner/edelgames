@@ -3,6 +3,8 @@ import ModuleGameInterface from './ModuleGameInterface';
 import { Logger } from '../util/Logger';
 import ModulePlayerApi from './api/ModulePlayerApi';
 import ModuleEventApi from './api/ModuleEventApi';
+import ModuleConfig from './configuration/ModuleConfig';
+import ModuleInterface from './ModuleInterface';
 
 /*
  * This class will be passed to the game instance to allow for restricted access to the room data.
@@ -11,19 +13,29 @@ import ModuleEventApi from './api/ModuleEventApi';
 export default class ModuleApi {
 	private readonly game: ModuleGameInterface;
 	private readonly gameId: string;
+	private readonly gameConfig: ModuleConfig;
 	private readonly playerApi: ModulePlayerApi;
 	private readonly eventApi: ModuleEventApi;
 	private readonly logger: Logger;
 
-	constructor(gameId: string, game: ModuleGameInterface, room: Room) {
+	constructor(
+		gameDefinition: ModuleInterface,
+		game: ModuleGameInterface,
+		room: Room
+	) {
 		this.game = game;
-		this.gameId = gameId;
+		this.gameId = gameDefinition.getUniqueId();
+		this.gameConfig = gameDefinition.getGameConfig();
 
 		this.logger = new Logger(this.gameId);
 		this.eventApi = new ModuleEventApi(this);
 		this.playerApi = new ModulePlayerApi(room, this);
 
 		room.setCurrentGame(this);
+	}
+
+	public getConfig(): ModuleConfig {
+		return this.gameConfig;
 	}
 
 	public getGameId(): string {

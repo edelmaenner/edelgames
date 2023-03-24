@@ -1,4 +1,5 @@
 export * as ApiTypes from './src/app/ApiTypes';
+export * as ConfigurationTypes from './src/app/ConfigurationTypes';
 export * as DrawingCanvasTypes from './src/app/components/DrawingCanvasTypes';
 export * as NotificationBubbleTypes from './src/app/components/NotificationBubbleTypes';
 

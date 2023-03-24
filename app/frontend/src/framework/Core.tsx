@@ -10,6 +10,7 @@ import roomManager, { RoomEventNames } from './util/RoomManager';
 import profileManager from './util/ProfileManager';
 import { clientLogger } from './util/Logger';
 import LoadingSpinner from './components/LoadingSpinner/LoadingSpinner';
+import ConfigRoom from "./screens/ConfigRoom/ConfigRoom";
 
 export default class Core extends React.Component {
 	constructor(props: object) {
@@ -71,7 +72,16 @@ export default class Core extends React.Component {
 
 		// if there is any game id selected, show the game room
 		if (roomManager.getCurrentGameId()) {
-			return <GameRoom />;
+			const config = roomManager.getCurrentGameConfig();
+
+			if(config && config.isFullyConfigured && roomManager.isInConfigEditingMode()) {
+				return <ConfigRoom
+					configuration={config}
+				/>
+			}
+			else {
+				return <GameRoom />;
+			}
 		}
 
 		// if we are not in the lobby and don't have a selected game, show the idle room

@@ -26,7 +26,7 @@ class ModuleRegistry {
 		}
 
 		const gameInstance = module.getGameInstance();
-		const moduleApi = new ModuleApi(gameId, gameInstance, room);
+		const moduleApi = new ModuleApi(module, gameInstance, room);
 		gameInstance.onGameInitialize(moduleApi);
 	}
 }

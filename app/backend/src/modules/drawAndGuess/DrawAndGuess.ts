@@ -3,6 +3,7 @@ import ModuleGameInterface from '../../framework/modules/ModuleGameInterface';
 import DrawAndGuessGame from './DrawAndGuessGame';
 import { systemLogger } from '../../framework/util/Logger';
 import wordList from './Wordlist';
+import ModuleConfig from '../../framework/modules/configuration/ModuleConfig';
 
 /*
  * This singleton is used to register the game to the ModuleList
@@ -12,6 +13,10 @@ class DrawAndGuess implements ModuleInterface {
 
 	getUniqueId(): string {
 		return 'drawAndGuess';
+	}
+
+	getGameConfig(): ModuleConfig {
+		return new ModuleConfig([]);
 	}
 
 	getGameInstance(): ModuleGameInterface {

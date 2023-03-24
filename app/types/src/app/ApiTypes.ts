@@ -1,3 +1,5 @@
+import { NativeConfiguration } from './ConfigurationTypes';
+
 export type authDataContainer = {
 	authCookie: string;
 	username: string;
@@ -27,9 +29,11 @@ export type ServerRoomMember = {
 export type ServerRoomObject = {
 	roomId: string;
 	roomName: string;
-	requiredPassphrase: boolean;
+	requirePassphrase: boolean;
 	roomMembers: ServerRoomMember[];
 	currentGameId: string;
+	currentGameConfig: NativeConfiguration | null;
+	isEditingGameConfig: boolean;
 };
 
 export interface IUser {

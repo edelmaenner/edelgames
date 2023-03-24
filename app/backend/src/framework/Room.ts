@@ -3,7 +3,10 @@ import SocketManager from './util/SocketManager';
 import roomManager from './RoomManager';
 import { systemLogger } from './util/Logger';
 import ModuleApi from './modules/ModuleApi';
-import { ServerRoomMember } from '@edelgames/types/src/app/ApiTypes';
+import {
+	ServerRoomMember,
+	ServerRoomObject,
+} from '@edelgames/types/src/app/ApiTypes';
 
 export default class Room {
 	protected roomId: string;
@@ -12,6 +15,7 @@ export default class Room {
 	protected roomMaster: User | null;
 	protected roomPassword: string | null = null;
 	protected moduleApi: ModuleApi | null = null;
+	protected isEditingGameConfig = false;
 
 	constructor(roomMaster: User | null) {
 		this.roomId = this.createIdHash();
@@ -79,6 +83,17 @@ export default class Room {
 		}
 
 		this.moduleApi = roomApi;
+		// in case there is no config, we skip the configuration completely, otherwise set the room to the config edit state
+		this.isEditingGameConfig =
+			this.moduleApi && this.moduleApi.getConfig().hasConfig();
+		if (this.moduleApi && !this.isEditingGameConfig) {
+			systemLogger.debug(
+				`Skipping empty configuration for ${
+					roomApi ? roomApi.getGameId() : 'IDLE'
+				}`
+			);
+		}
+
 		this.sendRoomChangedBroadcast();
 
 		systemLogger.info(
@@ -110,13 +125,18 @@ export default class Room {
 	 * alerts every member of this room, that something has changed, so data can be refreshed
 	 */
 	public sendRoomChangedBroadcast(): void {
-		this.broadcastRoomMembers('roomChanged', {
+		const api = this.moduleApi;
+
+		const roomChangedData: ServerRoomObject = {
 			roomId: this.roomId,
 			roomName: this.roomName,
 			requirePassphrase: !!this.roomPassword,
 			roomMembers: this.getPublicRoomMemberList(),
-			currentGameId: this.moduleApi ? this.moduleApi.getGameId() : null,
-		});
+			currentGameId: api ? api.getGameId() : null,
+			currentGameConfig: api ? api.getConfig().getNativeConfiguration() : null,
+			isEditingGameConfig: this.isEditingGameConfig,
+		};
+		this.broadcastRoomMembers('roomChanged', roomChangedData);
 
 		roomManager.updateLobbyMembersRoomData();
 	}

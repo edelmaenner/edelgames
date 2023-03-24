@@ -1,6 +1,6 @@
 import React from 'react';
-import GameSelection from '../../components/GameSelection/GameSelection';
 import PlayerList from '../../components/PlayerList/PlayerList';
+import GameSelection from "./GameSelection/GameSelection";
 
 export default class IdleRoom extends React.Component {
 	render() {

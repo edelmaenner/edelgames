@@ -1,5 +1,4 @@
 #screenConfigRoom {
-
 	.config-title {
 		font-size: 2rem;
 		font-weight: $font-weight-bold;
@@ -36,10 +35,10 @@
 					top: 0;
 				}
 
-				@import "elements/StringInput";
-				@import "elements/NumberInput";
-				@import "elements/BooleanInput";
-				@import "elements/MultiElementWrapper";
+				@import 'elements/StringInput';
+				@import 'elements/NumberInput';
+				@import 'elements/BooleanInput';
+				@import 'elements/MultiElementWrapper';
 			}
 		}
 	}
@@ -48,9 +47,6 @@
 		margin-top: 2rem;
 
 		.btn {
-
 		}
 	}
-
-
 }

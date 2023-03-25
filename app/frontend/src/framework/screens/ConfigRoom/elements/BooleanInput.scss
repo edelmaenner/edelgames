@@ -10,7 +10,7 @@
 			background-color: $backgroundDark;
 			cursor: pointer;
 			border-radius: 3px;
-			transition: background-color $animationTime*2 ease-in-out;
+			transition: background-color $animationTime * 2 ease-in-out;
 			justify-content: center;
 			align-items: center;
 
@@ -22,7 +22,7 @@
 					stroke-dasharray: $dashCount;
 					stroke-dashoffset: $dashCount;
 					transition: stroke-dashoffset $animationTime linear $animationTime,
-								fill $animationTime linear 0s;
+						fill $animationTime linear 0s;
 				}
 			}
 		}
@@ -37,7 +37,7 @@
 			cursor: pointer;
 
 			&:after {
-				content: "";
+				content: '';
 				width: 1.6rem;
 				height: 1.6rem;
 				border-radius: 100%;
@@ -66,7 +66,7 @@
 						stroke-dashoffset: 0;
 						fill: rgba($text-color, 1);
 						transition: stroke-dashoffset $animationTime linear 0s,
-									fill $animationTime linear $animationTime;
+							fill $animationTime linear $animationTime;
 					}
 				}
 			}

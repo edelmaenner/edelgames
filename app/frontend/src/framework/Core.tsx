@@ -74,10 +74,7 @@ export default class Core extends React.Component {
 		if (roomManager.getCurrentGameId()) {
 			const config = roomManager.getCurrentGameConfig();
 
-			if (
-				config &&
-				roomManager.isInConfigEditingMode()
-			) {
+			if (config && roomManager.isInConfigEditingMode()) {
 				return <ConfigRoom configuration={config} />;
 			} else {
 				return <GameRoom />;

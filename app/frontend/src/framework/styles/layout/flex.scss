@@ -6,11 +6,9 @@
 	display: flex;
 }
 
-
 @for $i from 1 through 12 {
 	.col-#{$i} {
 		flex: percentage(calc(1 / $i));
 		max-width: percentage(calc(1 / $i));
 	}
 }
-

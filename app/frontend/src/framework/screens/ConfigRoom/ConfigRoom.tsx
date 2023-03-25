@@ -3,13 +3,16 @@ import {
 	BooleanConfig,
 	ConfigurationTypes,
 	NativeConfiguration,
-	NativeConfigurationElement, NumberConfig, StringConfig, valueChangedCallback,
+	NativeConfigurationElement,
+	NumberConfig,
+	StringConfig,
+	valueChangedCallback,
 } from '@edelgames/types/src/app/ConfigurationTypes';
 import roomManager from '../../util/RoomManager';
-import StringInput from "./elements/StringInput";
-import NumberInput from "./elements/NumberInput";
-import MultiElementWrapper from "./elements/MultiElementWrapper";
-import BooleanInput from "./elements/BooleanInput";
+import StringInput from './elements/StringInput';
+import NumberInput from './elements/NumberInput';
+import MultiElementWrapper from './elements/MultiElementWrapper';
+import BooleanInput from './elements/BooleanInput';
 
 interface IProps {
 	configuration: NativeConfiguration;
@@ -18,7 +21,10 @@ interface IProps {
 export default class ConfigRoom extends React.Component<IProps, {}> {
 	canBeEdited: boolean = false;
 
-	onValueChanged(element: NativeConfigurationElement, newValue: ConfigurationTypes): boolean {
+	onValueChanged(
+		element: NativeConfigurationElement,
+		newValue: ConfigurationTypes
+	): boolean {
 		console.log(element.name, newValue);
 		return false;
 	}
@@ -51,55 +57,84 @@ export default class ConfigRoom extends React.Component<IProps, {}> {
 	): JSX.Element {
 		const isMultiElement = element.maxElements > 1;
 
-		return <div
-			key={'config_element_' + element.name + '_' + index}
-			className={'config-element config-element-' + (isMultiElement ? 'multi' : 'single')}
-		>
-			<div className={'config-element-label'}>
-				{element.label}
-			</div>
-			<div className={'config-element-body'}>
-				{
-					isMultiElement ?
+		return (
+			<div
+				key={'config_element_' + element.name + '_' + index}
+				className={
+					'config-element config-element-' +
+					(isMultiElement ? 'multi' : 'single')
+				}
+			>
+				<div className={'config-element-label'}>{element.label}</div>
+				<div className={'config-element-body'}>
+					{isMultiElement ? (
 						<MultiElementWrapper
 							valueChangedCallback={this.onValueChanged.bind(this, element)}
 							elementRenderCallback={this.renderConfigurationForType.bind(this)}
 							element={element}
-						/> :
-						this.renderConfigurationForType(element, this.onValueChanged.bind(this, element), true)
-				}
+						/>
+					) : (
+						this.renderConfigurationForType(
+							element,
+							this.onValueChanged.bind(this, element),
+							true
+						)
+					)}
+				</div>
 			</div>
-		</div>;
+		);
 	}
 
-	renderConfigurationForType(element: NativeConfigurationElement, onValueChangedCallback: valueChangedCallback, reactToBlur: boolean): JSX.Element {
-		switch(element.type) {
+	renderConfigurationForType(
+		element: NativeConfigurationElement,
+		onValueChangedCallback: valueChangedCallback,
+		reactToBlur: boolean
+	): JSX.Element {
+		switch (element.type) {
 			case 'string':
-				return <StringInput onChangeFinished={onValueChangedCallback}
-									onValueChanged={reactToBlur ? onValueChangedCallback : undefined}
-									name={element.name}
-									config={element.config as StringConfig}
-									initialValue={element.value as string} />
+				return (
+					<StringInput
+						onChangeFinished={onValueChangedCallback}
+						onValueChanged={reactToBlur ? onValueChangedCallback : undefined}
+						name={element.name}
+						config={element.config as StringConfig}
+						initialValue={element.value as string}
+					/>
+				);
 			case 'float':
-				return <NumberInput onChangeFinished={onValueChangedCallback}
-									onValueChanged={reactToBlur ? onValueChangedCallback : undefined}
-									name={element.name}
-									config={element.config as NumberConfig}
-									initialValue={element.value as number} />
+				return (
+					<NumberInput
+						onChangeFinished={onValueChangedCallback}
+						onValueChanged={reactToBlur ? onValueChangedCallback : undefined}
+						name={element.name}
+						config={element.config as NumberConfig}
+						initialValue={element.value as number}
+					/>
+				);
 			case 'int':
-				return <NumberInput onChangeFinished={onValueChangedCallback}
-									onValueChanged={reactToBlur ? onValueChangedCallback : undefined}
-									name={element.name}
-									config={element.config as NumberConfig}
-									initialValue={element.value as number} />
+				return (
+					<NumberInput
+						onChangeFinished={onValueChangedCallback}
+						onValueChanged={reactToBlur ? onValueChangedCallback : undefined}
+						name={element.name}
+						config={element.config as NumberConfig}
+						initialValue={element.value as number}
+					/>
+				);
 			case 'bool':
-				return <BooleanInput onChangeFinished={onValueChangedCallback}
-									 onValueChanged={reactToBlur ? onValueChangedCallback : undefined}
-									 name={element.name}
-									 config={element.config as BooleanConfig}
-									 initialValue={element.value as boolean} />
+				return (
+					<BooleanInput
+						onChangeFinished={onValueChangedCallback}
+						onValueChanged={reactToBlur ? onValueChangedCallback : undefined}
+						name={element.name}
+						config={element.config as BooleanConfig}
+						initialValue={element.value as boolean}
+					/>
+				);
 			default:
-				return <span>Could not find matching element for type {element.type}</span>
+				return (
+					<span>Could not find matching element for type {element.type}</span>
+				);
 		}
 	}
 }

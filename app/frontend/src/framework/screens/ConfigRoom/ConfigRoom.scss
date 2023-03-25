@@ -1,0 +1,56 @@
+#screenConfigRoom {
+
+	.config-title {
+		font-size: 2rem;
+		font-weight: $font-weight-bold;
+		margin-bottom: 2rem;
+	}
+
+	.config-elements {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+
+		.config-element {
+			display: flex;
+			padding: 0.5rem 0;
+			flex: 1 1 100%;
+
+			.config-element-label {
+				height: 100%;
+				flex: 1 0 33.33333%;
+				max-width: 25rem;
+				display: flex;
+				padding: 1.5rem 5rem 0.5rem 0;
+			}
+
+			.config-element-body {
+				padding: 1.5rem 0 1rem 0;
+				position: relative;
+				flex: 1 0 66.666666%;
+				max-width: 66.666666%;
+
+				.config-error-message {
+					color: $error;
+					position: absolute;
+					top: 0;
+				}
+
+				@import "elements/StringInput";
+				@import "elements/NumberInput";
+				@import "elements/BooleanInput";
+				@import "elements/MultiElementWrapper";
+			}
+		}
+	}
+
+	.config-footer {
+		margin-top: 2rem;
+
+		.btn {
+
+		}
+	}
+
+
+}

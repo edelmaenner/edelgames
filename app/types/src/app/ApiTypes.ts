@@ -1,4 +1,5 @@
 import { NativeConfiguration } from './ConfigurationTypes';
+import { anyObject } from './BasicTypes';
 
 export type authDataContainer = {
 	authCookie: string;
@@ -10,9 +11,7 @@ export type authDataContainer = {
 };
 
 // the data carried by an event on publish
-export type EventDataObject = {
-	[key: string]: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-};
+export type EventDataObject = anyObject;
 
 export type EventHandlerFunction = (eventData: EventDataObject) => void;
 

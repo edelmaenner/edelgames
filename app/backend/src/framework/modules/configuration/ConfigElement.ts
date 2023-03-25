@@ -1,17 +1,18 @@
 import {
 	ConfigurationTypes,
 	ConfigurationTypesDefs,
-	ConfigurationTypesSingle,
 	NativeConfigurationElement,
 	NativeConfigurationElementConfig,
 } from '@edelgames/types/src/app/ConfigurationTypes';
 
 export default abstract class ConfigElement {
+	private readonly name: string;
+	private readonly label: string;
 	private value: ConfigurationTypes = null;
-	private name: string;
-	private label: string;
+	private minElements = 1;
+	private maxElements = 1;
 
-	constructor(
+	protected constructor(
 		configName: string,
 		label: string,
 		initialValue: ConfigurationTypes = null
@@ -19,6 +20,21 @@ export default abstract class ConfigElement {
 		this.name = configName;
 		this.value = initialValue;
 		this.label = label;
+	}
+
+	public changeAllowedQuantities(min: number, max: number): this {
+		if (!this.allowElementQuantityChanges()) {
+			throw new Error(
+				`Cannot change quantity of the element "${this.getName()}"`
+			);
+		}
+
+		if (min > max) {
+			throw new Error('Cannot have higher minimum than maximum');
+		}
+		this.minElements = min;
+		this.maxElements = max;
+		return this;
 	}
 
 	public setValue(value: ConfigurationTypes): void {
@@ -49,23 +65,42 @@ export default abstract class ConfigElement {
 
 	private validateValue(
 		value: ConfigurationTypes,
-		allowArray: boolean
+		allowArrayStep: boolean
 	): true | string {
 		if (value === null) {
-			return this.allowEmptySelection()
+			return this.isValueMatchingConfig(value)
 				? true
 				: 'Cannot assign null to non empty field';
 		}
 
 		if (Array.isArray(value)) {
-			if (!allowArray) {
+			if (!this.canHaveMultipleValues()) {
+				return 'Cannot have multiple values on single value config';
+			}
+
+			if (!allowArrayStep) {
 				return 'Cannot have nested array as config value';
 			}
 
-			if (value.length === 0 && this.allowEmptySelection()) {
-				return true; // empty array
+			if (value.length < this.minElements) {
+				return 'Cannot store less elements than required';
 			}
-			return this.validateValue(value[0], false);
+			if (value.length > this.maxElements) {
+				return 'Cannot store more elements than required';
+			}
+
+			// validate every child element
+			for (const element of value) {
+				const elementValidation = this.validateValue(element, false);
+				if (elementValidation !== true) {
+					return elementValidation;
+				}
+			}
+			return true;
+		}
+
+		if (!this.isValueMatchingConfig(value)) {
+			return 'Cannot assign value conflicting with individual configuration';
 		}
 
 		switch (this.getValueType()) {
@@ -99,7 +134,7 @@ export default abstract class ConfigElement {
 	}
 
 	public isConfigured(): boolean {
-		return !!this.getValue() || this.allowEmptySelection();
+		return this.validateValue(this.value, true) === true;
 	}
 
 	public toNativeObject(): NativeConfigurationElement {
@@ -108,20 +143,28 @@ export default abstract class ConfigElement {
 			name: this.getName(),
 			label: this.getLabel(),
 			value: this.getValue(),
-			multiple: this.canHaveMultipleValues(),
+			minElements: this.minElements,
+			maxElements: this.maxElements,
 			isConfigured: this.isConfigured(),
-			allowEmpty: this.allowEmptySelection(),
 			config: this.getElementConfig(),
 		};
 	}
 
-	public getElementConfig(): NativeConfigurationElementConfig {
-		return null;
+	public canBeEmpty(): boolean {
+		return this.minElements === 0;
 	}
+
+	public canHaveMultipleValues(): boolean {
+		return this.maxElements > 1;
+	}
+
+	public allowElementQuantityChanges(): boolean {
+		return true;
+	}
+
+	public abstract getElementConfig(): NativeConfigurationElementConfig;
 
 	public abstract getValueType(): ConfigurationTypesDefs;
 
-	public abstract allowEmptySelection(): boolean;
-
-	public abstract canHaveMultipleValues(): boolean;
+	public abstract isValueMatchingConfig(value: ConfigurationTypes): boolean;
 }

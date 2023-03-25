@@ -11,6 +11,12 @@
 @import 'elements/buttons';
 @import 'elements/text-styles';
 
+
+/*
+ * Definitions for classes and default HTML Tags, that are used to create a grid like layout
+ */
+@import 'layout/flex';
+
 /*
  * Component style files, containing specific styles for a single component
  */
@@ -29,6 +35,7 @@
  */
 @import 'src/framework/screens/Lobby/Lobby';
 @import 'src/framework/screens/IdleRoom/IdleRoom';
+@import 'src/framework/screens/ConfigRoom/ConfigRoom';
 @import 'src/framework/screens/GameRoom/GameRoom';
 
 /*

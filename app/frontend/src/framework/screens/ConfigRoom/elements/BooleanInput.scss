@@ -1,0 +1,82 @@
+.bool-input-config {
+	$animationTime: 0.4s;
+	$dashCount: 1276;
+
+	.bool-input-type- {
+		&checkbox {
+			display: flex;
+			width: 2rem;
+			height: 2rem;
+			background-color: $backgroundDark;
+			cursor: pointer;
+			border-radius: 3px;
+			transition: background-color $animationTime*2 ease-in-out;
+			justify-content: center;
+			align-items: center;
+
+			svg {
+				path {
+					fill: rgba($text-color, 0);
+					stroke-width: 1rem;
+					stroke: $text-color;
+					stroke-dasharray: $dashCount;
+					stroke-dashoffset: $dashCount;
+					transition: stroke-dashoffset $animationTime linear $animationTime,
+								fill $animationTime linear 0s;
+				}
+			}
+		}
+		&switch {
+			background: $backgroundDark;
+			width: 4rem;
+			height: 2rem;
+			display: inline-block;
+			border-radius: 1rem;
+			position: relative;
+			transition: background-color $animationTime ease-in-out;
+			cursor: pointer;
+
+			&:after {
+				content: "";
+				width: 1.6rem;
+				height: 1.6rem;
+				border-radius: 100%;
+				position: absolute;
+				left: 0.2rem;
+				top: 50%;
+				transform: translate(0, -50%);
+				background-color: $white;
+				box-shadow: 0 0 3px $gray-600;
+				transition: left $animationTime ease-in-out;
+			}
+
+			svg {
+				display: none;
+			}
+		}
+	}
+
+	input[type='checkbox']:checked {
+		& + .bool-input-type- {
+			&checkbox {
+				background-color: $success;
+
+				svg {
+					path {
+						stroke-dashoffset: 0;
+						fill: rgba($text-color, 1);
+						transition: stroke-dashoffset $animationTime linear 0s,
+									fill $animationTime linear $animationTime;
+					}
+				}
+			}
+			&switch {
+				background-color: $success;
+
+				&:after {
+					left: calc(100% - 1.9rem);
+				}
+			}
+		}
+	}
+}

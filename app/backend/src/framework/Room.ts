@@ -86,6 +86,7 @@ export default class Room {
 		// in case there is no config, we skip the configuration completely, otherwise set the room to the config edit state
 		this.isEditingGameConfig =
 			this.moduleApi && this.moduleApi.getConfig().hasConfig();
+
 		if (this.moduleApi && !this.isEditingGameConfig) {
 			systemLogger.debug(
 				`Skipping empty configuration for ${

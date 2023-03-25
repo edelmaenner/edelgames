@@ -1,0 +1,22 @@
+.multi-element-wrapper {
+
+    .multi-element-input {
+        margin-bottom: 0.5rem;
+    }
+
+    .multi-element-list {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+
+        .multi-element-item {
+            background-color: $backgroundLight;
+            padding: 0.25rem 0.5rem;
+            border-radius: 3px;
+
+            svg {
+                margin-left: 0.5rem;
+            }
+        }
+    }
+}

@@ -76,7 +76,6 @@ export default class Core extends React.Component {
 
 			if (
 				config &&
-				config.isFullyConfigured &&
 				roomManager.isInConfigEditingMode()
 			) {
 				return <ConfigRoom configuration={config} />;

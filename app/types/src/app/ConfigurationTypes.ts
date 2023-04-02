@@ -10,10 +10,10 @@ export type NativeConfigurationElement = {
 	type: ConfigurationTypesDefs;
 	name: string;
 	label: string;
+	isValidState: boolean;
 	minElements: number;
 	maxElements: number;
 	value: ConfigurationTypes;
-	isConfigured: boolean;
 	config: NativeConfigurationElementConfig;
 };
 
@@ -75,4 +75,4 @@ export type ConfigurationTypes =
 	| ConfigurationTypesSingle[]
 	| null;
 
-export type valueChangedCallback = { (value: ConfigurationTypes): boolean };
+export type valueChangedCallback = { (value: ConfigurationTypes): void };

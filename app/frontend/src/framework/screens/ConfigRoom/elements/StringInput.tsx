@@ -7,29 +7,25 @@ import { onEnterKeyEvent } from '../../../components/Inputs/InputUtils';
 
 interface IProps {
 	onValueChanged?: valueChangedCallback;
-	onChangeFinished: valueChangedCallback;
+	onChangeFinished?: valueChangedCallback;
 	name: string;
 	config: StringConfig;
-	initialValue: string;
+	value: string;
+	isValidState: boolean;
+	allowEdit: boolean;
 }
 
 interface IState {
-	value: string;
 	error: null | string;
 }
 
 export default class StringInput extends Component<IProps, IState> {
+
 	state = {
-		value: '',
 		error: null,
 	};
-	elementRef = React.createRef<HTMLInputElement>();
 
-	componentDidMount() {
-		this.setState({
-			value: this.props.initialValue,
-		});
-	}
+	elementRef = React.createRef<HTMLInputElement>();
 
 	validateValue(value: string): boolean {
 		const { minLength, maxLength, forbiddenChars, allowedChars, regexMatch } =
@@ -83,50 +79,67 @@ export default class StringInput extends Component<IProps, IState> {
 	}
 
 	onTextChanged(): void {
-		const value = this.elementRef.current?.value;
-
-		if (value === undefined || value === null) {
+		if(!this.props.allowEdit) {
 			return;
 		}
 
-		this.setState({
-			value: value,
-		});
+		const value = this.elementRef.current?.value;
 
-		if (this.validateValue(value) && this.props.onValueChanged) {
-			this.props.onValueChanged(value);
+		if (value === undefined ||
+			value === null ||
+			!this.props.onValueChanged ||
+			!this.validateValue(value))
+		{
+			return;
 		}
+
+		this.props.onValueChanged(value);
 	}
 
 	onChangeFinished(): void {
-		const value = this.elementRef.current?.value;
-		if (!value) {
+		if(!this.props.allowEdit) {
 			return;
 		}
 
-		if (this.validateValue(value) && this.props.onChangeFinished(value)) {
-			this.setState({
-				value: '',
-			});
+		const value = this.elementRef.current?.value;
+
+		if (value === undefined ||
+			value === null ||
+			!this.props.onChangeFinished ||
+			!this.validateValue(value))
+		{
+			return;
 		}
+
+		this.props.onChangeFinished(value);
 	}
 
 	render() {
+		const hasValue = this.props.value !== null;
+		const hasError = hasValue && this.state.error !== null;
+
+		let classes = [];
+		if(hasError) classes.push('has-error');
+		if(this.props.isValidState) classes.push('is-valid');
+		if(this.props.allowEdit) classes.push('is-disabled');
+
 		return (
 			<div className={'string-input-config'}>
-				{this.state.error ? (
+				{hasError ? (
 					<div className={'config-error-message'}>{this.state.error}</div>
 				) : null}
 				<input
 					type={'text'}
 					ref={this.elementRef}
-					className={this.state.error ? 'has-error' : ''}
+					disabled={!this.props.allowEdit}
+					className={classes.join(' ')}
 					name={this.props.name}
-					value={this.state.value}
+					value={this.props.value || ''}
 					onKeyDown={onEnterKeyEvent.bind(
 						null,
 						this.onChangeFinished.bind(this)
 					)}
+					onBlur={this.onChangeFinished.bind(this)}
 					onChange={this.onTextChanged.bind(this)}
 				/>
 			</div>

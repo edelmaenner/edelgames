@@ -13,14 +13,15 @@ interface IProps {
 		(
 			element: NativeConfigurationElement,
 			callback: valueChangedCallback,
-			reactToBlur: boolean
+			finishedCallback: valueChangedCallback,
+			allowEdit: boolean
 		): JSX.Element;
 	};
 	element: NativeConfigurationElement;
+	allowEdit: boolean;
 }
 
 interface IState {
-	elements: ConfigurationTypesSingle[];
 	currentElement: ConfigurationTypesSingle;
 }
 
@@ -30,42 +31,75 @@ interface IState {
  */
 export default class MultiElementWrapper extends Component<IProps, IState> {
 	state = {
-		elements: [] as ConfigurationTypesSingle[],
 		currentElement: null,
 	};
 
 	onSingleValueRemoved(index: number): void {
-		let elementList = this.state.elements;
+		if(!this.props.allowEdit) {
+			return;
+		}
+
+		const oldList = Array.isArray(this.props.element.value) ? this.props.element.value : [];
+
+		let elementList = [...(oldList as ConfigurationTypesSingle[])];
 		elementList.splice(index, 1);
-		this.setState({
-			elements: elementList,
-		});
-		this.props.valueChangedCallback(elementList);
+
+		if(elementList.length >= this.props.element.minElements && elementList.length <= this.props.element.maxElements) {
+			this.props.element.value = elementList;
+			this.props.valueChangedCallback(elementList);
+		}
 	}
 
-	onSingleValueChanged(value: ConfigurationTypesSingle): boolean {
-		let elementList = this.state.elements;
+	onSingleValueAdded(value: ConfigurationTypesSingle): void {
+		if(!this.props.allowEdit) {
+			return;
+		}
+
+		const oldList = Array.isArray(this.props.element.value) ? this.props.element.value : [];
+
+		let elementList = [...(oldList  as ConfigurationTypesSingle[])];
 		elementList.push(value);
 
-		this.setState({
-			elements: elementList,
-		});
-		this.props.valueChangedCallback(elementList);
-		return true;
+		if(elementList.length >= this.props.element.minElements && elementList.length <= this.props.element.maxElements) {
+			this.props.element.value = elementList;
+			this.props.valueChangedCallback(elementList);
+			this.setState({
+				currentElement: null
+			});
+		}
 	}
 
+	onCurrentValueChanged(value: ConfigurationTypesSingle): void {
+		if(!this.props.allowEdit) {
+			return;
+		}
+
+		this.setState({
+			currentElement: value,
+		});
+	}
+
+
 	render() {
+		let tempElement = {
+			...this.props.element
+		};
+		tempElement.value = this.state.currentElement;
+
+		const elements = Array.isArray(this.props.element.value) ? this.props.element.value as ConfigurationTypesSingle[] : [];
+
 		return (
 			<div className={'multi-element-wrapper'}>
 				<div className={'multi-element-input'}>
 					{this.props.elementRenderCallback(
-						this.props.element,
-						this.onSingleValueChanged.bind(this),
-						false
+						tempElement,
+						this.onCurrentValueChanged.bind(this),
+						this.onSingleValueAdded.bind(this),
+						this.props.allowEdit
 					)}
 				</div>
 				<div className={'multi-element-list'}>
-					{this.state.elements.map((element, index) => (
+					{elements.map((element, index) => (
 						<span
 							key={'multi_element_item_' + index}
 							className={'multi-element-item'}
@@ -75,12 +109,12 @@ export default class MultiElementWrapper extends Component<IProps, IState> {
 							<FontAwesomeIcon
 								icon={['fad', 'xmark']}
 								size="1x"
-								className={'clickable'}
+								className={'clickable ' + (this.props.allowEdit ? '' : 'd-none')}
 								onClick={this.onSingleValueRemoved.bind(this, index)}
 							/>
 						</span>
 					))}
-					{this.state.elements.length === 0 ? (
+					{elements.length === 0 ? (
 						<span className={'multi-element-item'}>Nichts ausgewählt</span>
 					) : null}
 				</div>
@@ -91,27 +125,31 @@ export default class MultiElementWrapper extends Component<IProps, IState> {
 	valueToJsx(
 		value: ConfigurationTypesSingle
 	): JSX.Element | string | number | null {
+
 		if (value === null) {
 			return '???';
 		}
 
-		if (typeof value === 'object') {
-			if (!Object.hasOwn(value, 'render')) {
-				return JSON.stringify(value);
-			}
-			value = value as displayableObject;
+		switch (typeof value) {
+			case "string":
+			case "number":
+			case "undefined":
+				return value;
+			case "object":
+				if (!Object.hasOwn(value, 'render')) {
+					return JSON.stringify(value);
+				}
+				value = value as displayableObject;
 
-			if (typeof value.render === 'function') {
-				return value.render();
-			}
-			return value.render;
+				if (typeof value.render === 'function') {
+					return value.render();
+				}
+				return value.render;
+			case "boolean":
+				return value ? 'ON' : 'OFF';
+			default:
+				return '???';
 		}
-
-		if (typeof value === 'boolean') {
-			return value ? 'ON' : 'OFF';
-		}
-
-		return value;
 	}
 }
 

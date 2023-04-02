@@ -5,31 +5,27 @@ import {
 } from '@edelgames/types/src/app/ConfigurationTypes';
 import { onEnterKeyEvent } from '../../../components/Inputs/InputUtils';
 
+
 interface IProps {
 	onValueChanged?: valueChangedCallback;
-	onChangeFinished: valueChangedCallback;
+	onChangeFinished?: valueChangedCallback;
 	name: string;
 	config: NumberConfig;
-	initialValue: number;
+	value: number;
+	isValidState: boolean;
+	allowEdit: boolean;
 }
 
 interface IState {
-	value: number;
 	error: null | string;
 }
 
 export default class NumberInput extends Component<IProps, IState> {
 	state = {
-		value: 0,
 		error: null,
 	};
 	elementRef = React.createRef<HTMLInputElement>();
 
-	componentDidMount() {
-		this.setState({
-			value: this.props.initialValue,
-		});
-	}
 
 	isNumeric(str: string) {
 		return (
@@ -83,43 +79,54 @@ export default class NumberInput extends Component<IProps, IState> {
 	}
 
 	onNumberChanged(): void {
+		if(!this.props.allowEdit) {
+			return;
+		}
+
 		const value = this.elementRef.current?.value;
 
+		if(!this.props.onValueChanged) {
+			return;
+		}
+
 		if (value === undefined || value === null) {
-			this.setState({
-				value: 0,
-			});
+			this.props.onValueChanged(this.props.config.min);
 			return;
 		}
 
 		const validatedValue = this.validateValue(value);
 		if (validatedValue !== false) {
-			this.setState({
-				value: validatedValue,
-			});
-			if (this.props.onValueChanged) {
-				this.props.onValueChanged(validatedValue);
-			}
+			this.props.onValueChanged(value);
 		}
 	}
 
 	onChangeFinished(): void {
+		if(!this.props.allowEdit) {
+			return;
+		}
+
 		const value = this.elementRef.current?.value;
+
+		if(!this.props.onChangeFinished) {
+			return;
+		}
 
 		if (value === undefined || value === null) {
 			return;
 		}
 
 		const validatedValue = this.validateValue(value);
-		if (
-			validatedValue !== false &&
+		if (validatedValue !== false) {
 			this.props.onChangeFinished(validatedValue)
-		) {
-			// do nothing, a number input does not have to be reset
 		}
 	}
 
 	render() {
+		let classes = [];
+		if(this.state.error) classes.push('has-error');
+		if(this.props.isValidState) classes.push('is-valid');
+		if(this.props.allowEdit) classes.push('is-disabled');
+
 		return (
 			<div className={'number-input-config'}>
 				{this.state.error ? (
@@ -127,13 +134,14 @@ export default class NumberInput extends Component<IProps, IState> {
 				) : null}
 				<input
 					type={'number'}
+					disabled={!this.props.allowEdit}
 					min={this.props.config.min}
 					max={this.props.config.max}
 					step={this.props.config.step}
 					ref={this.elementRef}
-					className={this.state.error ? 'has-error' : ''}
+					className={classes.join(' ')}
 					name={this.props.name}
-					value={this.state.value}
+					value={this.props.value || this.props.config.min}
 					onChange={this.onNumberChanged.bind(this)}
 					onKeyDown={onEnterKeyEvent.bind(
 						null,

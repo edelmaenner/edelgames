@@ -16,11 +16,12 @@
 			flex: 1 1 100%;
 
 			.config-element-label {
-				height: 100%;
 				flex: 1 0 33.33333%;
 				max-width: 25rem;
 				display: flex;
-				padding: 1.5rem 5rem 0.5rem 0;
+				align-items: center;
+				padding: 1.5rem 5rem 1rem 0;
+				height: calc(4.5rem + 3px);
 			}
 
 			.config-element-body {

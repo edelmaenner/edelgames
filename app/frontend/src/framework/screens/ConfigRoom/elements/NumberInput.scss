@@ -20,6 +20,10 @@
 			-webkit-appearance: none;
 		}
 
+		&.is-valid {
+			border-bottom-color: $success;
+		}
+
 		&.has-error {
 			border-bottom-color: $error;
 		}

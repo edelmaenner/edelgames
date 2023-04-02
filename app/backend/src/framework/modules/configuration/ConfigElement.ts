@@ -38,10 +38,16 @@ export default abstract class ConfigElement {
 	}
 
 	public setValue(value: ConfigurationTypes): void {
-		const validationResult = this.validateValue(value, true);
-		// ensure multiple value elements always contain an array
-		if (this.canHaveMultipleValues() && !Array.isArray(value)) {
-			value = [value];
+		let validationResult;
+		if (this.canHaveMultipleValues()) {
+			// ensure multiple value elements always contain an array
+			if (!Array.isArray(value)) {
+				value = [value];
+			}
+
+			validationResult = this.validateMultipleValue(value);
+		} else {
+			validationResult = this.validateSingleValue(value);
 		}
 
 		if (validationResult === true) {
@@ -63,10 +69,31 @@ export default abstract class ConfigElement {
 		return this.label;
 	}
 
-	private validateValue(
-		value: ConfigurationTypes,
-		allowArrayStep: boolean
-	): true | string {
+	private validateMultipleValue(value: ConfigurationTypes): true | string {
+		if (!Array.isArray(value)) {
+			return 'Cannot assign single value to multi element configuration';
+		}
+
+		if (value.length < this.minElements) {
+			return 'Cannot store less elements than required';
+		}
+
+		if (value.length > this.maxElements) {
+			return 'Cannot store more elements than allowed';
+		}
+
+		// validate every child element
+		for (const element of value) {
+			const elementValidation = this.validateSingleValue(element);
+			if (elementValidation !== true) {
+				return elementValidation;
+			}
+		}
+
+		return true;
+	}
+
+	private validateSingleValue(value: ConfigurationTypes): true | string {
 		if (value === null) {
 			return this.isValueMatchingConfig(value)
 				? true
@@ -74,29 +101,7 @@ export default abstract class ConfigElement {
 		}
 
 		if (Array.isArray(value)) {
-			if (!this.canHaveMultipleValues()) {
-				return 'Cannot have multiple values on single value config';
-			}
-
-			if (!allowArrayStep) {
-				return 'Cannot have nested array as config value';
-			}
-
-			if (value.length < this.minElements) {
-				return 'Cannot store less elements than required';
-			}
-			if (value.length > this.maxElements) {
-				return 'Cannot store more elements than required';
-			}
-
-			// validate every child element
-			for (const element of value) {
-				const elementValidation = this.validateValue(element, false);
-				if (elementValidation !== true) {
-					return elementValidation;
-				}
-			}
-			return true;
+			return 'Cannot have array as single config value';
 		}
 
 		if (!this.isValueMatchingConfig(value)) {
@@ -133,8 +138,11 @@ export default abstract class ConfigElement {
 		return `Config element ${this.name} has an invalid value type!`;
 	}
 
-	public isConfigured(): boolean {
-		return this.validateValue(this.value, true) === true;
+	public isValidState(): boolean {
+		if (this.canHaveMultipleValues()) {
+			return this.validateMultipleValue(this.value) === true;
+		}
+		return this.validateSingleValue(this.value) === true;
 	}
 
 	public toNativeObject(): NativeConfigurationElement {
@@ -145,7 +153,7 @@ export default abstract class ConfigElement {
 			value: this.getValue(),
 			minElements: this.minElements,
 			maxElements: this.maxElements,
-			isConfigured: this.isConfigured(),
+			isValidState: this.isValidState(),
 			config: this.getElementConfig(),
 		};
 	}

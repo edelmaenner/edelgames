@@ -4,6 +4,7 @@ import roomManager from './RoomManager';
 import { systemLogger } from './util/Logger';
 import ModuleApi from './modules/ModuleApi';
 import {
+	EventDataObject,
 	ServerRoomMember,
 	ServerRoomObject,
 } from '@edelgames/types/src/app/ApiTypes';
@@ -227,5 +228,43 @@ export default class Room {
 				isRoomMaster: member === this.roomMaster,
 			};
 		});
+	}
+
+	updateGameConfig(eventData: EventDataObject, senderId: string): void {
+		if (
+			!this.isEditingGameConfig ||
+			!this.moduleApi ||
+			!this.moduleApi.getConfig() ||
+			!this.getRoomMaster()
+		) {
+			return;
+		}
+
+		const config = this.moduleApi.getConfig();
+
+		if (
+			this.getRoomMaster().getId() !== senderId &&
+			!config.isPublicEditable()
+		) {
+			this.moduleApi
+				.getPlayerApi()
+				.sendPlayerBubble(
+					senderId,
+					'Nur der Spielleiter kann aktuell die Konfiguration ändern',
+					'error'
+				);
+			return;
+		}
+
+		const { changedValueName, newValue } = eventData;
+		const result = config.setValueByName(changedValueName, newValue);
+
+		if (result !== true) {
+			this.moduleApi.getPlayerApi().sendPlayerBubble(senderId, result, 'error');
+			return;
+		}
+
+		// update changes to all players
+		this.sendRoomChangedBroadcast();
 	}
 }

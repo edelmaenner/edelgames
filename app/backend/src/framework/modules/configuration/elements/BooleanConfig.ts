@@ -30,7 +30,7 @@ export default class BooleanConfig extends ConfigElement {
 	}
 
 	public isValueMatchingConfig(value: ConfigurationTypes): boolean {
-		return typeof value !== 'boolean';
+		return typeof value === 'boolean';
 	}
 
 	public allowElementQuantityChanges() {

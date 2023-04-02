@@ -13,26 +13,44 @@ import StringInput from './elements/StringInput';
 import NumberInput from './elements/NumberInput';
 import MultiElementWrapper from './elements/MultiElementWrapper';
 import BooleanInput from './elements/BooleanInput';
+import socketManager from "../../util/SocketManager";
+import ProfileManager from "../../util/ProfileManager";
 
 interface IProps {
 	configuration: NativeConfiguration;
 }
 
 export default class ConfigRoom extends React.Component<IProps, {}> {
-	canBeEdited: boolean = false;
 
 	onValueChanged(
 		element: NativeConfigurationElement,
 		newValue: ConfigurationTypes
-	): boolean {
-		console.log(element.name, newValue);
-		return false;
+	): void {
+		if(!roomManager.isInConfigEditingMode()) {
+			return;
+		}
+
+		if(!ProfileManager.isRoomMaster() && !this.props.configuration.isPublicEditable) {
+			return;
+		}
+
+		this.props.configuration.elements = this.props.configuration.elements.map(configElement => {
+			if(configElement.name === element.name) {
+				configElement.value = newValue;
+			}
+			return configElement;
+		});
+		this.setState({});
+
+		socketManager.sendEvent('gameConfigEdited', {
+			changedValueName: element.name,
+			newValue: newValue
+		});
 	}
 
 	render() {
-		const isRoomMaster = !!roomManager.getRoomMaster()?.isRoomMaster();
-		this.canBeEdited =
-			isRoomMaster || this.props.configuration.isPublicEditable;
+		const isRoomMaster = ProfileManager.isRoomMaster();
+		// const canBeEdited = isRoomMaster || this.props.configuration.isPublicEditable;
 
 		return (
 			<div id="screenConfigRoom">
@@ -56,6 +74,7 @@ export default class ConfigRoom extends React.Component<IProps, {}> {
 		index: number
 	): JSX.Element {
 		const isMultiElement = element.maxElements > 1;
+		const allowEdit = this.props.configuration.isPublicEditable || ProfileManager.isRoomMaster();
 
 		return (
 			<div
@@ -72,12 +91,14 @@ export default class ConfigRoom extends React.Component<IProps, {}> {
 							valueChangedCallback={this.onValueChanged.bind(this, element)}
 							elementRenderCallback={this.renderConfigurationForType.bind(this)}
 							element={element}
+							allowEdit={allowEdit}
 						/>
 					) : (
 						this.renderConfigurationForType(
 							element,
 							this.onValueChanged.bind(this, element),
-							true
+							this.onValueChanged.bind(this, element),
+							allowEdit
 						)
 					)}
 				</div>
@@ -88,47 +109,54 @@ export default class ConfigRoom extends React.Component<IProps, {}> {
 	renderConfigurationForType(
 		element: NativeConfigurationElement,
 		onValueChangedCallback: valueChangedCallback,
-		reactToBlur: boolean
+		onChangeFinishedCallback: valueChangedCallback | undefined,
+		allowEdit: boolean
 	): JSX.Element {
 		switch (element.type) {
 			case 'string':
 				return (
 					<StringInput
-						onChangeFinished={onValueChangedCallback}
-						onValueChanged={reactToBlur ? onValueChangedCallback : undefined}
+						onChangeFinished={onChangeFinishedCallback}
+						onValueChanged={onValueChangedCallback}
 						name={element.name}
 						config={element.config as StringConfig}
-						initialValue={element.value as string}
+						value={element.value as string}
+						isValidState={element.isValidState}
+						allowEdit={allowEdit}
 					/>
 				);
 			case 'float':
 				return (
 					<NumberInput
-						onChangeFinished={onValueChangedCallback}
-						onValueChanged={reactToBlur ? onValueChangedCallback : undefined}
+						onChangeFinished={onChangeFinishedCallback}
+						onValueChanged={onValueChangedCallback}
 						name={element.name}
 						config={element.config as NumberConfig}
-						initialValue={element.value as number}
+						value={element.value as number}
+						isValidState={element.isValidState}
+						allowEdit={allowEdit}
 					/>
 				);
 			case 'int':
 				return (
 					<NumberInput
-						onChangeFinished={onValueChangedCallback}
-						onValueChanged={reactToBlur ? onValueChangedCallback : undefined}
+						onChangeFinished={onChangeFinishedCallback}
+						onValueChanged={onValueChangedCallback}
 						name={element.name}
 						config={element.config as NumberConfig}
-						initialValue={element.value as number}
+						value={element.value as number}
+						isValidState={element.isValidState}
+						allowEdit={allowEdit}
 					/>
 				);
 			case 'bool':
 				return (
 					<BooleanInput
-						onChangeFinished={onValueChangedCallback}
-						onValueChanged={reactToBlur ? onValueChangedCallback : undefined}
+						onValueChanged={onValueChangedCallback}
 						name={element.name}
 						config={element.config as BooleanConfig}
-						initialValue={element.value as boolean}
+						value={element.value as boolean}
+						allowEdit={allowEdit}
 					/>
 				);
 			default:

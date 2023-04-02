@@ -3,52 +3,30 @@ import {
 	BooleanConfig,
 	valueChangedCallback,
 } from '@edelgames/types/src/app/ConfigurationTypes';
-import { onEnterKeyEvent } from '../../../components/Inputs/InputUtils';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 interface IProps {
 	onValueChanged?: valueChangedCallback;
-	onChangeFinished: valueChangedCallback;
 	name: string;
 	config: BooleanConfig;
-	initialValue: boolean;
-}
-
-interface IState {
 	value: boolean;
+	allowEdit: boolean;
 }
 
-export default class BooleanInput extends Component<IProps, IState> {
-	state = {
-		value: false,
-	};
+
+export default class BooleanInput extends Component<IProps, {}> {
+
 	elementRef = React.createRef<HTMLInputElement>();
 
-	componentDidMount() {
-		this.setState({
-			value: this.props.initialValue,
-		});
-	}
-
 	onStatusChanged(): void {
+		if(!this.props.allowEdit) {
+			return;
+		}
+
 		const value = !!this.elementRef.current?.checked;
 
-		this.setState({
-			value: value,
-		});
 		if (this.props.onValueChanged) {
 			this.props.onValueChanged(value);
-		}
-	}
-
-	onChangeFinished(): void {
-		const value = this.elementRef.current?.value === 'ON';
-
-		this.setState({
-			value: value,
-		});
-		if (this.props.onChangeFinished(value)) {
-			// do nothing, a boolean input does not have to be reset
 		}
 	}
 
@@ -58,16 +36,13 @@ export default class BooleanInput extends Component<IProps, IState> {
 				<input
 					type={'checkbox'}
 					ref={this.elementRef}
+					disabled={!this.props.allowEdit}
 					className={'d-none'}
 					id={'bool_input_' + this.props.name}
 					name={this.props.name}
-					checked={this.state.value}
+					checked={this.props.value||false}
 					value={'ON'}
 					onChange={this.onStatusChanged.bind(this)}
-					onKeyDown={onEnterKeyEvent.bind(
-						null,
-						this.onChangeFinished.bind(this)
-					)}
 				/>
 				<label
 					htmlFor={'bool_input_' + this.props.name}

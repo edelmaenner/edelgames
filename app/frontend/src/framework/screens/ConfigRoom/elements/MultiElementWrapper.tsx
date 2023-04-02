@@ -35,42 +35,52 @@ export default class MultiElementWrapper extends Component<IProps, IState> {
 	};
 
 	onSingleValueRemoved(index: number): void {
-		if(!this.props.allowEdit) {
+		if (!this.props.allowEdit) {
 			return;
 		}
 
-		const oldList = Array.isArray(this.props.element.value) ? this.props.element.value : [];
+		const oldList = Array.isArray(this.props.element.value)
+			? this.props.element.value
+			: [];
 
 		let elementList = [...(oldList as ConfigurationTypesSingle[])];
 		elementList.splice(index, 1);
 
-		if(elementList.length >= this.props.element.minElements && elementList.length <= this.props.element.maxElements) {
+		if (
+			elementList.length >= this.props.element.minElements &&
+			elementList.length <= this.props.element.maxElements
+		) {
 			this.props.element.value = elementList;
 			this.props.valueChangedCallback(elementList);
 		}
 	}
 
 	onSingleValueAdded(value: ConfigurationTypesSingle): void {
-		if(!this.props.allowEdit) {
+		if (!this.props.allowEdit) {
 			return;
 		}
 
-		const oldList = Array.isArray(this.props.element.value) ? this.props.element.value : [];
+		const oldList = Array.isArray(this.props.element.value)
+			? this.props.element.value
+			: [];
 
-		let elementList = [...(oldList  as ConfigurationTypesSingle[])];
+		let elementList = [...(oldList as ConfigurationTypesSingle[])];
 		elementList.push(value);
 
-		if(elementList.length >= this.props.element.minElements && elementList.length <= this.props.element.maxElements) {
+		if (
+			elementList.length >= this.props.element.minElements &&
+			elementList.length <= this.props.element.maxElements
+		) {
 			this.props.element.value = elementList;
 			this.props.valueChangedCallback(elementList);
 			this.setState({
-				currentElement: null
+				currentElement: null,
 			});
 		}
 	}
 
 	onCurrentValueChanged(value: ConfigurationTypesSingle): void {
-		if(!this.props.allowEdit) {
+		if (!this.props.allowEdit) {
 			return;
 		}
 
@@ -79,14 +89,15 @@ export default class MultiElementWrapper extends Component<IProps, IState> {
 		});
 	}
 
-
 	render() {
 		let tempElement = {
-			...this.props.element
+			...this.props.element,
 		};
 		tempElement.value = this.state.currentElement;
 
-		const elements = Array.isArray(this.props.element.value) ? this.props.element.value as ConfigurationTypesSingle[] : [];
+		const elements = Array.isArray(this.props.element.value)
+			? (this.props.element.value as ConfigurationTypesSingle[])
+			: [];
 
 		return (
 			<div className={'multi-element-wrapper'}>
@@ -109,7 +120,9 @@ export default class MultiElementWrapper extends Component<IProps, IState> {
 							<FontAwesomeIcon
 								icon={['fad', 'xmark']}
 								size="1x"
-								className={'clickable ' + (this.props.allowEdit ? '' : 'd-none')}
+								className={
+									'clickable ' + (this.props.allowEdit ? '' : 'd-none')
+								}
 								onClick={this.onSingleValueRemoved.bind(this, index)}
 							/>
 						</span>
@@ -125,17 +138,16 @@ export default class MultiElementWrapper extends Component<IProps, IState> {
 	valueToJsx(
 		value: ConfigurationTypesSingle
 	): JSX.Element | string | number | null {
-
 		if (value === null) {
 			return '???';
 		}
 
 		switch (typeof value) {
-			case "string":
-			case "number":
-			case "undefined":
+			case 'string':
+			case 'number':
+			case 'undefined':
 				return value;
-			case "object":
+			case 'object':
 				if (!Object.hasOwn(value, 'render')) {
 					return JSON.stringify(value);
 				}
@@ -145,7 +157,7 @@ export default class MultiElementWrapper extends Component<IProps, IState> {
 					return value.render();
 				}
 				return value.render;
-			case "boolean":
+			case 'boolean':
 				return value ? 'ON' : 'OFF';
 			default:
 				return '???';

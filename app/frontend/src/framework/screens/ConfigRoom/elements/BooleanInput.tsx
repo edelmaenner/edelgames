@@ -13,13 +13,11 @@ interface IProps {
 	allowEdit: boolean;
 }
 
-
 export default class BooleanInput extends Component<IProps, {}> {
-
 	elementRef = React.createRef<HTMLInputElement>();
 
 	onStatusChanged(): void {
-		if(!this.props.allowEdit) {
+		if (!this.props.allowEdit) {
 			return;
 		}
 
@@ -40,7 +38,7 @@ export default class BooleanInput extends Component<IProps, {}> {
 					className={'d-none'}
 					id={'bool_input_' + this.props.name}
 					name={this.props.name}
-					checked={this.props.value||false}
+					checked={this.props.value || false}
 					value={'ON'}
 					onChange={this.onStatusChanged.bind(this)}
 				/>

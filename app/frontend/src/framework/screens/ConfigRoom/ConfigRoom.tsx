@@ -13,38 +13,42 @@ import StringInput from './elements/StringInput';
 import NumberInput from './elements/NumberInput';
 import MultiElementWrapper from './elements/MultiElementWrapper';
 import BooleanInput from './elements/BooleanInput';
-import socketManager from "../../util/SocketManager";
-import ProfileManager from "../../util/ProfileManager";
+import socketManager from '../../util/SocketManager';
+import ProfileManager from '../../util/ProfileManager';
 
 interface IProps {
 	configuration: NativeConfiguration;
 }
 
 export default class ConfigRoom extends React.Component<IProps, {}> {
-
 	onValueChanged(
 		element: NativeConfigurationElement,
 		newValue: ConfigurationTypes
 	): void {
-		if(!roomManager.isInConfigEditingMode()) {
+		if (!roomManager.isInConfigEditingMode()) {
 			return;
 		}
 
-		if(!ProfileManager.isRoomMaster() && !this.props.configuration.isPublicEditable) {
+		if (
+			!ProfileManager.isRoomMaster() &&
+			!this.props.configuration.isPublicEditable
+		) {
 			return;
 		}
 
-		this.props.configuration.elements = this.props.configuration.elements.map(configElement => {
-			if(configElement.name === element.name) {
-				configElement.value = newValue;
+		this.props.configuration.elements = this.props.configuration.elements.map(
+			(configElement) => {
+				if (configElement.name === element.name) {
+					configElement.value = newValue;
+				}
+				return configElement;
 			}
-			return configElement;
-		});
+		);
 		this.setState({});
 
 		socketManager.sendEvent('gameConfigEdited', {
 			changedValueName: element.name,
-			newValue: newValue
+			newValue: newValue,
 		});
 	}
 
@@ -74,7 +78,9 @@ export default class ConfigRoom extends React.Component<IProps, {}> {
 		index: number
 	): JSX.Element {
 		const isMultiElement = element.maxElements > 1;
-		const allowEdit = this.props.configuration.isPublicEditable || ProfileManager.isRoomMaster();
+		const allowEdit =
+			this.props.configuration.isPublicEditable ||
+			ProfileManager.isRoomMaster();
 
 		return (
 			<div

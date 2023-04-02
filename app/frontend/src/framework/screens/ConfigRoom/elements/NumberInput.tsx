@@ -5,7 +5,6 @@ import {
 } from '@edelgames/types/src/app/ConfigurationTypes';
 import { onEnterKeyEvent } from '../../../components/Inputs/InputUtils';
 
-
 interface IProps {
 	onValueChanged?: valueChangedCallback;
 	onChangeFinished?: valueChangedCallback;
@@ -25,7 +24,6 @@ export default class NumberInput extends Component<IProps, IState> {
 		error: null,
 	};
 	elementRef = React.createRef<HTMLInputElement>();
-
 
 	isNumeric(str: string) {
 		return (
@@ -79,13 +77,13 @@ export default class NumberInput extends Component<IProps, IState> {
 	}
 
 	onNumberChanged(): void {
-		if(!this.props.allowEdit) {
+		if (!this.props.allowEdit) {
 			return;
 		}
 
 		const value = this.elementRef.current?.value;
 
-		if(!this.props.onValueChanged) {
+		if (!this.props.onValueChanged) {
 			return;
 		}
 
@@ -101,13 +99,13 @@ export default class NumberInput extends Component<IProps, IState> {
 	}
 
 	onChangeFinished(): void {
-		if(!this.props.allowEdit) {
+		if (!this.props.allowEdit) {
 			return;
 		}
 
 		const value = this.elementRef.current?.value;
 
-		if(!this.props.onChangeFinished) {
+		if (!this.props.onChangeFinished) {
 			return;
 		}
 
@@ -117,15 +115,15 @@ export default class NumberInput extends Component<IProps, IState> {
 
 		const validatedValue = this.validateValue(value);
 		if (validatedValue !== false) {
-			this.props.onChangeFinished(validatedValue)
+			this.props.onChangeFinished(validatedValue);
 		}
 	}
 
 	render() {
 		let classes = [];
-		if(this.state.error) classes.push('has-error');
-		if(this.props.isValidState) classes.push('is-valid');
-		if(this.props.allowEdit) classes.push('is-disabled');
+		if (this.state.error) classes.push('has-error');
+		if (this.props.isValidState) classes.push('is-valid');
+		if (this.props.allowEdit) classes.push('is-disabled');
 
 		return (
 			<div className={'number-input-config'}>

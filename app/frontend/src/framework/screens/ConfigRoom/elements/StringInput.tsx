@@ -20,7 +20,6 @@ interface IState {
 }
 
 export default class StringInput extends Component<IProps, IState> {
-
 	state = {
 		error: null,
 	};
@@ -79,17 +78,18 @@ export default class StringInput extends Component<IProps, IState> {
 	}
 
 	onTextChanged(): void {
-		if(!this.props.allowEdit) {
+		if (!this.props.allowEdit) {
 			return;
 		}
 
 		const value = this.elementRef.current?.value;
 
-		if (value === undefined ||
+		if (
+			value === undefined ||
 			value === null ||
 			!this.props.onValueChanged ||
-			!this.validateValue(value))
-		{
+			!this.validateValue(value)
+		) {
 			return;
 		}
 
@@ -97,17 +97,18 @@ export default class StringInput extends Component<IProps, IState> {
 	}
 
 	onChangeFinished(): void {
-		if(!this.props.allowEdit) {
+		if (!this.props.allowEdit) {
 			return;
 		}
 
 		const value = this.elementRef.current?.value;
 
-		if (value === undefined ||
+		if (
+			value === undefined ||
 			value === null ||
 			!this.props.onChangeFinished ||
-			!this.validateValue(value))
-		{
+			!this.validateValue(value)
+		) {
 			return;
 		}
 
@@ -119,9 +120,9 @@ export default class StringInput extends Component<IProps, IState> {
 		const hasError = hasValue && this.state.error !== null;
 
 		let classes = [];
-		if(hasError) classes.push('has-error');
-		if(this.props.isValidState) classes.push('is-valid');
-		if(this.props.allowEdit) classes.push('is-disabled');
+		if (hasError) classes.push('has-error');
+		if (this.props.isValidState) classes.push('is-valid');
+		if (this.props.allowEdit) classes.push('is-disabled');
 
 		return (
 			<div className={'string-input-config'}>

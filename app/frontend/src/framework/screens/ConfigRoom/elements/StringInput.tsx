@@ -30,14 +30,14 @@ export default class StringInput extends Component<IProps, IState> {
 		const { minLength, maxLength, forbiddenChars, allowedChars, regexMatch } =
 			this.props.config;
 
-		if(value.length < minLength) {
+		if (value.length < minLength) {
 			// its ok to start typing with less characters than required (will be checked serverside again)
 			const errorMessage =
 				maxLength === minLength
 					? `Es sind nur Eingaben mit ${minLength} Zeichen erlaubt`
 					: `Es sind nur Eingaben zwischen ${minLength} und ${maxLength} Zeichen erlaubt`;
 			this.setState({
-				error: errorMessage
+				error: errorMessage,
 			});
 			return !finalCheck;
 		}

@@ -67,9 +67,7 @@ export default class MultiElementWrapper extends Component<IProps, IState> {
 		let elementList = [...(oldList as ConfigurationTypesSingle[])];
 		elementList.push(value);
 
-		if (
-			elementList.length <= this.props.element.maxElements
-		) {
+		if (elementList.length <= this.props.element.maxElements) {
 			this.props.element.value = elementList;
 			this.props.valueChangedCallback(elementList);
 			this.setState({

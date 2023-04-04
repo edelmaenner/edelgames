@@ -15,16 +15,15 @@ import MultiElementWrapper from './elements/MultiElementWrapper';
 import BooleanInput from './elements/BooleanInput';
 import socketManager from '../../util/SocketManager';
 import ProfileManager from '../../util/ProfileManager';
-import eventManager from "../../util/EventManager";
+import eventManager from '../../util/EventManager';
 
 interface IProps {
 	configuration: NativeConfiguration;
 }
 
 export default class ConfigRoom extends React.Component<IProps, {}> {
-
 	onConfigurationFinished(): void {
-		if(!this.props.configuration.isFullyConfigured) {
+		if (!this.props.configuration.isFullyConfigured) {
 			return;
 		}
 
@@ -180,17 +179,20 @@ export default class ConfigRoom extends React.Component<IProps, {}> {
 						allowEdit={allowEdit}
 					/>
 				);
-			case "custom":
+			case 'custom':
 				const renderData = {
-					render: null
-				}
+					render: null,
+				};
 
-				if(element.customConfigName) {
+				if (element.customConfigName) {
 					const customRenderType = element.customConfigName as string;
 					// send an event to fill in the render property
-					eventManager.publish('game_config_render_'+customRenderType, renderData);
+					eventManager.publish(
+						'game_config_render_' + customRenderType,
+						renderData
+					);
 					// display the rendered object or a fallback text
-					if(renderData.render) {
+					if (renderData.render) {
 						return renderData.render;
 					}
 				}

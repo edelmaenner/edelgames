@@ -26,11 +26,23 @@ export default class StringInput extends Component<IProps, IState> {
 
 	elementRef = React.createRef<HTMLInputElement>();
 
-	validateValue(value: string): boolean {
+	validateValue(value: string, finalCheck: boolean): boolean {
 		const { minLength, maxLength, forbiddenChars, allowedChars, regexMatch } =
 			this.props.config;
 
-		if (value.length > maxLength || value.length < minLength) {
+		if(value.length < minLength) {
+			// its ok to start typing with less characters than required (will be checked serverside again)
+			const errorMessage =
+				maxLength === minLength
+					? `Es sind nur Eingaben mit ${minLength} Zeichen erlaubt`
+					: `Es sind nur Eingaben zwischen ${minLength} und ${maxLength} Zeichen erlaubt`;
+			this.setState({
+				error: errorMessage
+			});
+			return !finalCheck;
+		}
+
+		if (value.length > maxLength) {
 			const errorMessage =
 				maxLength === minLength
 					? `Es sind nur Eingaben mit ${minLength} Zeichen erlaubt`
@@ -88,7 +100,7 @@ export default class StringInput extends Component<IProps, IState> {
 			value === undefined ||
 			value === null ||
 			!this.props.onValueChanged ||
-			!this.validateValue(value)
+			!this.validateValue(value, false)
 		) {
 			return;
 		}
@@ -107,7 +119,7 @@ export default class StringInput extends Component<IProps, IState> {
 			value === undefined ||
 			value === null ||
 			!this.props.onChangeFinished ||
-			!this.validateValue(value)
+			!this.validateValue(value, true)
 		) {
 			return;
 		}
@@ -122,7 +134,7 @@ export default class StringInput extends Component<IProps, IState> {
 		let classes = [];
 		if (hasError) classes.push('has-error');
 		if (this.props.isValidState) classes.push('is-valid');
-		if (this.props.allowEdit) classes.push('is-disabled');
+		if (!this.props.allowEdit) classes.push('is-disabled');
 
 		return (
 			<div className={'string-input-config'}>

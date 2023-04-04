@@ -36,7 +36,24 @@ export default class FloatConfig extends ConfigElement {
 		};
 	}
 
+	protected adjustValueBeforeSave(
+		value: ConfigurationTypes
+	): ConfigurationTypes {
+		if (typeof value === 'string') {
+			return parseFloat(value);
+		}
+		return value;
+	}
+
 	public isValueMatchingConfig(value: ConfigurationTypes): boolean {
+		if (Number.isNaN(value)) {
+			return false;
+		}
+
+		if (typeof value === 'string') {
+			value = parseFloat(value);
+		}
+
 		if (typeof value !== 'number') {
 			return false;
 		}

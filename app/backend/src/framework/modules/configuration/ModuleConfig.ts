@@ -12,6 +12,12 @@ export default class ModuleConfig {
 		this.configElements = configElements;
 	}
 
+	/**
+	 * @internal
+	 * @private
+	 * @param elementName
+	 * @param value
+	 */
 	setValueByName(
 		elementName: string,
 		value: ConfigurationTypes
@@ -36,6 +42,10 @@ export default class ModuleConfig {
 		return this.configElements.find((el) => el.getName() === elementName);
 	}
 
+	/**
+	 * @internal
+	 * @private
+	 */
 	getNativeConfiguration(): NativeConfiguration {
 		return {
 			elements: this.configElements.map((el) => el.toNativeObject()),
@@ -44,6 +54,10 @@ export default class ModuleConfig {
 		};
 	}
 
+	/**
+	 * @internal
+	 * @private
+	 */
 	isPublicEditable(): boolean {
 		return false;
 	}
@@ -52,6 +66,10 @@ export default class ModuleConfig {
 		return this.configElements.length > 0;
 	}
 
+	/**
+	 * @internal
+	 * @private
+	 */
 	isFullyConfigured(): boolean {
 		return this.configElements.every((el) => el.isValidState());
 	}

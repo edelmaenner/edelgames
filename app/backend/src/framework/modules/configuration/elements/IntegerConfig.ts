@@ -29,7 +29,16 @@ export default class IntegerConfig extends FloatConfig {
 		};
 	}
 
+	protected adjustValueBeforeSave(
+		value: ConfigurationTypes
+	): ConfigurationTypes {
+		if (typeof value === 'string') {
+			return parseInt(value);
+		}
+		return value;
+	}
+
 	public isValueMatchingConfig(value: ConfigurationTypes): boolean {
-		return super.isValueMatchingConfig(value) && Number.isInteger(value);
+		return super.isValueMatchingConfig(value);
 	}
 }

@@ -8,6 +8,7 @@ import {
 	ServerRoomMember,
 	ServerRoomObject,
 } from '@edelgames/types/src/app/ApiTypes';
+import ModuleConfig from './modules/configuration/ModuleConfig';
 
 export default class Room {
 	protected roomId: string;
@@ -94,6 +95,7 @@ export default class Room {
 					roomApi ? roomApi.getGameId() : 'IDLE'
 				}`
 			);
+			this.moduleApi.getGame().onGameInitialize(this.moduleApi);
 		}
 
 		this.sendRoomChangedBroadcast();
@@ -266,5 +268,25 @@ export default class Room {
 
 		// update changes to all players
 		this.sendRoomChangedBroadcast();
+	}
+
+	onGameConfigSaved(eventData: EventDataObject, senderId: string): void {
+		if (
+			!this.isEditingGameConfig ||
+			!this.moduleApi ||
+			!this.moduleApi.getConfig() ||
+			!this.getRoomMaster() ||
+			this.getRoomMaster().getId() !== senderId
+		) {
+			return;
+		}
+
+		const config = this.moduleApi.getConfig();
+
+		if (config.isFullyConfigured()) {
+			this.isEditingGameConfig = false;
+			this.moduleApi.getGame().onGameInitialize(this.moduleApi);
+			this.sendRoomChangedBroadcast();
+		}
 	}
 }

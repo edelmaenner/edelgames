@@ -34,6 +34,9 @@ export default abstract class ConfigElement {
 		}
 		this.minElements = min;
 		this.maxElements = max;
+		if (this.maxElements > 1) {
+			this.value = [];
+		}
 		return this;
 	}
 
@@ -45,7 +48,7 @@ export default abstract class ConfigElement {
 				value = [value];
 			}
 
-			validationResult = this.validateMultipleValue(value);
+			validationResult = this.validateMultipleValue(value, false);
 		} else {
 			validationResult = this.validateSingleValue(value);
 		}
@@ -69,12 +72,15 @@ export default abstract class ConfigElement {
 		return this.label;
 	}
 
-	private validateMultipleValue(value: ConfigurationTypes): true | string {
+	private validateMultipleValue(
+		value: ConfigurationTypes,
+		forceMinElements: boolean
+	): true | string {
 		if (!Array.isArray(value)) {
 			return 'Cannot assign single value to multi element configuration';
 		}
 
-		if (value.length < this.minElements) {
+		if (forceMinElements && value.length < this.minElements) {
 			return 'Cannot store less elements than required';
 		}
 
@@ -121,17 +127,17 @@ export default abstract class ConfigElement {
 				);
 			case 'int':
 				return (
-					Number.isInteger(value) || 'Cannot assign non int value to int config'
+					!Number.isNaN(value) || 'Cannot assign non int value to int config'
 				);
 			case 'float':
 				return (
 					!Number.isNaN(value) ||
 					'Cannot assign non numeric value to float config'
 				);
-			case 'object':
+			case 'custom':
 				return (
 					typeof value === 'object' ||
-					'Cannot assign non object value to object config'
+					'Cannot assign non object value to custom config'
 				);
 		}
 
@@ -140,14 +146,19 @@ export default abstract class ConfigElement {
 
 	public isValidState(): boolean {
 		if (this.canHaveMultipleValues()) {
-			return this.validateMultipleValue(this.value) === true;
+			return this.validateMultipleValue(this.value, true) === true;
 		}
 		return this.validateSingleValue(this.value) === true;
 	}
 
 	public toNativeObject(): NativeConfigurationElement {
+		const valueType = this.getValueType();
 		return {
-			type: this.getValueType(),
+			type: valueType,
+			customConfigName:
+				valueType === 'custom'
+					? this.getObjectRelatedConfigElementName()
+					: undefined,
 			name: this.getName(),
 			label: this.getLabel(),
 			value: this.getValue(),
@@ -168,6 +179,21 @@ export default abstract class ConfigElement {
 
 	public allowElementQuantityChanges(): boolean {
 		return true;
+	}
+
+	/**
+	 * If you are using the "object" value type, you can override this method to
+	 * specify the custom config element, that should be used for your configuration.
+	 * This way, you can add your own configuration type per module
+	 */
+	public getObjectRelatedConfigElementName(): string {
+		return this.getValueType();
+	}
+
+	protected adjustValueBeforeSave(
+		value: ConfigurationTypes
+	): ConfigurationTypes {
+		return value;
 	}
 
 	public abstract getElementConfig(): NativeConfigurationElementConfig;

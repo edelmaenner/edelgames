@@ -123,7 +123,7 @@ export default class NumberInput extends Component<IProps, IState> {
 		let classes = [];
 		if (this.state.error) classes.push('has-error');
 		if (this.props.isValidState) classes.push('is-valid');
-		if (this.props.allowEdit) classes.push('is-disabled');
+		if (!this.props.allowEdit) classes.push('is-disabled');
 
 		return (
 			<div className={'number-input-config'}>

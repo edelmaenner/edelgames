@@ -5,6 +5,7 @@ import ModulePlayerApi from './api/ModulePlayerApi';
 import ModuleEventApi from './api/ModuleEventApi';
 import ModuleConfig from './configuration/ModuleConfig';
 import ModuleInterface from './ModuleInterface';
+import { ConfigurationTypes } from '@edelgames/types/src/app/ConfigurationTypes';
 
 /*
  * This class will be passed to the game instance to allow for restricted access to the room data.
@@ -30,16 +31,22 @@ export default class ModuleApi {
 		this.logger = new Logger(this.gameId);
 		this.eventApi = new ModuleEventApi(this);
 		this.playerApi = new ModulePlayerApi(room, this);
-
-		room.setCurrentGame(this);
 	}
 
 	public getConfig(): ModuleConfig {
 		return this.gameConfig;
 	}
 
+	public getConfigValue(name: string): ConfigurationTypes | undefined {
+		return this.gameConfig.getElementByName(name)?.getValue();
+	}
+
 	public getGameId(): string {
 		return this.gameId;
+	}
+
+	public getGame(): ModuleGameInterface {
+		return this.game;
 	}
 
 	public getLogger(): Logger {

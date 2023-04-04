@@ -8,6 +8,7 @@ export type NativeConfiguration = {
 
 export type NativeConfigurationElement = {
 	type: ConfigurationTypesDefs;
+	customConfigName?: string;
 	name: string;
 	label: string;
 	isValidState: boolean;
@@ -56,13 +57,20 @@ export type StringConfig = {
 	regexMatch: string | null;
 };
 
+export type ColorValue = {
+	hex: string;
+	rgb?: { r: number; g: number; b: number };
+	rgba?: { r: number; g: number; b: number; a: number };
+	hsl?: { h: number; s: number; l: number };
+};
+
 export type ConfigurationTypesDefs =
 	| 'color'
 	| 'string'
 	| 'int'
 	| 'float'
 	| 'bool'
-	| 'object';
+	| 'custom';
 export type ConfigurationTypesSingle =
 	| null
 	| string

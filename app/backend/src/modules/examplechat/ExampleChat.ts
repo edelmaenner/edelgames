@@ -6,7 +6,6 @@ import StringConfig from '../../framework/modules/configuration/elements/StringC
 import { whitespace } from '../../framework/modules/configuration/elements/Collections';
 import IntegerConfig from '../../framework/modules/configuration/elements/IntegerConfig';
 import FloatConfig from '../../framework/modules/configuration/elements/FloatConfig';
-import ColorConfig from '../../framework/modules/configuration/elements/ColorConfig';
 import BooleanConfig from '../../framework/modules/configuration/elements/BooleanConfig';
 
 /*
@@ -19,13 +18,14 @@ class ExampleChat implements ModuleInterface {
 
 	getGameConfig(): ModuleConfig {
 		return new ModuleConfig([
-			new StringConfig('example_config', 'Beispieltext'),
+			new StringConfig('example_config', 'Beispieltext', []),
 
 			new StringConfig(
 				'example_config_2',
 				'Mehrere Beispieltext',
 				[],
-				whitespace
+				whitespace,
+				1
 			).changeAllowedQuantities(1, 5),
 
 			new IntegerConfig(
@@ -38,11 +38,11 @@ class ExampleChat implements ModuleInterface {
 
 			new IntegerConfig(
 				'example_config_int_2',
-				'0-5 Beliebige Zahlen zwischen 1 und 8!',
+				'2-5 Beliebige Zahlen zwischen 1 und 8!',
 				1,
 				8,
 				1
-			).changeAllowedQuantities(0, 5),
+			).changeAllowedQuantities(2, 5),
 
 			new FloatConfig(
 				'example_config_float',
@@ -61,15 +61,6 @@ class ExampleChat implements ModuleInterface {
 				0.01,
 				1
 			).changeAllowedQuantities(0, 3),
-
-			new ColorConfig('example_config_color', 'Eine beliebige Farbe', []),
-
-			new ColorConfig(
-				'example_config_color_2',
-				'0-2 Beliebige Farben!',
-				[]
-			).changeAllowedQuantities(0, 2),
-
 			new BooleanConfig(
 				'example_config_bool',
 				'Aktiviere speziellen Cheat',

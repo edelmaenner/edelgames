@@ -1,5 +1,6 @@
 import ConfigElement from '../ConfigElement';
 import {
+	ColorValue,
 	ConfigurationTypes,
 	ConfigurationTypesDefs,
 	NativeConfigurationElementConfig,
@@ -29,7 +30,7 @@ export default class ColorConfig extends ConfigElement {
 			forbiddenChars: [],
 			minLength: 7,
 			maxLength: 7,
-			regexMatch: '^#.{6}$',
+			regexMatch: null,
 			allowedHexColors: this.allowedHexColors,
 		};
 	}
@@ -39,11 +40,13 @@ export default class ColorConfig extends ConfigElement {
 			return false;
 		}
 
-		if (this.allowedHexColors.length) {
-			return this.allowedHexColors.includes(value);
+		if (
+			this.allowedHexColors.length &&
+			!this.allowedHexColors.includes(value)
+		) {
+			return false;
 		}
 
-		const regex = /^#[0-9A-F]{6}$/gm;
-		return value.match(regex) !== null;
+		return !(value.length !== 7 && value[0] !== '#');
 	}
 }

@@ -15,12 +15,22 @@ import MultiElementWrapper from './elements/MultiElementWrapper';
 import BooleanInput from './elements/BooleanInput';
 import socketManager from '../../util/SocketManager';
 import ProfileManager from '../../util/ProfileManager';
+import eventManager from "../../util/EventManager";
 
 interface IProps {
 	configuration: NativeConfiguration;
 }
 
 export default class ConfigRoom extends React.Component<IProps, {}> {
+
+	onConfigurationFinished(): void {
+		if(!this.props.configuration.isFullyConfigured) {
+			return;
+		}
+
+		socketManager.sendEvent('gameConfigFinished', {});
+	}
+
 	onValueChanged(
 		element: NativeConfigurationElement,
 		newValue: ConfigurationTypes
@@ -66,7 +76,12 @@ export default class ConfigRoom extends React.Component<IProps, {}> {
 
 				{isRoomMaster ? (
 					<div className={'config-footer btn'}>
-						<button>Anwenden und Spiel beginnen</button>
+						<button
+							onClick={this.onConfigurationFinished.bind(this)}
+							disabled={!this.props.configuration.isFullyConfigured}
+						>
+							Anwenden und Spiel beginnen
+						</button>
 					</div>
 				) : null}
 			</div>
@@ -164,6 +179,23 @@ export default class ConfigRoom extends React.Component<IProps, {}> {
 						value={element.value as boolean}
 						allowEdit={allowEdit}
 					/>
+				);
+			case "custom":
+				const renderData = {
+					render: null
+				}
+
+				if(element.customConfigName) {
+					const customRenderType = element.customConfigName as string;
+					// send an event to fill in the render property
+					eventManager.publish('game_config_render_'+customRenderType, renderData);
+					// display the rendered object or a fallback text
+					if(renderData.render) {
+						return renderData.render;
+					}
+				}
+				return (
+					<span>Could not find matching element for type {element.type}</span>
 				);
 			default:
 				return (

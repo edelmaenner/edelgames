@@ -66,7 +66,7 @@ class EventManager {
 		clientLogger.debug('unregistered event subscription: ' + event);
 	}
 
-	public publish(event: string, eventData: EventDataObject = {}): void {
+	public publish(event: string, eventData: EventDataObject = {}, preventBuffer: boolean = false): void {
 		clientLogger.debug('publishing event: ' + event, eventData);
 
 		let foundListener = false;
@@ -77,7 +77,7 @@ class EventManager {
 			}
 		}
 
-		if (!foundListener) {
+		if (!foundListener && !preventBuffer) {
 			this.eventBuffer.addBufferedEvent(event, eventData);
 		}
 	}

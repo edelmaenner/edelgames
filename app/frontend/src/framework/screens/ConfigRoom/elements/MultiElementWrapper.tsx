@@ -68,7 +68,6 @@ export default class MultiElementWrapper extends Component<IProps, IState> {
 		elementList.push(value);
 
 		if (
-			elementList.length >= this.props.element.minElements &&
 			elementList.length <= this.props.element.maxElements
 		) {
 			this.props.element.value = elementList;

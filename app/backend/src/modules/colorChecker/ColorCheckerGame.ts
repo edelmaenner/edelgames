@@ -22,6 +22,9 @@ import { defaultGrid } from './gridTemplates/default';
 import GridHelper from './helper/GridHelper';
 import PlayerHelper from './helper/PlayerHelper';
 import DiceHelper from './helper/DiceHelper';
+import { variant1Grid } from './gridTemplates/variant_1';
+import { variant2Grid } from './gridTemplates/variant_2';
+import { variant3Grid } from './gridTemplates/variant_3';
 
 /*
  * The actual game instance, that controls and manages the game
@@ -41,12 +44,18 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 	onGameInitialize(api: ModuleApi): void {
 		this.api = api;
 
+		const gridTemplateConfig = this.api.getConfigValue(
+			'grid_template_name',
+			'default'
+		) as string;
+		let template = this.getTemplateGrid(gridTemplateConfig);
+
 		for (const member of this.api.getPlayerApi().getRoomMembers()) {
-			const newPlayer = this.playerHelper.initiateNewPlayer(
-				member,
-				defaultGrid
-			);
+			const newPlayer = this.playerHelper.initiateNewPlayer(member, template);
 			this.updateClientPlayerGrid(member.getId(), newPlayer.grid);
+			if (gridTemplateConfig === 'random_everyone') {
+				template = this.getTemplateGrid('random');
+			}
 		}
 
 		const eventApi = this.api.getEventApi();
@@ -61,6 +70,23 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 		);
 
 		this.startNewRound(false);
+	}
+
+	getTemplateGrid(gridTemplateConfig: string): ColorGrid {
+		switch (gridTemplateConfig) {
+			case 'variant_1':
+				return variant1Grid;
+			case 'variant_2':
+				return variant2Grid;
+			case 'variant_3':
+				return variant3Grid;
+			case 'default':
+				return defaultGrid;
+			default:
+				return [variant1Grid, variant2Grid, variant3Grid][
+					Math.floor(Math.random() * 3)
+				];
+		}
 	}
 
 	onPlayerSelectionMadeEvent(event: EventDataObject): void {

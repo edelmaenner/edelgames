@@ -287,8 +287,8 @@ export default class Room {
 
 		if (config.isFullyConfigured()) {
 			this.isEditingGameConfig = false;
-			this.moduleApi.getGame().onGameInitialize(this.moduleApi);
 			this.sendRoomChangedBroadcast();
+			this.moduleApi.getGame().onGameInitialize(this.moduleApi);
 		}
 	}
 

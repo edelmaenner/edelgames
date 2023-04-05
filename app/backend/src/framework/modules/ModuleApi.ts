@@ -6,6 +6,7 @@ import ModuleEventApi from './api/ModuleEventApi';
 import ModuleConfig from './configuration/ModuleConfig';
 import ModuleInterface from './ModuleInterface';
 import { ConfigurationTypes } from '@edelgames/types/src/app/ConfigurationTypes';
+import { anyObject } from '@edelgames/types/src/app/BasicTypes';
 
 /*
  * This class will be passed to the game instance to allow for restricted access to the room data.
@@ -37,8 +38,12 @@ export default class ModuleApi {
 		return this.gameConfig;
 	}
 
-	public getConfigValue(name: string): ConfigurationTypes | undefined {
-		return this.gameConfig.getElementByName(name)?.getValue();
+	public getConfigValue(
+		name: string,
+		fallback: string | number | anyObject | null = null
+	): ConfigurationTypes | undefined {
+		const element = this.gameConfig.getElementByName(name);
+		return element ? element.getValue() : fallback;
 	}
 
 	public getGameId(): string {

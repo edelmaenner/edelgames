@@ -159,10 +159,6 @@ export default class StadtLandFlussGame
 	 * Render the component.
 	 */
 	render(): ReactNode {
-		return (
-			<div id={'stadtLandFluss'}>
-				{this.getCurrentlyActiveSection()}
-			</div>
-		);
+		return <div id={'stadtLandFluss'}>{this.getCurrentlyActiveSection()}</div>;
 	}
 }

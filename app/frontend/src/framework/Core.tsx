@@ -70,7 +70,7 @@ export default class Core extends React.Component {
 			return <Lobby />;
 		}
 
-		if(!roomManager.getCurrentGameId()) {
+		if (!roomManager.getCurrentGameId()) {
 			// if we are not in the lobby and don't have a selected game, show the idle room
 			return <IdleRoom />;
 		}

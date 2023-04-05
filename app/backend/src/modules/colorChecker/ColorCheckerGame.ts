@@ -205,6 +205,20 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 			return; // this player has already made a selection, is not found or has no jokers remaining
 		}
 
+		if (
+			this.gameState === GameStates.ACTIVE_PLAYER_SELECTS &&
+			this.activePlayerId !== playerData.playerId
+		) {
+			return; // the active player is taking a turn, but this player is not the active one
+		}
+
+		if (
+			this.gameState === GameStates.PASSIVE_PLAYERS_SELECTS &&
+			this.activePlayerId === playerData.playerId
+		) {
+			return; // the passive players are taking a turn, but this player is the active one
+		}
+
 		if (playerData.remainingJokers <= 0) {
 			this.api
 				.getEventApi()

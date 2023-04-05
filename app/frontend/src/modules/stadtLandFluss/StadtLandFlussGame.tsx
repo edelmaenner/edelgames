@@ -1,6 +1,5 @@
 import React, { Component, ReactNode } from 'react';
 import ModuleGameInterface from '../../framework/modules/ModuleGameInterface';
-import SLFConfig from './components/SLFConfig';
 import SLFGuessing from './components/SLFGuessing';
 import SLFRoundResults from './components/SLFRoundResults';
 import SLFEndResults from './components/SLFEndResults';

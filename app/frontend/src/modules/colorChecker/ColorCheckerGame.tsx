@@ -398,8 +398,8 @@ export default class ColorCheckerGame
 						onJokerUse={this.onJokerSelectionChanged.bind(this)}
 						usingColorJoker={this.state.usingColorJoker}
 						usingNumberJoker={this.state.usingNumberJoker}
-						canUseNumberJoker={canUseNumberJoker}
-						canUseColorJoker={canUseColorJoker}
+						canUseNumberJoker={allowSelection && canUseNumberJoker}
+						canUseColorJoker={allowSelection && canUseColorJoker}
 					/>
 
 					{allowSelection ? (

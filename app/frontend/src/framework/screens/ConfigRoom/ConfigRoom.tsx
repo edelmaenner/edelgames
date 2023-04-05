@@ -4,7 +4,8 @@ import {
 	ConfigurationTypes,
 	NativeConfiguration,
 	NativeConfigurationElement,
-	NumberConfig, SelectOneConfig,
+	NumberConfig,
+	SelectOneConfig,
 	StringConfig,
 	valueChangedCallback,
 } from '@edelgames/types/src/app/ConfigurationTypes';
@@ -16,7 +17,7 @@ import BooleanInput from './elements/BooleanInput';
 import socketManager from '../../util/SocketManager';
 import ProfileManager from '../../util/ProfileManager';
 import eventManager from '../../util/EventManager';
-import SelectOneInput from "./elements/SelectOneInput";
+import SelectOneInput from './elements/SelectOneInput';
 
 interface IProps {
 	configuration: NativeConfiguration;
@@ -66,7 +67,7 @@ export default class ConfigRoom extends React.Component<IProps, {}> {
 		this.props.configuration.isPublicEditable = true;
 
 		socketManager.sendEvent('gameConfigPubliclyStateChanged', {
-			newVisibilityState: !!newState
+			newVisibilityState: !!newState,
 		});
 	}
 
@@ -76,19 +77,20 @@ export default class ConfigRoom extends React.Component<IProps, {}> {
 
 		return (
 			<div id="screenConfigRoom">
-
 				<div className={'config-header'}>
 					<div className={'config-title'}>Konfiguration</div>
 
 					{isRoomMaster ? (
 						<div
 							className={'config-public-switch'}
-							title={'Erlaube anderen Spielern, selbst die Konfiguration zu bearbeiten'}
+							title={
+								'Erlaube anderen Spielern, selbst die Konfiguration zu bearbeiten'
+							}
 						>
 							<BooleanInput
 								onValueChanged={this.onPubliclyChanged.bind(this)}
 								name={''}
-								config={{style: "switch"}}
+								config={{ style: 'switch' }}
 								value={this.props.configuration.isPublicEditable}
 								allowEdit={true}
 							/>

@@ -13,7 +13,6 @@
 		color: $text-color;
 		flex: 0 1 25rem;
 
-
 		&.is-valid {
 			border-bottom-color: $success;
 		}
@@ -21,7 +20,5 @@
 		&.has-error {
 			border-bottom-color: $error;
 		}
-
 	}
-
 }

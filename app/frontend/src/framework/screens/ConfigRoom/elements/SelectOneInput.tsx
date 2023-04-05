@@ -14,8 +14,6 @@ interface IProps {
 }
 
 export default class SelectOneInput extends Component<IProps, {}> {
-
-
 	elementRef = React.createRef<HTMLSelectElement>();
 
 	onSelectionChanged(): void {
@@ -24,7 +22,7 @@ export default class SelectOneInput extends Component<IProps, {}> {
 		}
 
 		const value = this.elementRef.current?.value;
-		if(value) {
+		if (value) {
 			this.props.onValueChanged(value);
 		}
 	}
@@ -44,13 +42,9 @@ export default class SelectOneInput extends Component<IProps, {}> {
 					onChange={this.onSelectionChanged.bind(this)}
 					value={this.props.value}
 				>
-					{this.props.config.options.map(option =>
-						<option
-							value={option.value}
-						>
-							{option.label}
-						</option>
-					)}
+					{this.props.config.options.map((option) => (
+						<option value={option.value}>{option.label}</option>
+					))}
 				</select>
 			</div>
 		);

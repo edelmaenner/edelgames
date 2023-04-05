@@ -70,18 +70,17 @@ export default class Core extends React.Component {
 			return <Lobby />;
 		}
 
-		// if there is any game id selected, show the game room
-		if (roomManager.getCurrentGameId()) {
-			const config = roomManager.getCurrentGameConfig();
-
-			if (config && roomManager.isInConfigEditingMode()) {
-				return <ConfigRoom configuration={config} />;
-			} else {
-				return <GameRoom />;
-			}
+		if(!roomManager.getCurrentGameId()) {
+			// if we are not in the lobby and don't have a selected game, show the idle room
+			return <IdleRoom />;
 		}
 
-		// if we are not in the lobby and don't have a selected game, show the idle room
-		return <IdleRoom />;
+		const config = roomManager.getCurrentGameConfig();
+		if (config && roomManager.isInConfigEditingMode()) {
+			return <ConfigRoom configuration={config} />;
+		}
+
+		// if there is any game id selected, show the game room
+		return <GameRoom />;
 	}
 }

@@ -51,6 +51,10 @@ export default class Room {
 		return this.moduleApi ? this.moduleApi.getGameId() : null;
 	}
 
+	public isInConfigEditMode(): boolean {
+		return this.isEditingGameConfig;
+	}
+
 	public getRoomMaster(): User | null {
 		// if we don´t have a room master, we select another user as the room master
 		if (this.roomMaster === null && this.roomMembers.length > 0) {
@@ -88,13 +92,12 @@ export default class Room {
 		this.isEditingGameConfig =
 			this.moduleApi && this.moduleApi.getConfig().hasConfig();
 
-		if (this.moduleApi && !this.isEditingGameConfig) {
+		if (!this.isEditingGameConfig) {
 			systemLogger.debug(
 				`Skipping empty configuration for ${
 					roomApi ? roomApi.getGameId() : 'IDLE'
 				}`
 			);
-			this.moduleApi.getGame().onGameInitialize(this.moduleApi);
 		}
 
 		this.sendRoomChangedBroadcast();

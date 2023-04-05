@@ -22,7 +22,11 @@ export default abstract class ConfigElement {
 		this.label = label;
 	}
 
-	public changeAllowedQuantities(min: number, max: number): this {
+	public changeAllowedQuantities(
+		min: number,
+		max: number,
+		initialValues: ConfigurationTypes = []
+	): this {
 		if (!this.allowElementQuantityChanges()) {
 			throw new Error(
 				`Cannot change quantity of the element "${this.getName()}"`
@@ -35,7 +39,7 @@ export default abstract class ConfigElement {
 		this.minElements = min;
 		this.maxElements = max;
 		if (this.maxElements > 1) {
-			this.value = [];
+			this.value = initialValues;
 		}
 		return this;
 	}

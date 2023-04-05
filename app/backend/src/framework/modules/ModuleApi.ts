@@ -7,6 +7,7 @@ import ModuleConfig from './configuration/ModuleConfig';
 import ModuleInterface from './ModuleInterface';
 import { ConfigurationTypes } from '@edelgames/types/src/app/ConfigurationTypes';
 import { anyObject } from '@edelgames/types/src/app/BasicTypes';
+import ModuleConfigApi from './api/ModuleConfigApi';
 
 /*
  * This class will be passed to the game instance to allow for restricted access to the room data.
@@ -15,9 +16,9 @@ import { anyObject } from '@edelgames/types/src/app/BasicTypes';
 export default class ModuleApi {
 	private readonly game: ModuleGameInterface;
 	private readonly gameId: string;
-	private readonly gameConfig: ModuleConfig;
 	private readonly playerApi: ModulePlayerApi;
 	private readonly eventApi: ModuleEventApi;
+	private readonly configApi: ModuleConfigApi;
 	private readonly logger: Logger;
 
 	constructor(
@@ -27,23 +28,11 @@ export default class ModuleApi {
 	) {
 		this.game = game;
 		this.gameId = gameDefinition.getUniqueId();
-		this.gameConfig = gameDefinition.getGameConfig();
 
 		this.logger = new Logger(this.gameId);
 		this.eventApi = new ModuleEventApi(this);
 		this.playerApi = new ModulePlayerApi(room, this);
-	}
-
-	public getConfig(): ModuleConfig {
-		return this.gameConfig;
-	}
-
-	public getConfigValue(
-		name: string,
-		fallback: string | number | anyObject | null = null
-	): ConfigurationTypes | undefined {
-		const element = this.gameConfig.getElementByName(name);
-		return element ? element.getValue() : fallback;
+		this.configApi = new ModuleConfigApi(gameDefinition.getGameConfig());
 	}
 
 	public getGameId(): string {
@@ -64,6 +53,10 @@ export default class ModuleApi {
 
 	public getEventApi(): ModuleEventApi {
 		return this.eventApi;
+	}
+
+	public getConfigApi(): ModuleConfigApi {
+		return this.configApi;
 	}
 
 	// this will cancel / stop / end the current game instance and return the members back to the game select (idle) room

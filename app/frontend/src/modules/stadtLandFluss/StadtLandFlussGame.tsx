@@ -35,7 +35,7 @@ export default class StadtLandFlussGame
 		guesses: {},
 		players: {} as Players,
 		round: 0,
-		gamePhase: 'setup',
+		gamePhase: 'guessing',
 		letter: '',
 		ready_users: [],
 		points: {},
@@ -108,14 +108,6 @@ export default class StadtLandFlussGame
 		let isRoomMaster = this.api.getPlayerApi().getLocalePlayer().isRoomMaster();
 
 		switch (this.state.gamePhase) {
-			case 'setup':
-				return (
-					<SLFConfig
-						gameApi={this.api}
-						isRoomMaster={isRoomMaster}
-						config={this.state.config}
-					/>
-				);
 			case 'guessing':
 				return (
 					<SLFGuessing
@@ -164,23 +156,11 @@ export default class StadtLandFlussGame
 	}
 
 	/**
-	 * Renders the "Zur Spielauswahl" button.
-	 */
-	private renderBackToGameSelectionButton(): ReactNode {
-		return this.api.getPlayerApi().getLocalePlayer().isRoomMaster() ? (
-			<button onClick={this.returnToGameSelection.bind(this)}>
-				Zur Spielauswahl
-			</button>
-		) : null;
-	}
-
-	/**
 	 * Render the component.
 	 */
 	render(): ReactNode {
 		return (
 			<div id={'stadtLandFluss'}>
-				{this.renderBackToGameSelectionButton()}
 				{this.getCurrentlyActiveSection()}
 			</div>
 		);

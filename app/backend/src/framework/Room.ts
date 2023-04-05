@@ -90,7 +90,8 @@ export default class Room {
 		this.moduleApi = roomApi;
 		// in case there is no config, we skip the configuration completely, otherwise set the room to the config edit state
 		this.isEditingGameConfig =
-			this.moduleApi && this.moduleApi.getConfig().hasConfig();
+			this.moduleApi &&
+			this.moduleApi.getConfigApi().getInternalConfiguration().hasConfig();
 
 		if (!this.isEditingGameConfig) {
 			systemLogger.debug(
@@ -132,6 +133,9 @@ export default class Room {
 	 */
 	public sendRoomChangedBroadcast(): void {
 		const api = this.moduleApi;
+		const config = api
+			? api.getConfigApi().getInternalConfiguration().getNativeConfiguration()
+			: null;
 
 		const roomChangedData: ServerRoomObject = {
 			roomId: this.roomId,
@@ -139,7 +143,7 @@ export default class Room {
 			requirePassphrase: !!this.roomPassword,
 			roomMembers: this.getPublicRoomMemberList(),
 			currentGameId: api ? api.getGameId() : null,
-			currentGameConfig: api ? api.getConfig().getNativeConfiguration() : null,
+			currentGameConfig: config,
 			isEditingGameConfig: this.isEditingGameConfig,
 		};
 		this.broadcastRoomMembers('roomChanged', roomChangedData);
@@ -235,16 +239,11 @@ export default class Room {
 	}
 
 	updateGameConfig(eventData: EventDataObject, senderId: string): void {
-		if (
-			!this.isEditingGameConfig ||
-			!this.moduleApi ||
-			!this.moduleApi.getConfig() ||
-			!this.getRoomMaster()
-		) {
+		if (!this.isEditingGameConfig || !this.moduleApi || !this.getRoomMaster()) {
 			return;
 		}
 
-		const config = this.moduleApi.getConfig();
+		const config = this.moduleApi.getConfigApi().getInternalConfiguration();
 
 		if (
 			this.getRoomMaster().getId() !== senderId &&
@@ -276,14 +275,13 @@ export default class Room {
 		if (
 			!this.isEditingGameConfig ||
 			!this.moduleApi ||
-			!this.moduleApi.getConfig() ||
 			!this.getRoomMaster() ||
 			this.getRoomMaster().getId() !== senderId
 		) {
 			return;
 		}
 
-		const config = this.moduleApi.getConfig();
+		const config = this.moduleApi.getConfigApi().getInternalConfiguration();
 
 		if (config.isFullyConfigured()) {
 			this.isEditingGameConfig = false;
@@ -301,7 +299,10 @@ export default class Room {
 		}
 
 		const { newVisibilityState } = eventData;
-		this.moduleApi.getConfig().setPubliclyEditable(!!newVisibilityState);
+		this.moduleApi
+			.getConfigApi()
+			.getInternalConfiguration()
+			.setPubliclyEditable(!!newVisibilityState);
 		this.sendRoomChangedBroadcast();
 	}
 }

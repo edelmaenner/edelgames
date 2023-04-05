@@ -44,10 +44,9 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 	onGameInitialize(api: ModuleApi): void {
 		this.api = api;
 
-		const gridTemplateConfig = this.api.getConfigValue(
-			'grid_template_name',
-			'default'
-		) as string;
+		const gridTemplateConfig = this.api
+			.getConfigApi()
+			.getSingleStringConfigValue('grid_template_name', 'default') as string;
 		let template = this.getTemplateGrid(gridTemplateConfig);
 
 		for (const member of this.api.getPlayerApi().getRoomMembers()) {

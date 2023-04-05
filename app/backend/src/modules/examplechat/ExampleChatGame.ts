@@ -27,7 +27,9 @@ export default class ExampleChatGame implements ModuleGameInterface {
 			);
 		this.api.getPlayerApi().sendRoomMessage('serverMessageSend', {
 			user: eventData.senderId,
-			message: eventData.message,
+			message:
+				eventData.message +
+				this.api.getConfigApi().getSingleStringConfigValue('example_config'),
 		});
 	}
 }

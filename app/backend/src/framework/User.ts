@@ -77,6 +77,21 @@ export default class User implements IUser {
 			'changeRoomPass',
 			this.onRoomPassChangeRequested.bind(this)
 		);
+		SocketManager.subscribeEventToSocket(
+			socket,
+			'gameConfigEdited',
+			this.onGameConfigEdited.bind(this)
+		);
+		SocketManager.subscribeEventToSocket(
+			socket,
+			'gameConfigFinished',
+			this.onGameConfigFinished.bind(this)
+		);
+		SocketManager.subscribeEventToSocket(
+			socket,
+			'gameConfigPubliclyStateChanged',
+			this.onGameConfigPubliclyChanged.bind(this)
+		);
 	}
 
 	/** This will remove the user from its current room, hopefully leaving no reference behind. Thus allowing it to be cleared by the garbage collection
@@ -293,6 +308,24 @@ export default class User implements IUser {
 			newPassword.length <= 50
 		) {
 			this.currentRoom.setRoomPassword(newPassword || null);
+		}
+	}
+
+	public onGameConfigEdited(eventData: EventDataObject): void {
+		if (this.currentRoom) {
+			this.currentRoom.updateGameConfig(eventData, this.id);
+		}
+	}
+
+	public onGameConfigFinished(eventData: EventDataObject): void {
+		if (this.currentRoom) {
+			this.currentRoom.onGameConfigSaved(eventData, this.id);
+		}
+	}
+
+	public onGameConfigPubliclyChanged(eventData: EventDataObject): void {
+		if (this.currentRoom) {
+			this.currentRoom.onGameConfigPubliclyStateChanged(eventData, this.id);
 		}
 	}
 }

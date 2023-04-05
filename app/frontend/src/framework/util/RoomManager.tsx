@@ -7,6 +7,7 @@ import {
 	EventDataObject,
 	ServerRoomObject,
 } from '@edelgames/types/src/app/ApiTypes';
+import { NativeConfiguration } from '@edelgames/types/src/app/ConfigurationTypes';
 
 export const RoomEventNames = {
 	roomChangedEventNotified: 'roomChangedEventNotified',
@@ -27,6 +28,8 @@ class RoomManager {
 	private roomMembers: User[] = [];
 	private roomMaster: User | null = null;
 	private currentGameId: string = '';
+	private currentGameConfig: NativeConfiguration | null = null;
+	private isInGameEditingMode: boolean = false;
 
 	constructor() {
 		eventManager.subscribe(
@@ -45,10 +48,12 @@ class RoomManager {
 		this.roomId = data.roomId;
 		this.roomName = data.roomName;
 		this.currentGameId = data.currentGameId;
+		this.currentGameConfig = data.currentGameConfig;
+		this.isInGameEditingMode = data.isEditingGameConfig;
 		if (!data.requirePassphrase) this.roomPassword = undefined;
 
 		// calculate new room members
-		let roomMembers: User[] = [];
+		let roomMemberList: User[] = [];
 		for (let member of data.roomMembers) {
 			let user = new User(
 				member.id,
@@ -61,9 +66,9 @@ class RoomManager {
 				this.roomMaster = user;
 			}
 
-			roomMembers.push(user);
+			roomMemberList.push(user);
 		}
-		this.roomMembers = roomMembers;
+		this.roomMembers = roomMemberList;
 
 		eventManager.publish(RoomEventNames.roomUpdated);
 	}
@@ -98,6 +103,18 @@ class RoomManager {
 
 	public getCurrentGameId(): string {
 		return this.currentGameId;
+	}
+
+	public getCurrentGameConfig(): NativeConfiguration | null {
+		return this.currentGameConfig;
+	}
+
+	public isInConfigEditingMode(): boolean {
+		return this.isInGameEditingMode;
+	}
+
+	public setConfigEditingMode(active: boolean): void {
+		this.isInGameEditingMode = active;
 	}
 }
 

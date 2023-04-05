@@ -1,9 +1,25 @@
 #screenConfigRoom {
-	.config-title {
-		font-size: 2rem;
-		font-weight: $font-weight-bold;
-		margin-bottom: 2rem;
+	@import 'elements/StringInput';
+	@import 'elements/NumberInput';
+	@import 'elements/BooleanInput';
+	@import 'elements/SelectOneInput';
+	@import 'elements/MultiElementWrapper';
+
+	.config-header {
+		display: flex;
+		justify-content: space-between;
+
+		.config-title {
+			font-size: 2rem;
+			font-weight: $font-weight-bold;
+			margin-bottom: 2rem;
+		}
+
+		.config-public-switch {
+
+		}
 	}
+
 
 	.config-elements {
 		display: flex;
@@ -35,11 +51,6 @@
 					position: absolute;
 					top: 0;
 				}
-
-				@import 'elements/StringInput';
-				@import 'elements/NumberInput';
-				@import 'elements/BooleanInput';
-				@import 'elements/MultiElementWrapper';
 			}
 		}
 	}

@@ -4,7 +4,7 @@ import {
 	ConfigurationTypes,
 	NativeConfiguration,
 	NativeConfigurationElement,
-	NumberConfig,
+	NumberConfig, SelectOneConfig,
 	StringConfig,
 	valueChangedCallback,
 } from '@edelgames/types/src/app/ConfigurationTypes';
@@ -16,6 +16,7 @@ import BooleanInput from './elements/BooleanInput';
 import socketManager from '../../util/SocketManager';
 import ProfileManager from '../../util/ProfileManager';
 import eventManager from '../../util/EventManager';
+import SelectOneInput from "./elements/SelectOneInput";
 
 interface IProps {
 	configuration: NativeConfiguration;
@@ -61,13 +62,39 @@ export default class ConfigRoom extends React.Component<IProps, {}> {
 		});
 	}
 
+	onPubliclyChanged(newState: ConfigurationTypes): void {
+		this.props.configuration.isPublicEditable = true;
+
+		socketManager.sendEvent('gameConfigPubliclyStateChanged', {
+			newVisibilityState: !!newState
+		});
+	}
+
 	render() {
 		const isRoomMaster = ProfileManager.isRoomMaster();
 		// const canBeEdited = isRoomMaster || this.props.configuration.isPublicEditable;
 
 		return (
 			<div id="screenConfigRoom">
-				<div className={'config-title'}>Konfiguration</div>
+
+				<div className={'config-header'}>
+					<div className={'config-title'}>Konfiguration</div>
+
+					{isRoomMaster ? (
+						<div
+							className={'config-public-switch'}
+							title={'Erlaube anderen Spielern, selbst die Konfiguration zu bearbeiten'}
+						>
+							<BooleanInput
+								onValueChanged={this.onPubliclyChanged.bind(this)}
+								name={''}
+								config={{style: "switch"}}
+								value={this.props.configuration.isPublicEditable}
+								allowEdit={true}
+							/>
+						</div>
+					) : null}
+				</div>
 
 				<div className={'config-elements'}>
 					{this.props.configuration.elements.map(this.renderElement.bind(this))}
@@ -176,6 +203,17 @@ export default class ConfigRoom extends React.Component<IProps, {}> {
 						name={element.name}
 						config={element.config as BooleanConfig}
 						value={element.value as boolean}
+						allowEdit={allowEdit}
+					/>
+				);
+			case 'select':
+				return (
+					<SelectOneInput
+						onValueChanged={onValueChangedCallback}
+						name={element.name}
+						config={element.config as SelectOneConfig}
+						value={element.value as string}
+						isValidState={element.isValidState}
 						allowEdit={allowEdit}
 					/>
 				);

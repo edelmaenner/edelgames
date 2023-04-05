@@ -8,7 +8,6 @@ import {
 	ServerRoomMember,
 	ServerRoomObject,
 } from '@edelgames/types/src/app/ApiTypes';
-import ModuleConfig from './modules/configuration/ModuleConfig';
 
 export default class Room {
 	protected roomId: string;
@@ -288,5 +287,18 @@ export default class Room {
 			this.moduleApi.getGame().onGameInitialize(this.moduleApi);
 			this.sendRoomChangedBroadcast();
 		}
+	}
+
+	onGameConfigPubliclyStateChanged(
+		eventData: EventDataObject,
+		senderId: string
+	): void {
+		if (!this.getRoomMaster() || senderId !== this.getRoomMaster().getId()) {
+			return;
+		}
+
+		const { newVisibilityState } = eventData;
+		this.moduleApi.getConfig().setPubliclyEditable(!!newVisibilityState);
+		this.sendRoomChangedBroadcast();
 	}
 }

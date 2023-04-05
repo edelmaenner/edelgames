@@ -24,7 +24,13 @@ export type NativeConfigurationElementConfig =
 	| ColorConfig
 	| NumberConfig
 	| NumberRangeConfig
-	| StringConfig;
+	| StringConfig
+	| SelectOneConfig
+	| anyObject;
+
+export type SelectOneConfig = {
+	options: SelectOption[];
+};
 
 export type ColorConfig = StringConfig & {
 	allowedHexColors: string[];
@@ -64,13 +70,20 @@ export type ColorValue = {
 	hsl?: { h: number; s: number; l: number };
 };
 
+export type SelectOption = {
+	label: string;
+	value: string;
+};
+
 export type ConfigurationTypesDefs =
 	| 'color'
 	| 'string'
 	| 'int'
 	| 'float'
 	| 'bool'
+	| 'select'
 	| 'custom';
+
 export type ConfigurationTypesSingle =
 	| null
 	| string

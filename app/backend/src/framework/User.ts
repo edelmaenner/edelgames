@@ -87,6 +87,11 @@ export default class User implements IUser {
 			'gameConfigFinished',
 			this.onGameConfigFinished.bind(this)
 		);
+		SocketManager.subscribeEventToSocket(
+			socket,
+			'gameConfigPubliclyStateChanged',
+			this.onGameConfigPubliclyChanged.bind(this)
+		);
 	}
 
 	/** This will remove the user from its current room, hopefully leaving no reference behind. Thus allowing it to be cleared by the garbage collection
@@ -315,6 +320,12 @@ export default class User implements IUser {
 	public onGameConfigFinished(eventData: EventDataObject): void {
 		if (this.currentRoom) {
 			this.currentRoom.onGameConfigSaved(eventData, this.id);
+		}
+	}
+
+	public onGameConfigPubliclyChanged(eventData: EventDataObject): void {
+		if (this.currentRoom) {
+			this.currentRoom.onGameConfigPubliclyStateChanged(eventData, this.id);
 		}
 	}
 }

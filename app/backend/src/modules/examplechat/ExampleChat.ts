@@ -7,6 +7,7 @@ import { whitespace } from '../../framework/modules/configuration/elements/Colle
 import IntegerConfig from '../../framework/modules/configuration/elements/IntegerConfig';
 import FloatConfig from '../../framework/modules/configuration/elements/FloatConfig';
 import BooleanConfig from '../../framework/modules/configuration/elements/BooleanConfig';
+import SelectOneConfig from '../../framework/modules/configuration/elements/SelectOneConfig';
 
 /*
  * This singleton is used to register the game to the ModuleList
@@ -18,6 +19,12 @@ class ExampleChat implements ModuleInterface {
 
 	getGameConfig(): ModuleConfig {
 		return new ModuleConfig([
+			new SelectOneConfig('example_config_select', 'Wähle eine Option', [
+				{ label: 'Diese Option 1', value: 'option_1' },
+				{ label: 'Diese andere Option 2', value: 'option_2' },
+				{ label: 'Keins der vorherigen', value: 'option_3' },
+			]),
+
 			new StringConfig('example_config', 'Beispieltext', []),
 
 			new StringConfig(

@@ -7,9 +7,11 @@ import { systemLogger } from '../../util/Logger';
 
 export default class ModuleConfig {
 	configElements: ConfigElement[];
+	isPubliclyEditable: boolean;
 
 	constructor(configElements: ConfigElement[]) {
 		this.configElements = configElements;
+		this.isPubliclyEditable = false;
 	}
 
 	/**
@@ -59,7 +61,15 @@ export default class ModuleConfig {
 	 * @private
 	 */
 	isPublicEditable(): boolean {
-		return false;
+		return this.isPubliclyEditable;
+	}
+
+	/**
+	 * @internal
+	 * @private
+	 */
+	setPubliclyEditable(newState: boolean): void {
+		this.isPubliclyEditable = newState;
 	}
 
 	hasConfig(): boolean {

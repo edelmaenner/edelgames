@@ -134,6 +134,11 @@ export default abstract class ConfigElement {
 					!Number.isNaN(value) ||
 					'Cannot assign non numeric value to float config'
 				);
+			case 'select':
+				return (
+					typeof value === 'string' ||
+					'Cannot assign non string value to string config'
+				);
 			case 'custom':
 				return (
 					typeof value === 'object' ||

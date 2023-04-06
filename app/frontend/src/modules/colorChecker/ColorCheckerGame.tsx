@@ -48,7 +48,7 @@ interface IState {
 	isPlayerWaiting: boolean;
 	finishedColors: boolean[];
 	finishedColumns: boolean[];
-	remainingPlayers: number;
+	finishedPlayers: string[];
 	lastRollTimestamp: number;
 	scoreboard: GridScoreboard | undefined;
 }
@@ -79,7 +79,7 @@ export default class ColorCheckerGame
 			isPlayerWaiting: false,
 			finishedColumns: Array(15).fill(false),
 			finishedColors: Array(5).fill(false),
-			remainingPlayers: 0,
+			finishedPlayers: [],
 			scoreboard: undefined,
 			lastRollTimestamp: -1,
 		};
@@ -137,10 +137,10 @@ export default class ColorCheckerGame
 	}
 
 	onRemainingPlayersChangedEvent(eventData: EventDataObject): void {
-		const { remainingPlayers } =
+		const { finishedPlayers } =
 			eventData as OnRemainingPlayersChangedEventData;
 		this.setState({
-			remainingPlayers: remainingPlayers,
+			finishedPlayers: finishedPlayers,
 		});
 	}
 
@@ -172,7 +172,7 @@ export default class ColorCheckerGame
 			reservedColumnPoints,
 			currentDiceValues,
 			activePlayerId,
-			remainingPlayers,
+			finishedPlayers,
 			lastRollTimestamp,
 		} = eventData as OnGameStateUpdateEventData;
 
@@ -189,7 +189,7 @@ export default class ColorCheckerGame
 				),
 				currentDiceValues: currentDiceValues,
 				activePlayerId: activePlayerId,
-				remainingPlayers: remainingPlayers,
+				finishedPlayers: finishedPlayers,
 				lastRollTimestamp: lastRollTimestamp,
 			},
 			this.updateAllowedNumbersAndColors.bind(this)
@@ -208,7 +208,6 @@ export default class ColorCheckerGame
 	/*
 		Locale Events and functions
 	 */
-
 	updateAllowedNumbersAndColors(): void {
 		let dices = this.state.currentDiceValues;
 
@@ -358,14 +357,6 @@ export default class ColorCheckerGame
 					i > 2 && el === 6 && this.state.reservedDiceIndices.indexOf(i) === -1
 			) !== undefined;
 
-		const activePlayerName =
-			(this.state.activePlayerId
-				? this.api
-						.getPlayerApi()
-						.getPlayerById(this.state.activePlayerId)
-						?.getUsername()
-				: '') || '';
-
 		return (
 			<div id={'colorChecker'}>
 				<div
@@ -420,8 +411,8 @@ export default class ColorCheckerGame
 					finishedColors={this.state.finishedColors}
 					grid={this.state.grid}
 					gameState={this.state.gameState}
-					remainingPlayers={this.state.remainingPlayers}
-					activePlayerName={activePlayerName}
+					finishedPlayers={this.state.finishedPlayers}
+					activePlayerId={this.state.activePlayerId}
 				/>
 
 				<DiceTable

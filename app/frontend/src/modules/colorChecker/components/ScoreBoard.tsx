@@ -1,18 +1,18 @@
-import React, { Component } from 'react';
-import { SelectableColors } from './ColorGridBox';
-import {
-	ColorGrid,
-	GameStates,
-} from '@edelgames/types/src/modules/colorChecker/CCTypes';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, {Component} from 'react';
+import {SelectableColors} from './ColorGridBox';
+import {ColorGrid, GameStates,} from '@edelgames/types/src/modules/colorChecker/CCTypes';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import roomManager from "../../../framework/util/RoomManager";
+import User from "../../../framework/util/User";
+import ProfileImage from "../../../framework/components/ProfileImage/ProfileImage";
 
 interface IProps {
 	reservedBonusPoints: boolean[];
 	finishedColors: boolean[];
 	grid: ColorGrid;
 	gameState: GameStates;
-	remainingPlayers: number;
-	activePlayerName: string;
+	finishedPlayers: string[];
+	activePlayerId: string | undefined;
 }
 
 export default class ScoreBoard extends Component<IProps, {}> {
@@ -32,13 +32,42 @@ export default class ScoreBoard extends Component<IProps, {}> {
 				</div>
 
 				<div className={'status-board'}>
+
 					<div className={'bold'}>Aktiver Spieler:</div>
-					<div>{this.props.activePlayerName}</div>
+					{this.renderPlayerIcon(true, roomManager.getRoomMembers().find(member => member.getId() === this.props.activePlayerId))}
 					<br />
+
+					<div className={'bold'}>Passive Spieler:</div>
+					<div className={'passive-player-list'}>
+						{
+							roomManager.getRoomMembers().map(this.renderPlayerIcon.bind(this, false))
+						}
+					</div>
+					<br />
+
 					<div className={'bold'}>Status:</div>
 					{this.getGameStateMessage()}
 				</div>
 			</div>
+		);
+	}
+
+	renderPlayerIcon(isActivePlayer: boolean, member: User|undefined): JSX.Element | null {
+		if(!member || (!isActivePlayer && member.getId() === this.props.activePlayerId)) {
+			return null;
+		}
+
+		const isWaitingForOtherPlayers =
+			(isActivePlayer && this.props.gameState !== GameStates.ACTIVE_PLAYER_SELECTS) ||
+			(!isActivePlayer && (this.props.gameState === GameStates.ACTIVE_PLAYER_SELECTS || this.props.finishedPlayers.includes(member.getId())));
+
+		return (
+			<ProfileImage
+				picture={member.getPicture()}
+				username={member.getUsername()}
+				id={member.getId()}
+				className={isWaitingForOtherPlayers ? 'is-waiting' : undefined}
+			/>
 		);
 	}
 
@@ -47,7 +76,7 @@ export default class ScoreBoard extends Component<IProps, {}> {
 			case GameStates.ACTIVE_PLAYER_SELECTS:
 				return 'Der aktive Spieler darf zuerst seinen Zug machen';
 			case GameStates.PASSIVE_PLAYERS_SELECTS:
-				return `Alle nicht aktiven Spieler, dürfen ihren Zug mit den übrigen Würfeln machen. ${this.props.remainingPlayers} Spieler verbleibend`;
+				return `Alle passiven Spieler, dürfen ihren Zug mit den übrigen Würfeln machen`;
 		}
 		return '';
 	}

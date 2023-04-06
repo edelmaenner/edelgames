@@ -22,7 +22,7 @@ export const enum S2CEvents {
 }
 
 export type OnRemainingPlayersChangedEventData = {
-	remainingPlayers: number;
+	finishedPlayers: string[];
 };
 
 export type OnScoresCalculatedEventData = {
@@ -32,7 +32,7 @@ export type OnScoresCalculatedEventData = {
 export type OnGameStateUpdateEventData = {
 	gameState: GameStates;
 	activePlayerId?: string;
-	remainingPlayers: number;
+	finishedPlayers: string[];
 	currentDiceValues: number[];
 	lastRollTimestamp: number;
 	reservedDiceIndices: number[];

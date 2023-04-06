@@ -4,6 +4,7 @@ type IProps = {
 	picture: string | null;
 	username: string;
 	id: string;
+	className?: string;
 };
 
 interface IState {
@@ -23,7 +24,7 @@ export default class ProfileImage extends React.Component<IProps, IState> {
 		let fallbackColorHue = parseInt(this.props.id, 36) % 360;
 
 		return (
-			<div className="profile-picture" title={this.props.username}>
+			<div className={"profile-picture " + (this.props.className || '')} title={this.props.username}>
 				{this.props.picture && !this.state.hasPictureError ? (
 					<img
 						src={this.props.picture}

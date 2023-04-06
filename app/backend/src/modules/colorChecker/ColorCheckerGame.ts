@@ -122,9 +122,7 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 					: GridHelper.checkCellsInGrid(cells, playerData.grid);
 
 			this.playerHelper.addReadyPlayer(senderId);
-			this.updateClientRemainingPlayers(
-				this.playerHelper.players.length - this.playerHelper.readyPlayers.length
-			);
+			this.updateClientRemainingPlayers(this.playerHelper.readyPlayers);
 
 			if (cells.length > 0 && selectedColor !== '#fff') {
 				playerData.addCellsToHistory(cells);
@@ -257,9 +255,9 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 		}
 	}
 
-	updateClientRemainingPlayers(remainingPlayers: number): void {
+	updateClientRemainingPlayers(finishedPlayers: string[]): void {
 		const eventData: OnRemainingPlayersChangedEventData = {
-			remainingPlayers: remainingPlayers,
+			finishedPlayers: finishedPlayers,
 		};
 		this.api
 			.getEventApi()
@@ -366,9 +364,7 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 			lastRollTimestamp: this.diceHelper.lastRollTimestamp,
 			reservedBonusPoints: this.bonusOwners,
 			reservedDiceIndices: this.diceHelper.getReservedDiceIndices(),
-			remainingPlayers:
-				this.playerHelper.players.length -
-				this.playerHelper.readyPlayers.length,
+			finishedPlayers: this.playerHelper.readyPlayers,
 		};
 		this.api
 			.getEventApi()

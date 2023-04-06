@@ -92,7 +92,7 @@ export default class ScoreBoard extends Component<IProps, {}> {
 			case GameStates.ACTIVE_PLAYER_SELECTS:
 				return 'Der aktive Spieler darf zuerst seinen Zug machen';
 			case GameStates.PASSIVE_PLAYERS_SELECTS:
-				return `Alle passiven Spieler, dürfen ihren Zug mit den übrigen Würfeln machen`;
+				return `Alle passiven Spieler dürfen ihren Zug mit den übrigen Würfeln machen`;
 		}
 		return '';
 	}

@@ -1,10 +1,13 @@
-import React, {Component} from 'react';
-import {SelectableColors} from './ColorGridBox';
-import {ColorGrid, GameStates,} from '@edelgames/types/src/modules/colorChecker/CCTypes';
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import roomManager from "../../../framework/util/RoomManager";
-import User from "../../../framework/util/User";
-import ProfileImage from "../../../framework/components/ProfileImage/ProfileImage";
+import React, { Component } from 'react';
+import { SelectableColors } from './ColorGridBox';
+import {
+	ColorGrid,
+	GameStates,
+} from '@edelgames/types/src/modules/colorChecker/CCTypes';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import roomManager from '../../../framework/util/RoomManager';
+import User from '../../../framework/util/User';
+import ProfileImage from '../../../framework/components/ProfileImage/ProfileImage';
 
 interface IProps {
 	reservedBonusPoints: boolean[];
@@ -32,16 +35,20 @@ export default class ScoreBoard extends Component<IProps, {}> {
 				</div>
 
 				<div className={'status-board'}>
-
 					<div className={'bold'}>Aktiver Spieler:</div>
-					{this.renderPlayerIcon(true, roomManager.getRoomMembers().find(member => member.getId() === this.props.activePlayerId))}
+					{this.renderPlayerIcon(
+						true,
+						roomManager
+							.getRoomMembers()
+							.find((member) => member.getId() === this.props.activePlayerId)
+					)}
 					<br />
 
 					<div className={'bold'}>Passive Spieler:</div>
 					<div className={'passive-player-list'}>
-						{
-							roomManager.getRoomMembers().map(this.renderPlayerIcon.bind(this, false))
-						}
+						{roomManager
+							.getRoomMembers()
+							.map(this.renderPlayerIcon.bind(this, false))}
 					</div>
 					<br />
 
@@ -52,14 +59,23 @@ export default class ScoreBoard extends Component<IProps, {}> {
 		);
 	}
 
-	renderPlayerIcon(isActivePlayer: boolean, member: User|undefined): JSX.Element | null {
-		if(!member || (!isActivePlayer && member.getId() === this.props.activePlayerId)) {
+	renderPlayerIcon(
+		isActivePlayer: boolean,
+		member: User | undefined
+	): JSX.Element | null {
+		if (
+			!member ||
+			(!isActivePlayer && member.getId() === this.props.activePlayerId)
+		) {
 			return null;
 		}
 
 		const isWaitingForOtherPlayers =
-			(isActivePlayer && this.props.gameState !== GameStates.ACTIVE_PLAYER_SELECTS) ||
-			(!isActivePlayer && (this.props.gameState === GameStates.ACTIVE_PLAYER_SELECTS || this.props.finishedPlayers.includes(member.getId())));
+			(isActivePlayer &&
+				this.props.gameState !== GameStates.ACTIVE_PLAYER_SELECTS) ||
+			(!isActivePlayer &&
+				(this.props.gameState === GameStates.ACTIVE_PLAYER_SELECTS ||
+					this.props.finishedPlayers.includes(member.getId())));
 
 		return (
 			<ProfileImage

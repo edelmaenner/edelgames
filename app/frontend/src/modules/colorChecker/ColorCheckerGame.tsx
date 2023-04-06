@@ -137,8 +137,7 @@ export default class ColorCheckerGame
 	}
 
 	onRemainingPlayersChangedEvent(eventData: EventDataObject): void {
-		const { finishedPlayers } =
-			eventData as OnRemainingPlayersChangedEventData;
+		const { finishedPlayers } = eventData as OnRemainingPlayersChangedEventData;
 		this.setState({
 			finishedPlayers: finishedPlayers,
 		});

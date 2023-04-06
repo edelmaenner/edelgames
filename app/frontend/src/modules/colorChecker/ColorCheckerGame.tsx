@@ -9,7 +9,8 @@ import ColorGridBox, {
 	SelectableColors,
 } from './components/ColorGridBox';
 import {
-	ColorGrid, ColorGridPublicDefinition,
+	ColorGrid,
+	ColorGridPublicDefinition,
 	Coordinate,
 	GameStates,
 	GridColorOptions,
@@ -30,7 +31,7 @@ import {
 	S2CEvents,
 } from '@edelgames/types/src/modules/colorChecker/CCEvents';
 import WinningScreen from './components/WinningScreen';
-import ColorGridBoxAnimation from "./components/ColorGridBoxAnimation";
+import ColorGridBoxAnimation from './components/ColorGridBoxAnimation';
 
 interface IState {
 	grid: ColorGrid;
@@ -178,7 +179,7 @@ export default class ColorCheckerGame
 			activePlayerId,
 			finishedPlayers,
 			lastRollTimestamp,
-			playerGrids
+			playerGrids,
 		} = eventData as OnGameStateUpdateEventData;
 
 		const localePlayerId = this.api.getPlayerApi().getLocalePlayer().getId();
@@ -196,7 +197,7 @@ export default class ColorCheckerGame
 				activePlayerId: activePlayerId,
 				finishedPlayers: finishedPlayers,
 				lastRollTimestamp: lastRollTimestamp,
-				opponentsGrids: playerGrids
+				opponentsGrids: playerGrids,
 			},
 			this.updateAllowedNumbersAndColors.bind(this)
 		);
@@ -363,7 +364,11 @@ export default class ColorCheckerGame
 					i > 2 && el === 6 && this.state.reservedDiceIndices.indexOf(i) === -1
 			) !== undefined;
 
-		const observedGrid = this.state.observedOpponent ? this.state.opponentsGrids?.find(el => el.playerId === this.state.observedOpponent) : undefined;
+		const observedGrid = this.state.observedOpponent
+			? this.state.opponentsGrids?.find(
+					(el) => el.playerId === this.state.observedOpponent
+			  )
+			: undefined;
 
 		return (
 			<div id={'colorChecker'}>
@@ -416,7 +421,10 @@ export default class ColorCheckerGame
 					{observedGrid && (
 						<div className={'opponents-view'}>
 							<div className={'opponents-name'}>
-								{this.api.getPlayerApi().getPlayerById(observedGrid.playerId)?.getUsername()}
+								{this.api
+									.getPlayerApi()
+									.getPlayerById(observedGrid.playerId)
+									?.getUsername()}
 							</div>
 							<ColorGridBoxAnimation
 								grid={observedGrid.grid}
@@ -424,7 +432,6 @@ export default class ColorCheckerGame
 							/>
 						</div>
 					)}
-
 				</div>
 
 				<ScoreBoard
@@ -437,8 +444,8 @@ export default class ColorCheckerGame
 					api={this.api}
 					observedOpponentChanged={(playerId) => {
 						this.setState({
-							observedOpponent: playerId
-						})
+							observedOpponent: playerId,
+						});
 					}}
 				/>
 

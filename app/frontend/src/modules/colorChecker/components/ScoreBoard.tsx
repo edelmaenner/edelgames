@@ -7,7 +7,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import User from '../../../framework/util/User';
 import ProfileImage from '../../../framework/components/ProfileImage/ProfileImage';
-import ModuleApi from "../../../framework/modules/ModuleApi";
+import ModuleApi from '../../../framework/modules/ModuleApi';
 
 interface IProps {
 	reservedBonusPoints: boolean[];
@@ -17,12 +17,10 @@ interface IProps {
 	finishedPlayers: string[];
 	activePlayerId: string | undefined;
 	api: ModuleApi;
-	observedOpponentChanged: {(observedOpponent: string|null): void};
+	observedOpponentChanged: { (observedOpponent: string | null): void };
 }
 
-
 export default class ScoreBoard extends Component<IProps, {}> {
-
 	render() {
 		return (
 			<div className={'scoreboard'}>
@@ -40,15 +38,21 @@ export default class ScoreBoard extends Component<IProps, {}> {
 
 				<div className={'status-board'}>
 					<div className={'bold'}>Aktiver Spieler:</div>
-					{this.props.activePlayerId && this.renderPlayerIcon(
-						true,
-						this.props.api.getPlayerApi().getPlayerById(this.props.activePlayerId)
-					)}
+					{this.props.activePlayerId &&
+						this.renderPlayerIcon(
+							true,
+							this.props.api
+								.getPlayerApi()
+								.getPlayerById(this.props.activePlayerId)
+						)}
 					<br />
 
 					<div className={'bold'}>Passive Spieler:</div>
 					<div className={'passive-player-list'}>
-						{	this.props.api.getPlayerApi().getPlayers().map(this.renderPlayerIcon.bind(this, false))}
+						{this.props.api
+							.getPlayerApi()
+							.getPlayers()
+							.map(this.renderPlayerIcon.bind(this, false))}
 					</div>
 					<br />
 
@@ -84,13 +88,17 @@ export default class ScoreBoard extends Component<IProps, {}> {
 				id={member.getId()}
 				className={isWaitingForOtherPlayers ? 'is-waiting' : undefined}
 				onHover={this.onViewedPlayerChanged.bind(this, member.getId(), true)}
-				onHoverEnd={this.onViewedPlayerChanged.bind(this, member.getId(), false)}
+				onHoverEnd={this.onViewedPlayerChanged.bind(
+					this,
+					member.getId(),
+					false
+				)}
 			/>
 		);
 	}
 
 	onViewedPlayerChanged(playerId: string, isStartViewing: boolean): void {
-		if(playerId === this.props.api.getPlayerApi().getLocalePlayer().getId()) {
+		if (playerId === this.props.api.getPlayerApi().getLocalePlayer().getId()) {
 			return; // a player cannot view its own board this way
 		}
 

@@ -5,9 +5,9 @@ type IProps = {
 	username: string;
 	id: string;
 	className?: string;
-	onClick?: {(): void};
-	onHover?: {(): void};
-	onHoverEnd?: {(): void};
+	onClick?: { (): void };
+	onHover?: { (): void };
+	onHoverEnd?: { (): void };
 };
 
 interface IState {

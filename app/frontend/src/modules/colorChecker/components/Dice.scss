@@ -51,3 +51,19 @@
 		}
 	}
 }
+
+.dice {
+	&.is-highlighted {
+		.die-list {
+			.die-item {
+				background-color: $signature;
+			}
+		}
+	}
+
+	.die-list {
+		.die-item {
+			transition: background-color 0.2s ease-in-out;
+		}
+	}
+}

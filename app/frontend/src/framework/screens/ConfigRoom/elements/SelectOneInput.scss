@@ -1,0 +1,24 @@
+.select-one-input-config {
+	display: flex;
+
+	select {
+		padding: 0.5rem 1rem;
+		border-radius: 3px;
+		border-top: none;
+		border-left: none;
+		border-right: none;
+		border-bottom: 3px solid gray;
+		outline: none;
+		background: $backgroundDark;
+		color: $text-color;
+		flex: 0 1 25rem;
+
+		&.is-valid {
+			border-bottom-color: $success;
+		}
+
+		&.has-error {
+			border-bottom-color: $error;
+		}
+	}
+}

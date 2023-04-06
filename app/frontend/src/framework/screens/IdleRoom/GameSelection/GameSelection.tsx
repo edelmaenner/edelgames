@@ -1,9 +1,9 @@
 import React, { ReactNode } from 'react';
-import ModuleInterface from '../../modules/ModuleInterface';
-import roomManager from '../../util/RoomManager';
-import profileManager from '../../util/ProfileManager';
-import socketManager from '../../util/SocketManager';
-import moduleRegistry from '../../modules/ModuleRegistry';
+import ModuleInterface from '../../../modules/ModuleInterface';
+import roomManager from '../../../util/RoomManager';
+import profileManager from '../../../util/ProfileManager';
+import socketManager from '../../../util/SocketManager';
+import moduleRegistry from '../../../modules/ModuleRegistry';
 
 export const GameSelectionEvents = {
 	startGame: 'startGame',

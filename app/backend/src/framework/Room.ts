@@ -3,7 +3,11 @@ import SocketManager from './util/SocketManager';
 import roomManager from './RoomManager';
 import { systemLogger } from './util/Logger';
 import ModuleApi from './modules/ModuleApi';
-import { ServerRoomMember } from '@edelgames/types/src/app/ApiTypes';
+import {
+	EventDataObject,
+	ServerRoomMember,
+	ServerRoomObject,
+} from '@edelgames/types/src/app/ApiTypes';
 
 export default class Room {
 	protected roomId: string;
@@ -12,6 +16,7 @@ export default class Room {
 	protected roomMaster: User | null;
 	protected roomPassword: string | null = null;
 	protected moduleApi: ModuleApi | null = null;
+	protected isEditingGameConfig = false;
 
 	constructor(roomMaster: User | null) {
 		this.roomId = this.createIdHash();
@@ -44,6 +49,10 @@ export default class Room {
 
 	public getCurrentGameId(): string | null {
 		return this.moduleApi ? this.moduleApi.getGameId() : null;
+	}
+
+	public isInConfigEditMode(): boolean {
+		return this.isEditingGameConfig;
 	}
 
 	public getRoomMaster(): User | null {
@@ -79,6 +88,19 @@ export default class Room {
 		}
 
 		this.moduleApi = roomApi;
+		// in case there is no config, we skip the configuration completely, otherwise set the room to the config edit state
+		this.isEditingGameConfig =
+			this.moduleApi &&
+			this.moduleApi.getConfigApi().getInternalConfiguration().hasConfig();
+
+		if (!this.isEditingGameConfig) {
+			systemLogger.debug(
+				`Skipping empty configuration for ${
+					roomApi ? roomApi.getGameId() : 'IDLE'
+				}`
+			);
+		}
+
 		this.sendRoomChangedBroadcast();
 
 		systemLogger.info(
@@ -110,13 +132,21 @@ export default class Room {
 	 * alerts every member of this room, that something has changed, so data can be refreshed
 	 */
 	public sendRoomChangedBroadcast(): void {
-		this.broadcastRoomMembers('roomChanged', {
+		const api = this.moduleApi;
+		const config = api
+			? api.getConfigApi().getInternalConfiguration().getNativeConfiguration()
+			: null;
+
+		const roomChangedData: ServerRoomObject = {
 			roomId: this.roomId,
 			roomName: this.roomName,
 			requirePassphrase: !!this.roomPassword,
 			roomMembers: this.getPublicRoomMemberList(),
-			currentGameId: this.moduleApi ? this.moduleApi.getGameId() : null,
-		});
+			currentGameId: api ? api.getGameId() : null,
+			currentGameConfig: config,
+			isEditingGameConfig: this.isEditingGameConfig,
+		};
+		this.broadcastRoomMembers('roomChanged', roomChangedData);
 
 		roomManager.updateLobbyMembersRoomData();
 	}
@@ -206,5 +236,73 @@ export default class Room {
 				isRoomMaster: member === this.roomMaster,
 			};
 		});
+	}
+
+	updateGameConfig(eventData: EventDataObject, senderId: string): void {
+		if (!this.isEditingGameConfig || !this.moduleApi || !this.getRoomMaster()) {
+			return;
+		}
+
+		const config = this.moduleApi.getConfigApi().getInternalConfiguration();
+
+		if (
+			this.getRoomMaster().getId() !== senderId &&
+			!config.isPublicEditable()
+		) {
+			this.moduleApi
+				.getPlayerApi()
+				.sendPlayerBubble(
+					senderId,
+					'Nur der Spielleiter kann aktuell die Konfiguration ändern',
+					'error'
+				);
+			return;
+		}
+
+		const { changedValueName, newValue } = eventData;
+		const result = config.setValueByName(changedValueName, newValue);
+
+		if (result !== true) {
+			this.moduleApi.getPlayerApi().sendPlayerBubble(senderId, result, 'error');
+			return;
+		}
+
+		// update changes to all players
+		this.sendRoomChangedBroadcast();
+	}
+
+	onGameConfigSaved(eventData: EventDataObject, senderId: string): void {
+		if (
+			!this.isEditingGameConfig ||
+			!this.moduleApi ||
+			!this.getRoomMaster() ||
+			this.getRoomMaster().getId() !== senderId
+		) {
+			return;
+		}
+
+		const config = this.moduleApi.getConfigApi().getInternalConfiguration();
+
+		if (config.isFullyConfigured()) {
+			this.isEditingGameConfig = false;
+			this.sendRoomChangedBroadcast();
+			this.moduleApi.getGame().onGameInitialize(this.moduleApi);
+		}
+	}
+
+	onGameConfigPubliclyStateChanged(
+		eventData: EventDataObject,
+		senderId: string
+	): void {
+		if (!this.getRoomMaster() || senderId !== this.getRoomMaster().getId()) {
+			return;
+		}
+
+		const { newVisibilityState } = eventData;
+		this.moduleApi
+			.getConfigApi()
+			.getInternalConfiguration()
+			.setPubliclyEditable(!!newVisibilityState);
+		this.sendRoomChangedBroadcast();
 	}
 }

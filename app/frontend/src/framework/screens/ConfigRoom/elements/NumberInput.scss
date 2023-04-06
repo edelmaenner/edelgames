@@ -1,0 +1,31 @@
+.number-input-config {
+	display: flex;
+
+	input[type='number'] {
+		border: none;
+		border-bottom: 3px solid gray;
+		border-radius: 3px;
+		padding: 0.5rem 1rem;
+		outline: none;
+		background: $backgroundDark;
+		color: $text-color;
+		flex: 0 1 25rem;
+
+		// disable up and down buttons
+		-webkit-appearance: textfield;
+		-moz-appearance: textfield;
+		appearance: textfield;
+		&::-webkit-inner-spin-button,
+		&::-webkit-outer-spin-button {
+			-webkit-appearance: none;
+		}
+
+		&.is-valid {
+			border-bottom-color: $success;
+		}
+
+		&.has-error {
+			border-bottom-color: $error;
+		}
+	}
+}

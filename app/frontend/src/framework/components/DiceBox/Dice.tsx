@@ -41,11 +41,15 @@ export default class Dice extends Component<IProps, {}> {
 			filter: this.props.backdropColor
 				? `drop-shadow(0 0 0.8rem ${this.props.backdropColor})`
 				: 'initial',
+			borderColor: this.props.backdropColor ? this.props.backdropColor : 'none', // none is not a valid value for borderColor, thus it disables the inline css
 		};
 
 		let classes = ['dice', 'dice-type-' + this.diceType];
 		if (this.props.onDiceClicked) {
 			classes.push('clickable');
+		}
+		if (this.props.backdropColor) {
+			classes.push('is-highlighted');
 		}
 
 		return (

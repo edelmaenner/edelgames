@@ -7,6 +7,8 @@ import {
 	Players,
 } from '@edelgames/types/src/modules/stadtLandFluss/SLFTypes';
 
+export const defaultSLFCategories = ['Stadt', 'Land', 'Fluss'];
+
 /**
  * Main class for the Stadt Land Fluss game.
  */
@@ -25,7 +27,6 @@ export default class StadtLandFlussGame implements ModuleGameInterface {
 	 * The possible game phases.
 	 */
 	private readonly gamePhases = {
-		SETUP: 'setup',
 		GUESSING: 'guessing',
 		ROUND_RESULTS: 'round_results',
 		END_SCREEN: 'end_screen',
@@ -41,75 +42,61 @@ export default class StadtLandFlussGame implements ModuleGameInterface {
 	};
 
 	/**
-	 * The initial game state.
-	 */
-	private readonly initialGameState: GameState = {
-		active: false,
-		config: {
-			categories: ['Stadt', 'Land', 'Fluss'],
-			rounds: 10,
-		},
-		guesses: {},
-		players: {} as Players,
-		round: 0,
-		gamePhase: this.gamePhases.SETUP,
-		letter: '',
-		ready_users: [],
-		points: {},
-		point_overrides: {},
-	};
-
-	/**
 	 * Register the relevant event handlers and set up the initial player list.
 	 *
 	 * @param {ModuleApi} api
 	 */
 	onGameInitialize(api: ModuleApi): void {
 		this.api = api;
-		this.api
-			.getEventApi()
-			.addEventHandler(
-				'returnToGameSelection',
-				this.onReturnToGameSelection.bind(this)
-			);
-		this.api
-			.getEventApi()
-			.addEventHandler('updateSettings', this.onUpdateSettings.bind(this));
-		this.api
-			.getEventApi()
-			.addEventHandler('startGame', this.onStartGame.bind(this));
-		this.api
-			.getEventApi()
-			.addEventHandler('nextRound', this.onNextRound.bind(this));
-		this.api
-			.getEventApi()
-			.addEventHandler('updateGuesses', this.onUpdateGuesses.bind(this));
-		this.api
-			.getEventApi()
-			.addEventHandler('requestGameState', this.onRequestGameState.bind(this));
-		this.api
-			.getEventApi()
-			.addEventHandler('unready', this.onUnready.bind(this));
-		this.api
-			.getEventApi()
-			.addEventHandler('playAgain', this.onPlayAgain.bind(this));
-		this.api
-			.getEventApi()
-			.addEventHandler('setDownvote', this.onToggleDownvote.bind(this));
+		const eventApi = this.api.getEventApi();
+		eventApi.addEventHandler('nextRound', this.onNextRound.bind(this));
+		eventApi.addEventHandler('updateGuesses', this.onUpdateGuesses.bind(this));
+		eventApi.addEventHandler(
+			'requestGameState',
+			this.onRequestGameState.bind(this)
+		);
+		eventApi.addEventHandler('unready', this.onUnready.bind(this));
+		eventApi.addEventHandler('playAgain', this.onPlayAgain.bind(this));
+		eventApi.addEventHandler('setDownvote', this.onToggleDownvote.bind(this));
 
-		this.api.getEventApi().addUserJoinedHandler(this.onUserJoin.bind(this));
-		this.api.getEventApi().addUserLeaveHandler(this.onUserLeave.bind(this));
-		this.gameState = { ...this.initialGameState };
-		for (const roomMember of this.api.getPlayerApi().getRoomMembers()) {
-			this.gameState.players[roomMember.getId()] = roomMember.getUsername();
-		}
+		eventApi.addUserJoinedHandler(this.onUserJoin.bind(this));
+		eventApi.addUserLeaveHandler(this.onUserLeave.bind(this));
+		this.gameState = this.createInitialGameState();
+
+		// start game
+		this.onNextRound({
+			senderId: this.api.getPlayerApi().getRoomMaster().getId(),
+		});
 	}
 
-	/**
-	 * Cancel the game and return to the game selection screen.
-	 */
-	private onReturnToGameSelection() {
-		this.api.cancelGame();
+	private createInitialGameState(): GameState {
+		const players: Players = {};
+		for (const roomMember of this.api.getPlayerApi().getRoomMembers()) {
+			players[roomMember.getId()] = roomMember.getUsername();
+		}
+
+		return {
+			active: true,
+			config: {
+				categories: this.api
+					.getConfigApi()
+					.getMultipleStringConfigValue(
+						'slf_categories',
+						defaultSLFCategories
+					) as string[],
+				rounds: this.api
+					.getConfigApi()
+					.getSingleNumberConfigValue('slf_num_rounds', 10),
+			},
+			guesses: {},
+			players: players,
+			round: 0,
+			gamePhase: this.gamePhases.GUESSING,
+			letter: '',
+			ready_users: [],
+			points: {},
+			point_overrides: {},
+		};
 	}
 
 	/**
@@ -309,42 +296,6 @@ export default class StadtLandFlussGame implements ModuleGameInterface {
 	}
 
 	/**
-	 * Update the game settings.
-	 *
-	 * @param {{ senderId: string, rounds: number, categories: string[] }} newConfig
-	 */
-	private onUpdateSettings(newConfig: {
-		senderId: string;
-		rounds: number;
-		categories: string[];
-	}): void {
-		if (
-			this.api.getPlayerApi().getRoomMaster().getId() === newConfig.senderId
-		) {
-			if (newConfig.rounds > 26) {
-				newConfig.rounds = 26;
-			}
-			this.gameState.config = newConfig;
-			this.publishGameState();
-		}
-	}
-
-	/**
-	 * Start the game.
-	 *
-	 * @param {{ senderId: string }} eventData
-	 */
-	private onStartGame(eventData: { senderId: string }): void {
-		if (
-			this.api.getPlayerApi().getRoomMaster().getId() === eventData.senderId
-		) {
-			this.gameState.active = true;
-			this.gameState.gamePhase = this.gamePhases.GUESSING;
-			this.onNextRound(eventData);
-		}
-	}
-
-	/**
 	 * Start the next round.
 	 *
 	 * @param {{ senderId: string }} eventData
@@ -435,14 +386,10 @@ export default class StadtLandFlussGame implements ModuleGameInterface {
 		if (
 			this.api.getPlayerApi().getRoomMaster().getId() === eventData.senderId
 		) {
-			const newState = Object.create(this.initialGameState);
-			newState.config = this.gameState.config;
-
-			for (const roomMember of this.api.getPlayerApi().getRoomMembers()) {
-				newState.players[roomMember.getId()] = roomMember;
-			}
-
-			this.gameState = newState;
+			this.gameState = this.createInitialGameState();
+			this.onNextRound({
+				senderId: this.api.getPlayerApi().getRoomMaster().getId(),
+			});
 			this.publishGameState();
 		}
 	}

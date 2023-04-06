@@ -46,9 +46,6 @@ export default class ModuleEventApi {
 		skipPrefix: boolean = false
 	): number {
 		let event = skipPrefix ? eventName : this.api.getGameId() + '_' + eventName;
-		if (!this.eventListeners[event]) {
-			return 0;
-		}
 
 		let alertedListenerCount = 0;
 		if (this.eventListeners[event]) {

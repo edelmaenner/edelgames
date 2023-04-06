@@ -26,8 +26,12 @@ class ModuleRegistry {
 		}
 
 		const gameInstance = module.getGameInstance();
-		const moduleApi = new ModuleApi(gameId, gameInstance, room);
-		gameInstance.onGameInitialize(moduleApi);
+		const moduleApi = new ModuleApi(module, gameInstance, room);
+		room.setCurrentGame(moduleApi);
+		if (!room.isInConfigEditMode()) {
+			// if this game does not trigger the config edit mode, we continue to start the game
+			gameInstance.onGameInitialize(moduleApi);
+		}
 	}
 }
 

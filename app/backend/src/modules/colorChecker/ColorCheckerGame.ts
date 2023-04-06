@@ -170,8 +170,8 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 				}
 
 				this.updateClientPlayerGrid(playerData.playerId, playerData.grid);
-				this.updateClientPlayerState(playerData.playerId);
 			}
+			this.updateClientPlayerState(playerData.playerId);
 
 			if (this.playerHelper.allPlayersReady()) {
 				// this was probably a passive or a single player. If all of them made their turn, start the next round

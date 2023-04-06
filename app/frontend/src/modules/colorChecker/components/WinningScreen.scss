@@ -1,0 +1,68 @@
+.winning-screen {
+	align-self: center;
+	margin: auto;
+	display: flex;
+	max-width: 100%;
+
+	.scoreboard {
+		display: flex;
+
+		&.grid-visible {
+			max-width: calc(100% - 32rem);
+			overflow: hidden;
+		}
+
+		.scoreboard-column {
+			display: flex;
+			flex-direction: column;
+			min-width: 5rem;
+
+			.scoreboard-cell {
+				padding: 1rem;
+				background-color: $background;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				position: relative;
+				white-space: nowrap;
+
+				.crown {
+					position: absolute;
+					left: 2rem;
+					top: -0.5rem;
+					transform: rotateZ(15deg);
+					color: gold;
+				}
+
+				.spacer-v {
+					height: 2rem;
+					display: inline-block;
+				}
+
+				&:first-of-type {
+					background-color: $backgroundDark;
+					min-height: 2rem;
+				}
+
+				&:last-of-type {
+					background-color: $backgroundDark;
+				}
+
+				&:nth-of-type(2n):not(:first-of-type):not(:last-of-type) {
+					background-color: $backgroundLight;
+				}
+			}
+		}
+	}
+
+	.grid-image-container {
+		display: flex;
+		flex-direction: column;
+		margin-left: 2rem;
+
+		.grid-title {
+			font-weight: bold;
+			margin-bottom: 1rem;
+		}
+	}
+}

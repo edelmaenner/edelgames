@@ -9,10 +9,10 @@ import socketManager, { SocketEventNames } from './util/SocketManager';
 import roomManager, { RoomEventNames } from './util/RoomManager';
 import profileManager from './util/ProfileManager';
 import { clientLogger } from './util/Logger';
-import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner";
+import LoadingSpinner from './components/LoadingSpinner/LoadingSpinner';
+import ConfigRoom from './screens/ConfigRoom/ConfigRoom';
 
 export default class Core extends React.Component {
-
 	constructor(props: object) {
 		super(props);
 
@@ -50,7 +50,7 @@ export default class Core extends React.Component {
 	render(): ReactNode {
 		// show loading spinner, until page is loaded
 		if (!socketManager.isConnected()) {
-			return (<LoadingSpinner />);
+			return <LoadingSpinner />;
 		}
 
 		return (
@@ -70,12 +70,17 @@ export default class Core extends React.Component {
 			return <Lobby />;
 		}
 
-		// if there is any game id selected, show the game room
-		if (roomManager.getCurrentGameId()) {
-			return <GameRoom />;
+		if (!roomManager.getCurrentGameId()) {
+			// if we are not in the lobby and don't have a selected game, show the idle room
+			return <IdleRoom />;
 		}
 
-		// if we are not in the lobby and don't have a selected game, show the idle room
-		return <IdleRoom />;
+		const config = roomManager.getCurrentGameConfig();
+		if (config && roomManager.isInConfigEditingMode()) {
+			return <ConfigRoom configuration={config} />;
+		}
+
+		// if there is any game id selected, show the game room
+		return <GameRoom />;
 	}
 }

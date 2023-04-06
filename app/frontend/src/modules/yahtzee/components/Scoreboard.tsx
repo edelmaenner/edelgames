@@ -5,11 +5,11 @@ import {
 	YahtzeeScoreboardType,
 	YahtzeeScoreObject,
 } from '@edelgames/types/src/modules/yahtzee/YTypes';
+import ModulePlayerApi from '../../../framework/modules/api/ModulePlayerApi';
 import {
 	getPointsFromDices,
 	getTotalFirstPartPoints,
-} from '@edelgames/types/src/modules/yahtzee/YFunctions';
-import ModulePlayerApi from '../../../framework/modules/api/ModulePlayerApi';
+} from './YahtzeeFunctions';
 
 interface IProps {
 	playerApi: ModulePlayerApi;
@@ -94,9 +94,9 @@ export default class Scoreboard extends React.Component<IProps, {}> {
 			isLocalePlayer =
 				this.props.playerApi.getLocalePlayer().getId() === player.getId();
 			isActivePlayer = this.props.activePlayerId === player.getId();
-			allowSelection = isLocalePlayer && isActivePlayer && this.props.remainingRolls <= 2;
+			allowSelection =
+				isLocalePlayer && isActivePlayer && this.props.remainingRolls <= 2;
 		}
-
 
 		let totalFirstPart = getTotalFirstPartPoints(playerScore);
 
@@ -122,7 +122,14 @@ export default class Scoreboard extends React.Component<IProps, {}> {
 				{this.renderScoreCell(playerScore, ScoreCellIDs.FIVE, allowSelection)}
 				{this.renderScoreCell(playerScore, ScoreCellIDs.SIX, allowSelection)}
 
-				<div className={'yahtzee-tcell'}>{totalFirstPart >= 63 ? 35 : 0}</div>
+				<div
+					className={'yahtzee-tcell'}
+					title={
+						totalFirstPart < 63 ? `noch ${63 - totalFirstPart}` : undefined
+					}
+				>
+					{totalFirstPart >= 63 ? 35 : 0}
+				</div>
 
 				{this.renderScoreCell(
 					playerScore,

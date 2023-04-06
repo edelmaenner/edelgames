@@ -18,5 +18,8 @@
 	"lint-staged": {
 		"*.{ts,js}": "npm run lint",
 		"*.{ts,js,css,md,html,json}": "npm run format"
+	},
+	"dependencies": {
+		"typescript": "^4.9.5"
 	}
 }

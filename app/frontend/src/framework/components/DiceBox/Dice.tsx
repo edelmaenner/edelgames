@@ -8,12 +8,15 @@ interface IProps {
 	onDiceRolled?: { (): void };
 	onDiceClicked?: { (diceId: number): void };
 	style?: React.CSSProperties;
+	customProps?: { [key: string]: any };
 }
 
 export default class Dice extends Component<IProps, {}> {
 	static defaultProps: Partial<IProps> = {
 		onDiceClicked: (diceId: number) => {},
 	};
+
+	diceType: string = 'default';
 
 	lastRollCount: number = 0; // how many times the dice value has changed
 
@@ -36,13 +39,22 @@ export default class Dice extends Component<IProps, {}> {
 
 		let displayFilter: React.CSSProperties = {
 			filter: this.props.backdropColor
-				? `drop-shadow(0 0 0.3rem ${this.props.backdropColor})`
+				? `drop-shadow(0 0 0.8rem ${this.props.backdropColor})`
 				: 'initial',
+			borderColor: this.props.backdropColor ? this.props.backdropColor : 'none', // none is not a valid value for borderColor, thus it disables the inline css
 		};
+
+		let classes = ['dice', 'dice-type-' + this.diceType];
+		if (this.props.onDiceClicked) {
+			classes.push('clickable');
+		}
+		if (this.props.backdropColor) {
+			classes.push('is-highlighted');
+		}
 
 		return (
 			<div
-				className={'dice ' + (this.props.onDiceClicked ? 'clickable' : '')}
+				className={classes.join(' ')}
 				style={{
 					...this.props.style,
 					...displayFilter,

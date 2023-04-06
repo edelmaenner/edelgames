@@ -1,3 +1,6 @@
+import { NativeConfiguration } from './ConfigurationTypes';
+import { anyObject } from './BasicTypes';
+
 export type authDataContainer = {
 	authCookie: string;
 	username: string;
@@ -8,9 +11,7 @@ export type authDataContainer = {
 };
 
 // the data carried by an event on publish
-export type EventDataObject = {
-	[key: string]: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-};
+export type EventDataObject = anyObject;
 
 export type EventHandlerFunction = (eventData: EventDataObject) => void;
 
@@ -27,9 +28,11 @@ export type ServerRoomMember = {
 export type ServerRoomObject = {
 	roomId: string;
 	roomName: string;
-	requiredPassphrase: boolean;
+	requirePassphrase: boolean;
 	roomMembers: ServerRoomMember[];
 	currentGameId: string;
+	currentGameConfig: NativeConfiguration | null;
+	isEditingGameConfig: boolean;
 };
 
 export interface IUser {

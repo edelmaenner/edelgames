@@ -9,19 +9,29 @@ import {
 	YahtzeeScoreObject,
 } from '@edelgames/types/src/modules/yahtzee/YTypes';
 import {
-	getPointsFromDices,
-	getTotalFirstPartPoints,
-} from '@edelgames/types/src/modules/yahtzee/YFunctions';
-import {
 	CellSelectedEventData,
 	DiceChangedEventData,
 	DiceSelectionChangedEventData,
 	GameStateChangedEventData,
 	RollRequestedEventData,
 	ScoresChangedEventData,
-	YahtzeeClientToServerEventNames,
-	YahtzeeServerToClientEventNames,
 } from '@edelgames/types/src/modules/yahtzee/YEvents';
+import {
+	getPointsFromDices,
+	getTotalFirstPartPoints,
+} from './YahtzeeFunctions';
+
+export enum YahtzeeServerToClientEventNames {
+	DICES_CHANGED = 'dicesChanged',
+	SCORES_CHANGED = 'scoresChanged',
+	GAME_STATE_CHANGED = 'gameStateChanged',
+}
+
+export enum YahtzeeClientToServerEventNames {
+	ROLL_REQUESTED = 'rollRequested',
+	CELL_SELECTED = 'cellSelected',
+	DICE_SELECTION_CHANGED = 'diceSelectionChanged',
+}
 
 /*
  * The actual game instance, that controls and manages the game
@@ -260,12 +270,13 @@ export default class YahtzeeGame implements ModuleGameInterface {
 	}
 
 	isGameFinished(): boolean {
-		let remainingMembers = this.api.getPlayerApi().getRoomMembers();
+		const remainingMembers = this.api.getPlayerApi().getRoomMembers();
 
 		for (let scores of this.scoreboard) {
-
-			let scoreOwner = remainingMembers.find((member) => member.getId() === scores.playerId);
-			if(scoreOwner === undefined) {
+			const scoreOwner = remainingMembers.find(
+				(member) => member.getId() === scores.playerId
+			);
+			if (scoreOwner === undefined) {
 				// if the player left the game, we don't need to check this scores
 				continue;
 			}
@@ -305,13 +316,13 @@ export default class YahtzeeGame implements ModuleGameInterface {
 			scores = scores as YahtzeeScoreObject;
 			const firstPart = getTotalFirstPartPoints(scores);
 			const secondPart =
-				(scores[ScoreCellIDs.THREE_OF_A_KIND]||0) +
-				(scores[ScoreCellIDs.FOUR_OF_A_KIND]||0) +
-				(scores[ScoreCellIDs.FIVE_OF_A_KIND]||0) +
-				(scores[ScoreCellIDs.CHANCE]||0) +
-				(scores[ScoreCellIDs.FULL_HOUSE]||0) +
-				(scores[ScoreCellIDs.SMALL_STRAIGHT]||0) +
-				(scores[ScoreCellIDs.SMALL_STRAIGHT]||0);
+				(scores[ScoreCellIDs.THREE_OF_A_KIND] || 0) +
+				(scores[ScoreCellIDs.FOUR_OF_A_KIND] || 0) +
+				(scores[ScoreCellIDs.FIVE_OF_A_KIND] || 0) +
+				(scores[ScoreCellIDs.CHANCE] || 0) +
+				(scores[ScoreCellIDs.FULL_HOUSE] || 0) +
+				(scores[ScoreCellIDs.SMALL_STRAIGHT] || 0) +
+				(scores[ScoreCellIDs.SMALL_STRAIGHT] || 0);
 
 			scores.total = firstPart + (firstPart >= 63 ? 35 : 0) + secondPart;
 

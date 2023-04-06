@@ -1,0 +1,54 @@
+.scoreboard {
+	flex: 1 1 auto;
+	background-color: $backgroundDark;
+	max-width: 20rem;
+
+	.bonus-panel {
+		display: flex;
+		flex-direction: column;
+		padding: 1rem;
+
+		.color-bonus-row {
+			display: flex;
+			gap: 1rem;
+			padding: 0.5rem;
+			background: $background;
+			border-bottom: 3px solid $backgroundDark;
+
+			.color-bonus-cell {
+				min-width: 3rem;
+				text-align: center;
+				position: relative;
+			}
+
+			.color-bonus-preview {
+			}
+		}
+	}
+
+	.point-hints {
+		padding: 0 1rem;
+
+		.indent {
+			padding-left: 2rem;
+		}
+	}
+
+	.status-board {
+		padding: 1rem;
+
+		.profile-picture {
+			margin-right: 0.5rem;
+			margin-top: 0.5rem;
+
+			&.is-waiting {
+				filter: grayscale(1) brightness(0.5);
+			}
+		}
+
+		.passive-player-list {
+			display: flex;
+			flex-wrap: wrap;
+		}
+	}
+}

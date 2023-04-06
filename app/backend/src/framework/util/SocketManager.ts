@@ -1,6 +1,9 @@
 import Controller from '../Controller';
 import { Socket } from 'socket.io';
-import { ListenerFunction } from '@edelgames/types/src/app/ApiTypes';
+import {
+	EventDataObject,
+	ListenerFunction,
+} from '@edelgames/types/src/app/ApiTypes';
 
 // https://socket.io/docs/v3/emit-cheatsheet/
 export default class SocketManager {
@@ -36,7 +39,7 @@ export default class SocketManager {
 	public static directMessageToSocket(
 		socket: Socket,
 		eventName: string,
-		eventData: object
+		eventData: EventDataObject = {}
 	): void {
 		socket.emit('message', {
 			eventName: eventName,

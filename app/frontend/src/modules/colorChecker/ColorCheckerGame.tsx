@@ -9,7 +9,7 @@ import ColorGridBox, {
 	SelectableColors,
 } from './components/ColorGridBox';
 import {
-	ColorGrid,
+	ColorGrid, ColorGridPublicDefinition,
 	Coordinate,
 	GameStates,
 	GridColorOptions,
@@ -30,6 +30,7 @@ import {
 	S2CEvents,
 } from '@edelgames/types/src/modules/colorChecker/CCEvents';
 import WinningScreen from './components/WinningScreen';
+import ColorGridBoxAnimation from "./components/ColorGridBoxAnimation";
 
 interface IState {
 	grid: ColorGrid;
@@ -51,6 +52,8 @@ interface IState {
 	finishedPlayers: string[];
 	lastRollTimestamp: number;
 	scoreboard: GridScoreboard | undefined;
+	opponentsGrids?: ColorGridPublicDefinition[];
+	observedOpponent: string | null;
 }
 
 export default class ColorCheckerGame
@@ -82,6 +85,8 @@ export default class ColorCheckerGame
 			finishedPlayers: [],
 			scoreboard: undefined,
 			lastRollTimestamp: -1,
+			opponentsGrids: undefined,
+			observedOpponent: null,
 		};
 	}
 
@@ -173,6 +178,7 @@ export default class ColorCheckerGame
 			activePlayerId,
 			finishedPlayers,
 			lastRollTimestamp,
+			playerGrids
 		} = eventData as OnGameStateUpdateEventData;
 
 		const localePlayerId = this.api.getPlayerApi().getLocalePlayer().getId();
@@ -190,6 +196,7 @@ export default class ColorCheckerGame
 				activePlayerId: activePlayerId,
 				finishedPlayers: finishedPlayers,
 				lastRollTimestamp: lastRollTimestamp,
+				opponentsGrids: playerGrids
 			},
 			this.updateAllowedNumbersAndColors.bind(this)
 		);
@@ -356,6 +363,8 @@ export default class ColorCheckerGame
 					i > 2 && el === 6 && this.state.reservedDiceIndices.indexOf(i) === -1
 			) !== undefined;
 
+		const observedGrid = this.state.observedOpponent ? this.state.opponentsGrids?.find(el => el.playerId === this.state.observedOpponent) : undefined;
+
 		return (
 			<div id={'colorChecker'}>
 				<div
@@ -392,7 +401,7 @@ export default class ColorCheckerGame
 						canUseColorJoker={allowSelection && canUseColorJoker}
 					/>
 
-					{allowSelection ? (
+					{allowSelection && (
 						<button
 							className={'btn btn-primary '}
 							onClick={this.onSelectionConfirmed.bind(this)}
@@ -402,7 +411,20 @@ export default class ColorCheckerGame
 								? 'Bestätigen'
 								: 'Runde überspringen'}
 						</button>
-					) : null}
+					)}
+
+					{observedGrid && (
+						<div className={'opponents-view'}>
+							<div className={'opponents-name'}>
+								{this.api.getPlayerApi().getPlayerById(observedGrid.playerId)?.getUsername()}
+							</div>
+							<ColorGridBoxAnimation
+								grid={observedGrid.grid}
+								animationSpeed={0}
+							/>
+						</div>
+					)}
+
 				</div>
 
 				<ScoreBoard
@@ -412,6 +434,12 @@ export default class ColorCheckerGame
 					gameState={this.state.gameState}
 					finishedPlayers={this.state.finishedPlayers}
 					activePlayerId={this.state.activePlayerId}
+					api={this.api}
+					observedOpponentChanged={(playerId) => {
+						this.setState({
+							observedOpponent: playerId
+						})
+					}}
 				/>
 
 				<DiceTable

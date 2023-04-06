@@ -5,9 +5,9 @@ import {
 	GameStates,
 } from '@edelgames/types/src/modules/colorChecker/CCTypes';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import roomManager from '../../../framework/util/RoomManager';
 import User from '../../../framework/util/User';
 import ProfileImage from '../../../framework/components/ProfileImage/ProfileImage';
+import ModuleApi from "../../../framework/modules/ModuleApi";
 
 interface IProps {
 	reservedBonusPoints: boolean[];
@@ -16,9 +16,13 @@ interface IProps {
 	gameState: GameStates;
 	finishedPlayers: string[];
 	activePlayerId: string | undefined;
+	api: ModuleApi;
+	observedOpponentChanged: {(observedOpponent: string|null): void};
 }
 
+
 export default class ScoreBoard extends Component<IProps, {}> {
+
 	render() {
 		return (
 			<div className={'scoreboard'}>
@@ -36,19 +40,15 @@ export default class ScoreBoard extends Component<IProps, {}> {
 
 				<div className={'status-board'}>
 					<div className={'bold'}>Aktiver Spieler:</div>
-					{this.renderPlayerIcon(
+					{this.props.activePlayerId && this.renderPlayerIcon(
 						true,
-						roomManager
-							.getRoomMembers()
-							.find((member) => member.getId() === this.props.activePlayerId)
+						this.props.api.getPlayerApi().getPlayerById(this.props.activePlayerId)
 					)}
 					<br />
 
 					<div className={'bold'}>Passive Spieler:</div>
 					<div className={'passive-player-list'}>
-						{roomManager
-							.getRoomMembers()
-							.map(this.renderPlayerIcon.bind(this, false))}
+						{	this.props.api.getPlayerApi().getPlayers().map(this.renderPlayerIcon.bind(this, false))}
 					</div>
 					<br />
 
@@ -83,8 +83,18 @@ export default class ScoreBoard extends Component<IProps, {}> {
 				username={member.getUsername()}
 				id={member.getId()}
 				className={isWaitingForOtherPlayers ? 'is-waiting' : undefined}
+				onHover={this.onViewedPlayerChanged.bind(this, member.getId(), true)}
+				onHoverEnd={this.onViewedPlayerChanged.bind(this, member.getId(), false)}
 			/>
 		);
+	}
+
+	onViewedPlayerChanged(playerId: string, isStartViewing: boolean): void {
+		if(playerId === this.props.api.getPlayerApi().getLocalePlayer().getId()) {
+			return; // a player cannot view its own board this way
+		}
+
+		this.props.observedOpponentChanged(isStartViewing ? playerId : null);
 	}
 
 	getGameStateMessage(): string {

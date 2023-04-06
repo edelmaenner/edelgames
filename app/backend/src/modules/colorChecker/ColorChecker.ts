@@ -3,6 +3,7 @@ import ModuleGameInterface from '../../framework/modules/ModuleGameInterface';
 import ColorCheckerGame from './ColorCheckerGame';
 import ModuleConfig from '../../framework/modules/configuration/ModuleConfig';
 import SelectOneConfig from '../../framework/modules/configuration/elements/SelectOneConfig';
+import BooleanConfig from '../../framework/modules/configuration/elements/BooleanConfig';
 
 /*
  * This singleton is used to register the game to the ModuleList
@@ -22,6 +23,12 @@ class ColorChecker implements ModuleInterface {
 				{ label: 'Zufällig', value: 'random' },
 				{ label: 'Jeder Spieler zufällig', value: 'random_everyone' },
 			]),
+			new BooleanConfig(
+				'show_opponents_grids',
+				'Spieler können andere Spielbretter ansehen',
+				false,
+				'checkbox'
+			),
 		]);
 	}
 

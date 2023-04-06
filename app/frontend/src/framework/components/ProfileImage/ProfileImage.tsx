@@ -5,6 +5,9 @@ type IProps = {
 	username: string;
 	id: string;
 	className?: string;
+	onClick?: {(): void};
+	onHover?: {(): void};
+	onHoverEnd?: {(): void};
 };
 
 interface IState {
@@ -27,6 +30,9 @@ export default class ProfileImage extends React.Component<IProps, IState> {
 			<div
 				className={'profile-picture ' + (this.props.className || '')}
 				title={this.props.username}
+				onClick={this.props.onClick}
+				onMouseEnter={this.props.onHover}
+				onMouseLeave={this.props.onHoverEnd}
 			>
 				{this.props.picture && !this.state.hasPictureError ? (
 					<img

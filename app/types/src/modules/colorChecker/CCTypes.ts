@@ -47,6 +47,10 @@ export type ColorGridDefinition = {
 	finishedColors: boolean[];
 	finishedColumns: boolean[];
 };
+export type ColorGridPublicDefinition = {
+	playerId: string;
+	grid: ColorGrid;
+};
 
 export type Coordinate = {
 	x: number;

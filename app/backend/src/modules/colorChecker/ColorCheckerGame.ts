@@ -37,6 +37,7 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 	gameState: GameStates = GameStates.INIT;
 	columnOwners: (string | undefined)[] = Array(15).fill(undefined);
 	bonusOwners: (string | undefined)[] = Array(5).fill(undefined);
+	showOpponentsGrids = false;
 
 	playerHelper = new PlayerHelper();
 	diceHelper = new DiceHelper();
@@ -44,6 +45,9 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 	onGameInitialize(api: ModuleApi): void {
 		this.api = api;
 
+		this.showOpponentsGrids = this.api
+			.getConfigApi()
+			.getBooleanConfigValue('show_opponents_grids', false);
 		const gridTemplateConfig = this.api
 			.getConfigApi()
 			.getSingleStringConfigValue('grid_template_name', 'default') as string;
@@ -365,6 +369,9 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 			reservedBonusPoints: this.bonusOwners,
 			reservedDiceIndices: this.diceHelper.getReservedDiceIndices(),
 			finishedPlayers: this.playerHelper.readyPlayers,
+			playerGrids: this.showOpponentsGrids
+				? this.playerHelper.getPublicGridData()
+				: undefined,
 		};
 		this.api
 			.getEventApi()

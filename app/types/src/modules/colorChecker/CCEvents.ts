@@ -1,4 +1,10 @@
-import { ColorGrid, Coordinate, GameStates, GridScoreboard } from './CCTypes';
+import {
+	ColorGrid,
+	ColorGridPublicDefinition,
+	Coordinate,
+	GameStates,
+	GridScoreboard,
+} from './CCTypes';
 
 export const enum C2SEvents {
 	ON_SELECTION_MADE = 'onSelectionMade',
@@ -38,6 +44,7 @@ export type OnGameStateUpdateEventData = {
 	reservedDiceIndices: number[];
 	reservedBonusPoints: (string | undefined)[];
 	reservedColumnPoints: (string | undefined)[];
+	playerGrids?: ColorGridPublicDefinition[];
 };
 
 export type OnPlayerStateUpdateEventData = {

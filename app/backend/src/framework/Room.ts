@@ -55,6 +55,16 @@ export default class Room {
 		return this.isEditingGameConfig;
 	}
 
+	public shuffleMemberList(): void {
+		for (let i = this.roomMembers.length - 1; i > 0; i--) {
+			const j = Math.floor(Math.random() * (i + 1));
+			[this.roomMembers[i], this.roomMembers[j]] = [
+				this.roomMembers[j],
+				this.roomMembers[i],
+			];
+		}
+	}
+
 	public getRoomMaster(): User | null {
 		// if we don´t have a room master, we select another user as the room master
 		if (this.roomMaster === null && this.roomMembers.length > 0) {
@@ -85,6 +95,10 @@ export default class Room {
 					this.roomId
 				}`
 			);
+		}
+
+		if (roomApi !== null) {
+			this.shuffleMemberList();
 		}
 
 		this.moduleApi = roomApi;

@@ -37,6 +37,7 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 	gameState: GameStates = GameStates.INIT;
 	columnOwners: (string | undefined)[] = Array(15).fill(undefined);
 	bonusOwners: (string | undefined)[] = Array(5).fill(undefined);
+	showOpponentsGrids = false;
 
 	playerHelper = new PlayerHelper();
 	diceHelper = new DiceHelper();
@@ -44,6 +45,9 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 	onGameInitialize(api: ModuleApi): void {
 		this.api = api;
 
+		this.showOpponentsGrids = this.api
+			.getConfigApi()
+			.getBooleanConfigValue('show_opponents_grids', false);
 		const gridTemplateConfig = this.api
 			.getConfigApi()
 			.getSingleStringConfigValue('grid_template_name', 'default') as string;
@@ -122,9 +126,7 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 					: GridHelper.checkCellsInGrid(cells, playerData.grid);
 
 			this.playerHelper.addReadyPlayer(senderId);
-			this.updateClientRemainingPlayers(
-				this.playerHelper.players.length - this.playerHelper.readyPlayers.length
-			);
+			this.updateClientRemainingPlayers(this.playerHelper.readyPlayers);
 
 			if (cells.length > 0 && selectedColor !== '#fff') {
 				playerData.addCellsToHistory(cells);
@@ -170,8 +172,8 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 				}
 
 				this.updateClientPlayerGrid(playerData.playerId, playerData.grid);
-				this.updateClientPlayerState(playerData.playerId);
 			}
+			this.updateClientPlayerState(playerData.playerId);
 
 			if (this.playerHelper.allPlayersReady()) {
 				// this was probably a passive or a single player. If all of them made their turn, start the next round
@@ -257,9 +259,9 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 		}
 	}
 
-	updateClientRemainingPlayers(remainingPlayers: number): void {
+	updateClientRemainingPlayers(finishedPlayers: string[]): void {
 		const eventData: OnRemainingPlayersChangedEventData = {
-			remainingPlayers: remainingPlayers,
+			finishedPlayers: finishedPlayers,
 		};
 		this.api
 			.getEventApi()
@@ -366,9 +368,10 @@ export default class ColorCheckerGame implements ModuleGameInterface {
 			lastRollTimestamp: this.diceHelper.lastRollTimestamp,
 			reservedBonusPoints: this.bonusOwners,
 			reservedDiceIndices: this.diceHelper.getReservedDiceIndices(),
-			remainingPlayers:
-				this.playerHelper.players.length -
-				this.playerHelper.readyPlayers.length,
+			finishedPlayers: this.playerHelper.readyPlayers,
+			playerGrids: this.showOpponentsGrids
+				? this.playerHelper.getPublicGridData()
+				: undefined,
 		};
 		this.api
 			.getEventApi()

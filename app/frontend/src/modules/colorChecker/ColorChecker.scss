@@ -16,6 +16,15 @@
 		width: 30rem;
 	}
 
+	.opponents-view {
+		margin-top: auto;
+
+		.opponents-name {
+			font-weight: bold;
+			margin-bottom: 1rem;
+		}
+	}
+
 	.striked {
 		position: absolute;
 		left: 50%;

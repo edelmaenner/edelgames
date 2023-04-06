@@ -1,4 +1,7 @@
-import { ColorGrid } from '@edelgames/types/src/modules/colorChecker/CCTypes';
+import {
+	ColorGrid,
+	ColorGridPublicDefinition,
+} from '@edelgames/types/src/modules/colorChecker/CCTypes';
 import User from '../../../framework/User';
 import PlayerData from './PlayerData';
 
@@ -42,5 +45,14 @@ export default class PlayerHelper {
 
 	clearReadyPlayers(): void {
 		this.readyPlayers = [];
+	}
+
+	getPublicGridData(): ColorGridPublicDefinition[] {
+		return this.players.map((player) => {
+			return {
+				playerId: player.playerId,
+				grid: player.grid,
+			};
+		});
 	}
 }

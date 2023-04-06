@@ -10,6 +10,7 @@ import ColorGridBox, {
 } from './components/ColorGridBox';
 import {
 	ColorGrid,
+	ColorGridPublicDefinition,
 	Coordinate,
 	GameStates,
 	GridColorOptions,
@@ -30,6 +31,7 @@ import {
 	S2CEvents,
 } from '@edelgames/types/src/modules/colorChecker/CCEvents';
 import WinningScreen from './components/WinningScreen';
+import ColorGridBoxAnimation from './components/ColorGridBoxAnimation';
 
 interface IState {
 	grid: ColorGrid;
@@ -48,9 +50,11 @@ interface IState {
 	isPlayerWaiting: boolean;
 	finishedColors: boolean[];
 	finishedColumns: boolean[];
-	remainingPlayers: number;
+	finishedPlayers: string[];
 	lastRollTimestamp: number;
 	scoreboard: GridScoreboard | undefined;
+	opponentsGrids?: ColorGridPublicDefinition[];
+	observedOpponent: string | null;
 }
 
 export default class ColorCheckerGame
@@ -79,9 +83,11 @@ export default class ColorCheckerGame
 			isPlayerWaiting: false,
 			finishedColumns: Array(15).fill(false),
 			finishedColors: Array(5).fill(false),
-			remainingPlayers: 0,
+			finishedPlayers: [],
 			scoreboard: undefined,
 			lastRollTimestamp: -1,
+			opponentsGrids: undefined,
+			observedOpponent: null,
 		};
 	}
 
@@ -137,10 +143,9 @@ export default class ColorCheckerGame
 	}
 
 	onRemainingPlayersChangedEvent(eventData: EventDataObject): void {
-		const { remainingPlayers } =
-			eventData as OnRemainingPlayersChangedEventData;
+		const { finishedPlayers } = eventData as OnRemainingPlayersChangedEventData;
 		this.setState({
-			remainingPlayers: remainingPlayers,
+			finishedPlayers: finishedPlayers,
 		});
 	}
 
@@ -172,8 +177,9 @@ export default class ColorCheckerGame
 			reservedColumnPoints,
 			currentDiceValues,
 			activePlayerId,
-			remainingPlayers,
+			finishedPlayers,
 			lastRollTimestamp,
+			playerGrids,
 		} = eventData as OnGameStateUpdateEventData;
 
 		const localePlayerId = this.api.getPlayerApi().getLocalePlayer().getId();
@@ -189,8 +195,9 @@ export default class ColorCheckerGame
 				),
 				currentDiceValues: currentDiceValues,
 				activePlayerId: activePlayerId,
-				remainingPlayers: remainingPlayers,
+				finishedPlayers: finishedPlayers,
 				lastRollTimestamp: lastRollTimestamp,
+				opponentsGrids: playerGrids,
 			},
 			this.updateAllowedNumbersAndColors.bind(this)
 		);
@@ -208,7 +215,6 @@ export default class ColorCheckerGame
 	/*
 		Locale Events and functions
 	 */
-
 	updateAllowedNumbersAndColors(): void {
 		let dices = this.state.currentDiceValues;
 
@@ -358,13 +364,11 @@ export default class ColorCheckerGame
 					i > 2 && el === 6 && this.state.reservedDiceIndices.indexOf(i) === -1
 			) !== undefined;
 
-		const activePlayerName =
-			(this.state.activePlayerId
-				? this.api
-						.getPlayerApi()
-						.getPlayerById(this.state.activePlayerId)
-						?.getUsername()
-				: '') || '';
+		const observedGrid = this.state.observedOpponent
+			? this.state.opponentsGrids?.find(
+					(el) => el.playerId === this.state.observedOpponent
+			  )
+			: undefined;
 
 		return (
 			<div id={'colorChecker'}>
@@ -402,7 +406,7 @@ export default class ColorCheckerGame
 						canUseColorJoker={allowSelection && canUseColorJoker}
 					/>
 
-					{allowSelection ? (
+					{allowSelection && (
 						<button
 							className={'btn btn-primary '}
 							onClick={this.onSelectionConfirmed.bind(this)}
@@ -412,7 +416,22 @@ export default class ColorCheckerGame
 								? 'Bestätigen'
 								: 'Runde überspringen'}
 						</button>
-					) : null}
+					)}
+
+					{observedGrid && (
+						<div className={'opponents-view'}>
+							<div className={'opponents-name'}>
+								{this.api
+									.getPlayerApi()
+									.getPlayerById(observedGrid.playerId)
+									?.getUsername()}
+							</div>
+							<ColorGridBoxAnimation
+								grid={observedGrid.grid}
+								animationSpeed={0}
+							/>
+						</div>
+					)}
 				</div>
 
 				<ScoreBoard
@@ -420,8 +439,14 @@ export default class ColorCheckerGame
 					finishedColors={this.state.finishedColors}
 					grid={this.state.grid}
 					gameState={this.state.gameState}
-					remainingPlayers={this.state.remainingPlayers}
-					activePlayerName={activePlayerName}
+					finishedPlayers={this.state.finishedPlayers}
+					activePlayerId={this.state.activePlayerId}
+					api={this.api}
+					observedOpponentChanged={(playerId) => {
+						this.setState({
+							observedOpponent: playerId,
+						});
+					}}
 				/>
 
 				<DiceTable

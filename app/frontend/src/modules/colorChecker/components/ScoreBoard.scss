@@ -36,5 +36,19 @@
 
 	.status-board {
 		padding: 1rem;
+
+		.profile-picture {
+			margin-right: 0.5rem;
+			margin-top: 0.5rem;
+
+			&.is-waiting {
+				filter: grayscale(1) brightness(0.5);
+			}
+		}
+
+		.passive-player-list {
+			display: flex;
+			flex-wrap: wrap;
+		}
 	}
 }

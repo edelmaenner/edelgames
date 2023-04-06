@@ -51,7 +51,6 @@ export default class BooleanInput extends Component<IProps, {}> {
 						size="2x"
 						scale={1}
 						transform={'0,0'}
-						height={'2rem'}
 					/>
 				</label>
 			</div>

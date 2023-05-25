@@ -1,11 +1,9 @@
 import React, { ReactNode } from 'react';
 import ModuleGameInterface from '../../framework/modules/ModuleGameInterface';
 import ModuleApi from '../../framework/modules/ModuleApi';
-import hangman from "./Hangman";
+import hangman from './Hangman';
 
-interface IState {
-
-}
+interface IState {}
 
 export default class Hangman
 	extends React.Component<{}, IState>
@@ -13,26 +11,18 @@ export default class Hangman
 {
 	private readonly api: ModuleApi;
 
-	state = {
-
-	};
+	state = {};
 
 	constructor(props: {}) {
 		super(props);
 		this.api = new ModuleApi(hangman, this);
 	}
 
-	componentDidMount() {
-
-	}
+	componentDidMount() {}
 
 	componentWillUnmount() {}
 
 	render(): ReactNode {
-		return (
-			<div id={'hangman'}>
-				helloworld
-			</div>
-		);
+		return <div id={'hangman'}>helloworld</div>;
 	}
 }

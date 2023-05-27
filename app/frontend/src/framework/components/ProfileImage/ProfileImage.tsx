@@ -8,6 +8,7 @@ type IProps = {
 	onClick?: { (): void };
 	onHover?: { (): void };
 	onHoverEnd?: { (): void };
+	sizeMultiplier?: number;
 };
 
 interface IState {
@@ -26,6 +27,14 @@ export default class ProfileImage extends React.Component<IProps, IState> {
 	render(): ReactNode {
 		let fallbackColorHue = parseInt(this.props.id, 36) % 360;
 
+		let overrideStyle = undefined;
+		if(this.props.sizeMultiplier) {
+			overrideStyle = {
+				width: (2 * this.props.sizeMultiplier) + 'rem',
+				height: (2 * this.props.sizeMultiplier) + 'rem',
+			};
+		}
+
 		return (
 			<div
 				className={'profile-picture ' + (this.props.className || '')}
@@ -33,6 +42,7 @@ export default class ProfileImage extends React.Component<IProps, IState> {
 				onClick={this.props.onClick}
 				onMouseEnter={this.props.onHover}
 				onMouseLeave={this.props.onHoverEnd}
+				style={overrideStyle}
 			>
 				{this.props.picture && !this.state.hasPictureError ? (
 					<img
@@ -43,7 +53,10 @@ export default class ProfileImage extends React.Component<IProps, IState> {
 				) : (
 					<div
 						className="profile-picture-anonymous"
-						style={{ backgroundColor: `hsl(${fallbackColorHue},60%,60%)` }}
+						style={{
+							...{ backgroundColor: `hsl(${fallbackColorHue},60%,60%)` },
+							...(overrideStyle || {})
+						}}
 					>
 						?
 					</div>

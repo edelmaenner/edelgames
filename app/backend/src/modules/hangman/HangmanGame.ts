@@ -7,11 +7,15 @@ import {
 } from '@edelgames/types/src/modules/hangman/HMTypes';
 import { EventDataObject } from '@edelgames/types/src/app/ApiTypes';
 import DrawAndGuess from '../drawAndGuess/DrawAndGuess';
+import { alphabet } from '../../framework/modules/configuration/elements/Collections';
 
 export enum HangmanClientToServerEventNames {
 	PLAYER_GUESSED = 'playerGuessed',
 	PLAYERS_SUBMITTED_WORD = 'playerSubmittedWord',
 }
+
+const syntaxCharacters = [' ', ',', '.', '-', '?', '!'];
+const allowedCharacters = [...alphabet, syntaxCharacters];
 
 /*
  * The actual game instance, that controls and manages the game
@@ -193,7 +197,10 @@ export default class HangmanGame implements ModuleGameInterface {
 	updateClients(): void {
 		const solutionChars = (this.currentWord || '').split('');
 		const letters = solutionChars.map((char) => {
-			return this.guessedChars.includes(char) ? char : undefined;
+			const isVisibleChar =
+				this.guessedChars.includes(char) || syntaxCharacters.includes(char);
+
+			return isVisibleChar ? char : undefined;
 		});
 		const wrongChars = this.guessedChars.filter(
 			(char) => !solutionChars.includes(char)

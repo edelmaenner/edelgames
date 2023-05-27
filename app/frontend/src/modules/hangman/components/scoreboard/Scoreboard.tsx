@@ -1,10 +1,7 @@
-import {Component} from "react";
+import { Component } from 'react';
 
 export default class Scoreboard extends Component<{}, {}> {
-
-    render() {
-        return (
-            <div>scoreboard</div>
-        );
-    }
+	render() {
+		return <div>scoreboard</div>;
+	}
 }

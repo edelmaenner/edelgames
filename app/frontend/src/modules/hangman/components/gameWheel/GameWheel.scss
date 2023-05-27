@@ -33,7 +33,7 @@
 
 		// with blurred background
 		&:before {
-			content: "";
+			content: '';
 			position: absolute;
 			top: 0;
 			left: 0;
@@ -72,10 +72,9 @@
 
 	.game-wheel-player {
 		display: inline-block;
-		transform: translate(-50%,-50%);
+		transform: translate(-50%, -50%);
 		position: absolute;
-		transition: top 20ms linear,
-		left 20ms linear;
+		transition: top 20ms linear, left 20ms linear;
 		box-shadow: 0 0 1rem #000;
 	}
 }

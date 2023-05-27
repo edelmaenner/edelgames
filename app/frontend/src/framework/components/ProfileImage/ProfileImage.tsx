@@ -28,10 +28,10 @@ export default class ProfileImage extends React.Component<IProps, IState> {
 		let fallbackColorHue = parseInt(this.props.id, 36) % 360;
 
 		let overrideStyle = undefined;
-		if(this.props.sizeMultiplier) {
+		if (this.props.sizeMultiplier) {
 			overrideStyle = {
-				width: (2 * this.props.sizeMultiplier) + 'rem',
-				height: (2 * this.props.sizeMultiplier) + 'rem',
+				width: 2 * this.props.sizeMultiplier + 'rem',
+				height: 2 * this.props.sizeMultiplier + 'rem',
 			};
 		}
 
@@ -55,7 +55,7 @@ export default class ProfileImage extends React.Component<IProps, IState> {
 						className="profile-picture-anonymous"
 						style={{
 							...{ backgroundColor: `hsl(${fallbackColorHue},60%,60%)` },
-							...(overrideStyle || {})
+							...(overrideStyle || {}),
 						}}
 					>
 						?

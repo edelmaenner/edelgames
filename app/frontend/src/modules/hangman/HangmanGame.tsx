@@ -24,22 +24,7 @@ export default class Hangman
 			round: 0,
 			activeGuesserId: '',
 			currentHostId: '',
-			letters: [
-				's',
-				'o',
-				'm',
-				'm',
-				'e',
-				'r',
-				's',
-				'p',
-				null,
-				null,
-				's',
-				null,
-				'e',
-				'n',
-			],
+			letters: [],
 			wrongChars: [],
 			configuration: {
 				minWordLength: 1,
@@ -79,23 +64,34 @@ export default class Hangman
 					configuration: newState.configuration,
 				},
 			},
-			console.log.bind(null, `active guesser: ${newState.activeGuesserId}`)
+			console.log.bind(null, newState)
 		);
 	}
 
 	render(): ReactNode {
+		const activePlayerId = this.state.gameState.phase === 'spelling' ?
+			this.state.gameState.currentHostId :
+			this.state.gameState.activeGuesserId;
+
+
 		return (
 			<div id={'hangman'}>
 				<GameWheel
 					letters={this.state.gameState.letters}
 					playerApi={this.api.getPlayerApi()}
-					activePlayerId={this.state.gameState.activeGuesserId}
+					activePlayerId={activePlayerId}
 				/>
 
 				<div className={'game-data-interface'}>
 					<Scoreboard />
 
-					<InputField />
+					<InputField
+						playerApi={this.api.getPlayerApi()}
+						eventApi={this.api.getEventApi()}
+						gameState={this.state.gameState}
+						playerGuessCharCallback={console.log}
+						playerGuessWordCallback={console.log}
+					/>
 				</div>
 			</div>
 		);

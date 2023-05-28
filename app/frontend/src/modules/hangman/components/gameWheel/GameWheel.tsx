@@ -37,7 +37,8 @@ export default class GameWheel extends Component<IProps, IState> {
 		const activePlayerIndex = roomMembers.findIndex(
 			(user) => user.getId() === this.props.activePlayerId
 		);
-		this.changeWheelDirection((360 / roomMembers.length) * activePlayerIndex);
+
+		this.changeWheelDirection(360 - (360 / roomMembers.length) * activePlayerIndex, false);
 	}
 
 	onWheelRotationIntervalTicked(): void {
@@ -62,8 +63,14 @@ export default class GameWheel extends Component<IProps, IState> {
 	}
 
 	changeWheelDirection(newOffset: number, isRelative: boolean = false): void {
-		this.desiredWheelRotation =
-			newOffset + (isRelative ? this.desiredWheelRotation : 0);
+		const newCalculatedOffset = newOffset + (isRelative ? this.desiredWheelRotation : 0);
+
+		if(Math.abs(newCalculatedOffset - this.desiredWheelRotation) < this.wheelRotationStep) {
+			return;
+		}
+
+		this.desiredWheelRotation = newCalculatedOffset;
+
 		if (!this.wheelRotationInterval) {
 			this.wheelRotationInterval = setInterval(
 				this.onWheelRotationIntervalTicked.bind(this),
@@ -81,7 +88,7 @@ export default class GameWheel extends Component<IProps, IState> {
 					className={'wheel-background'}
 					style={{
 						backgroundImage: `url('${WoodenImage}')`,
-						transform: `rotate(${-this.state.currentWheelRotation}deg)`,
+						//transform: `rotate(${-this.state.currentWheelRotation}deg)`,
 						transitionDuration: this.wheelRotationIntervalSpeed + 'ms',
 					}}
 				></div>
@@ -103,7 +110,7 @@ export default class GameWheel extends Component<IProps, IState> {
 										letter !== null ? 'solved' : ''
 									}`}
 								>
-									{letter || <>&nbsp;</>}
+									{letter === ' ' || !letter ? <>&nbsp;</> : letter}
 								</div>
 							);
 						})}

@@ -52,6 +52,8 @@ export const alphabet = [
 	'Y',
 	'Z',
 ];
+export const specialChars = ['ö', 'Ö', 'ä', 'Ä', 'ü', 'Ü'];
+
 export const punctuation = [
 	'.',
 	',',

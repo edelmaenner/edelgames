@@ -1,13 +1,17 @@
 import ModuleGameInterface from '../../framework/modules/ModuleGameInterface';
 import ModuleApi from '../../framework/modules/ModuleApi';
 import {
+	GamePhase,
 	GameState,
 	PlayerGuessedEventData,
 	PlayerSubmittedWordEventData,
 } from '@edelgames/types/src/modules/hangman/HMTypes';
 import { EventDataObject } from '@edelgames/types/src/app/ApiTypes';
 import DrawAndGuess from '../drawAndGuess/DrawAndGuess';
-import { alphabet } from '../../framework/modules/configuration/elements/Collections';
+import {
+	alphabet,
+	specialChars,
+} from '../../framework/modules/configuration/elements/Collections';
 
 export enum HangmanClientToServerEventNames {
 	PLAYER_GUESSED = 'playerGuessed',
@@ -15,7 +19,7 @@ export enum HangmanClientToServerEventNames {
 }
 
 const syntaxCharacters = [' ', ',', '.', '-', '?', '!'];
-const allowedCharacters = [...alphabet, syntaxCharacters];
+const allowedCharacters = [...alphabet, ...specialChars, ...syntaxCharacters];
 
 /*
  * The actual game instance, that controls and manages the game
@@ -35,6 +39,8 @@ export default class HangmanGame implements ModuleGameInterface {
 	activeGuesserIndex = -1;
 	currentWord: string = undefined;
 	guessedChars: string[] = [];
+	isOnWinningTimeout = false;
+	winningTimeoutMs = 3000;
 
 	// generated values
 	activeGuesserId: string;
@@ -83,6 +89,7 @@ export default class HangmanGame implements ModuleGameInterface {
 	 */
 	startNewRound(): void {
 		this.round++;
+		this.isOnWinningTimeout = false;
 
 		// reset old data
 		this.guessedChars = [];
@@ -100,8 +107,7 @@ export default class HangmanGame implements ModuleGameInterface {
 			this.currentWord = undefined;
 		}
 
-		this.continueGuessingWithNextPlayer(true);
-		this.updateClients();
+		this.continueGuessingWithNextPlayer(false);
 	}
 
 	/**
@@ -118,7 +124,7 @@ export default class HangmanGame implements ModuleGameInterface {
 			this.continueGuessingWithNextPlayer();
 		}
 
-		if (preventUpdatingClients) {
+		if (!preventUpdatingClients) {
 			this.updateClients();
 		}
 	}
@@ -131,9 +137,22 @@ export default class HangmanGame implements ModuleGameInterface {
 	 */
 	onPlayerGuessed(eventData: EventDataObject): void {
 		const { senderId } = eventData;
-		const { char } = eventData as PlayerGuessedEventData;
+		let { char } = eventData as PlayerGuessedEventData;
+
+		char = char.toLowerCase();
 
 		if (senderId !== this.activeGuesserId) {
+			return;
+		}
+
+		if (!allowedCharacters.includes(char)) {
+			this.api
+				.getPlayerApi()
+				.sendPlayerBubble(
+					senderId,
+					`Das Symbol "${char}" ist nicht erlaubt!`,
+					'error'
+				);
 			return;
 		}
 
@@ -142,7 +161,7 @@ export default class HangmanGame implements ModuleGameInterface {
 				.getPlayerApi()
 				.sendPlayerBubble(
 					senderId,
-					`Das Symbol "${char}" wurde bereits geraten!`,
+					`Das Symbol "${char.toUpperCase()}" wurde bereits geraten!`,
 					'error'
 				);
 			return;
@@ -161,8 +180,11 @@ export default class HangmanGame implements ModuleGameInterface {
 			.split('')
 			.every((char) => this.guessedChars.includes(char));
 		if (isWordGuessedCorrectly) {
-			this.startNewRound();
+			this.isOnWinningTimeout = true;
+			setTimeout(this.startNewRound.bind(this), this.winningTimeoutMs);
 		}
+
+		this.updateClients();
 	}
 
 	/**
@@ -171,9 +193,39 @@ export default class HangmanGame implements ModuleGameInterface {
 	 */
 	onPlayerSubmittedWord(eventData: EventDataObject): void {
 		const { senderId } = eventData;
-		const { word } = eventData as PlayerSubmittedWordEventData;
+		let { word } = eventData as PlayerSubmittedWordEventData;
+
+		word = word.toLowerCase().trim();
 
 		if (senderId !== this.currentHostId || typeof word !== 'string') {
+			return;
+		}
+
+		let containsLetterChars = false;
+
+		// check if every character is allowed
+		for (const char of word.split('')) {
+			if (!allowedCharacters.includes(char)) {
+				this.api
+					.getPlayerApi()
+					.sendPlayerBubble(
+						senderId,
+						`Das Symbol "${char.toUpperCase()}" ist nicht erlaubt!`,
+						'error'
+					);
+				return;
+			} else if (
+				!containsLetterChars &&
+				(alphabet.includes(char) || specialChars.includes(char))
+			) {
+				containsLetterChars = true;
+			}
+		}
+
+		if (!containsLetterChars) {
+			this.api
+				.getPlayerApi()
+				.sendPlayerBubble(senderId, `Das Wort muss Buchstaben enthalten!`);
 			return;
 		}
 
@@ -206,8 +258,14 @@ export default class HangmanGame implements ModuleGameInterface {
 			(char) => !solutionChars.includes(char)
 		);
 
+		const currentPhase: GamePhase = this.isOnWinningTimeout
+			? 'waiting'
+			: this.currentWord === undefined
+			? 'spelling'
+			: 'guessing';
+
 		this.api.getPlayerApi().sendRoomMessage('gameStateUpdated', {
-			phase: this.currentWord === undefined ? 'spelling' : 'guessing',
+			phase: currentPhase,
 			round: this.round,
 			currentHostId: this.currentHostId,
 			activeGuesserId: this.activeGuesserId,

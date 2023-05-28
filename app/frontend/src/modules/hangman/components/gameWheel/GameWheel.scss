@@ -61,7 +61,7 @@
 				border-bottom: 0.4rem solid black;
 				text-align: center;
 				text-transform: uppercase;
-				transition: border-color 1s ease-in-out;
+				transition: border-color 0.3s ease-in-out;
 
 				&.solved {
 					border-color: $success;

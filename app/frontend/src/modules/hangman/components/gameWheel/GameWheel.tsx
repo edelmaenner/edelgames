@@ -38,7 +38,10 @@ export default class GameWheel extends Component<IProps, IState> {
 			(user) => user.getId() === this.props.activePlayerId
 		);
 
-		this.changeWheelDirection(360 - (360 / roomMembers.length) * activePlayerIndex, false);
+		this.changeWheelDirection(
+			360 - (360 / roomMembers.length) * activePlayerIndex,
+			false
+		);
 	}
 
 	onWheelRotationIntervalTicked(): void {
@@ -63,9 +66,13 @@ export default class GameWheel extends Component<IProps, IState> {
 	}
 
 	changeWheelDirection(newOffset: number, isRelative: boolean = false): void {
-		const newCalculatedOffset = newOffset + (isRelative ? this.desiredWheelRotation : 0);
+		const newCalculatedOffset =
+			newOffset + (isRelative ? this.desiredWheelRotation : 0);
 
-		if(Math.abs(newCalculatedOffset - this.desiredWheelRotation) < this.wheelRotationStep) {
+		if (
+			Math.abs(newCalculatedOffset - this.desiredWheelRotation) <
+			this.wheelRotationStep
+		) {
 			return;
 		}
 

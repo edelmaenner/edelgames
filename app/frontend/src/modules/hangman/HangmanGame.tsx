@@ -69,10 +69,10 @@ export default class Hangman
 	}
 
 	render(): ReactNode {
-		const activePlayerId = this.state.gameState.phase === 'spelling' ?
-			this.state.gameState.currentHostId :
-			this.state.gameState.activeGuesserId;
-
+		const activePlayerId =
+			this.state.gameState.phase === 'spelling'
+				? this.state.gameState.currentHostId
+				: this.state.gameState.activeGuesserId;
 
 		return (
 			<div id={'hangman'}>

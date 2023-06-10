@@ -42,7 +42,10 @@ export default class InputField extends Component<IProps, IState> {
 			return;
 		}
 
-		if (!alphabet.includes(event.key) && !specialCharacters.includes(event.key)) {
+		if (
+			!alphabet.includes(event.key) &&
+			!specialCharacters.includes(event.key)
+		) {
 			return;
 		}
 
@@ -130,18 +133,19 @@ export default class InputField extends Component<IProps, IState> {
 			<div className={'hangman-user-input-container'}>
 				<div className={'error-text'}>{this.state.errorText}</div>
 
-
-				{phase === 'guessing' && (
-					activeGuesserId === currentUserId
+				{phase === 'guessing' &&
+					(activeGuesserId === currentUserId
 						? this.renderGuessChar()
-						: `${this.props.playerApi.getPlayerById(activeGuesserId)?.getUsername()} rät gerade einen Buchstaben`
-				)}
+						: `${this.props.playerApi
+								.getPlayerById(activeGuesserId)
+								?.getUsername()} rät gerade einen Buchstaben`)}
 
-				{phase === 'spelling' && (
-					currentHostId === currentUserId
+				{phase === 'spelling' &&
+					(currentHostId === currentUserId
 						? this.renderSubmitWord()
-						: `${this.props.playerApi.getPlayerById(currentHostId)?.getUsername()} überlegt sich gerade ein neues Wort`
-				)}
+						: `${this.props.playerApi
+								.getPlayerById(currentHostId)
+								?.getUsername()} überlegt sich gerade ein neues Wort`)}
 
 				{this.props.gameState.phase === 'guessing' && (
 					<div className={'wrong-character-list'}>

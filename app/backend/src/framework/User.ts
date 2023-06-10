@@ -10,6 +10,7 @@ import {
 	EventDataObject,
 	IUser,
 } from '@edelgames/types/src/app/ApiTypes';
+import RandomNameGenerator from './util/RandomNameGenerator';
 
 export default class User implements IUser {
 	private readonly id: string = ''; // required for identifying users with the same name
@@ -24,6 +25,7 @@ export default class User implements IUser {
 		this.socket = socket;
 		this.id = this.createIdHash();
 		this.name = 'guest_' + this.id;
+		this.name = RandomNameGenerator.generate();
 		this.sendUserProfileChangedMessage();
 
 		// register generic listeners

@@ -1,0 +1,49 @@
+.hangman-user-input-container {
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+
+	.error-text {
+		height: 1.5rem;
+	}
+
+	.guess-input {
+		border: none;
+		border-radius: 0;
+		background: white;
+		width: 3rem;
+		height: 3rem;
+		font-size: 2.5rem;
+		text-transform: uppercase;
+		text-align: center;
+		outline: none;
+	}
+
+	.submit-input {
+		border: none;
+		border-radius: 0;
+		background: white;
+		width: 100%;
+		height: 3rem;
+		font-size: 2.5rem;
+		text-transform: uppercase;
+		text-align: center;
+		outline: none;
+	}
+
+	.wrong-character-list {
+		min-height: 3rem;
+		width: 100%;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1rem;
+		justify-content: center;
+		margin-top: 2em;
+
+		.wrong-char {
+			color: $error;
+			font-weight: bold;
+			text-transform: uppercase;
+		}
+	}
+}

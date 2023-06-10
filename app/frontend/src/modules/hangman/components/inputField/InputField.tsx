@@ -42,7 +42,7 @@ export default class InputField extends Component<IProps, IState> {
 			return;
 		}
 
-		if (!alphabet.includes(event.key)) {
+		if (!alphabet.includes(event.key) && !specialCharacters.includes(event.key)) {
 			return;
 		}
 
@@ -121,24 +121,27 @@ export default class InputField extends Component<IProps, IState> {
 
 	render() {
 		const currentUserId = this.props.playerApi.getLocalePlayer().getId();
-		const userCanGuess =
-			this.props.gameState.activeGuesserId === currentUserId &&
-			this.props.gameState.phase === 'guessing';
-		const userCanSubmit =
-			this.props.gameState.currentHostId === currentUserId &&
-			this.props.gameState.phase === 'spelling';
+
+		const phase = this.props.gameState.phase;
+		const activeGuesserId = this.props.gameState.activeGuesserId;
+		const currentHostId = this.props.gameState.currentHostId;
 
 		return (
 			<div className={'hangman-user-input-container'}>
-				{this.props.gameState.phase}
-				{userCanGuess && 'canguess'}
-				{userCanSubmit && 'cansubmit'}
-
 				<div className={'error-text'}>{this.state.errorText}</div>
 
-				{userCanGuess && this.renderGuessChar()}
 
-				{userCanSubmit && this.renderSubmitWord()}
+				{phase === 'guessing' && (
+					activeGuesserId === currentUserId
+						? this.renderGuessChar()
+						: `${this.props.playerApi.getPlayerById(activeGuesserId)?.getUsername()} rät gerade einen Buchstaben`
+				)}
+
+				{phase === 'spelling' && (
+					currentHostId === currentUserId
+						? this.renderSubmitWord()
+						: `${this.props.playerApi.getPlayerById(currentHostId)?.getUsername()} überlegt sich gerade ein neues Wort`
+				)}
 
 				{this.props.gameState.phase === 'guessing' && (
 					<div className={'wrong-character-list'}>
@@ -158,6 +161,8 @@ export default class InputField extends Component<IProps, IState> {
 					className={'guess-input'}
 					value={this.state.currentCharValue}
 					onKeyDown={this.onGuessCharKeyDown.bind(this)}
+					placeholder={'?'}
+					autoFocus={true}
 				/>
 			</>
 		);
@@ -172,6 +177,8 @@ export default class InputField extends Component<IProps, IState> {
 					value={this.state.currentWordValue}
 					onChange={this.onSubmitWordChange.bind(this)}
 					onKeyDown={this.onSubmitWordKeyDown.bind(this)}
+					placeholder={'...'}
+					autoFocus={true}
 				/>
 			</>
 		);

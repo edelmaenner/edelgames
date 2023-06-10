@@ -3,6 +3,8 @@ import ModuleApi from '../../framework/modules/ModuleApi';
 import {
 	GamePhase,
 	GameState,
+	HangmanScoreboard,
+	LetterHint,
 	PlayerGuessedEventData,
 	PlayerSubmittedWordEventData,
 } from '@edelgames/types/src/modules/hangman/HMTypes';
@@ -27,13 +29,18 @@ const allowedCharacters = [...alphabet, ...specialChars, ...syntaxCharacters];
 export default class HangmanGame implements ModuleGameInterface {
 	// technical properties
 	api: ModuleApi = null;
+	clientUpdateInterval: NodeJS.Timer = null;
 
 	// configuration
 	generateWordsAutomatically: boolean;
 	minWordLength: number;
 	maxWordLength: number;
+	scoreWinningThreshold: number;
+	turnWinningThreshold: number;
+	maxWrongGuesses: number;
 
 	// game values
+	turn = 0;
 	round = 0;
 	currentHostIndex = -1;
 	activeGuesserIndex = -1;
@@ -41,6 +48,10 @@ export default class HangmanGame implements ModuleGameInterface {
 	guessedChars: string[] = [];
 	isOnWinningTimeout = false;
 	winningTimeoutMs = 3000;
+	isOnGameOverTimeout = false;
+	gameOverTimeoutMs = 6000;
+	scoreboard: HangmanScoreboard = [];
+	gameFinishState: string | undefined = undefined;
 
 	// generated values
 	activeGuesserId: string;
@@ -57,6 +68,15 @@ export default class HangmanGame implements ModuleGameInterface {
 		this.maxWordLength = api
 			.getConfigApi()
 			.getSingleNumberConfigValue('max_word_length', 15);
+		this.scoreWinningThreshold = api
+			.getConfigApi()
+			.getSingleNumberConfigValue('score_winning_threshold', 50);
+		this.turnWinningThreshold = api
+			.getConfigApi()
+			.getSingleNumberConfigValue('turn_winning_threshold', 10);
+		this.maxWrongGuesses = api
+			.getConfigApi()
+			.getSingleNumberConfigValue('max_wrong_guesses', 0);
 
 		if (this.minWordLength > this.maxWordLength) {
 			this.maxWordLength = this.minWordLength + 1;
@@ -66,6 +86,13 @@ export default class HangmanGame implements ModuleGameInterface {
 					'Maximale Wortlänge geändert auf ' + this.maxWordLength,
 					'warning'
 				);
+		}
+
+		for (const member of this.api.getPlayerApi().getRoomMembers()) {
+			this.scoreboard.push({
+				playerId: member.getId(),
+				points: 0,
+			});
 		}
 
 		this.api
@@ -82,14 +109,47 @@ export default class HangmanGame implements ModuleGameInterface {
 			);
 
 		this.startNewRound();
+
+		this.clientUpdateInterval = setInterval(
+			this.updateClients.bind(this),
+			5000
+		);
+		this.api.getEventApi().addGameStoppedHandler(this.onGameStopped.bind(this));
+	}
+
+	onGameStopped(): void {
+		clearInterval(this.clientUpdateInterval);
 	}
 
 	/**
 	 * Starts a new round by resetting data and requesting or generating a new word
 	 */
 	startNewRound(): void {
-		this.round++;
+		if (this.turn === 0) {
+			this.round++;
+		}
+
+		this.turn =
+			(this.turn + 1) % this.api.getPlayerApi().getRoomMembers().length;
 		this.isOnWinningTimeout = false;
+		this.isOnGameOverTimeout = false;
+
+		if (this.scoreWinningThreshold > 0) {
+			if (
+				this.scoreboard.find((sb) => sb.points >= this.scoreWinningThreshold)
+			) {
+				this.finishGame('scoreLimitReached');
+				return;
+			}
+		}
+
+		if (
+			this.turnWinningThreshold > 0 &&
+			this.round > this.turnWinningThreshold
+		) {
+			this.finishGame('turnLimitReached');
+			return;
+		}
 
 		// reset old data
 		this.guessedChars = [];
@@ -108,6 +168,13 @@ export default class HangmanGame implements ModuleGameInterface {
 		}
 
 		this.continueGuessingWithNextPlayer(false);
+	}
+
+	// sets the game into the finished state and displays the scoreboard
+	finishGame(reason: string): void {
+		this.gameFinishState = reason;
+		clearInterval(this.clientUpdateInterval);
+		this.updateClients();
 	}
 
 	/**
@@ -171,20 +238,52 @@ export default class HangmanGame implements ModuleGameInterface {
 
 		const isCorrectGuess = this.currentWord.includes(char);
 		if (!isCorrectGuess) {
-			this.continueGuessingWithNextPlayer();
+			const wrongChars = this.guessedChars.filter(
+				(char) => !this.currentWord.includes(char)
+			);
+
+			if (
+				this.maxWrongGuesses > 0 &&
+				wrongChars.length > this.maxWrongGuesses
+			) {
+				this.isOnGameOverTimeout = true;
+				setTimeout(this.startNewRound.bind(this), this.gameOverTimeoutMs);
+				this.updateClients();
+			} else {
+				this.continueGuessingWithNextPlayer();
+			}
+
 			return;
 		}
 
 		// check winning condition
 		const isWordGuessedCorrectly = this.currentWord
 			.split('')
-			.every((char) => this.guessedChars.includes(char));
+			.every(
+				(char) =>
+					this.guessedChars.includes(char) || syntaxCharacters.includes(char)
+			);
 		if (isWordGuessedCorrectly) {
 			this.isOnWinningTimeout = true;
 			setTimeout(this.startNewRound.bind(this), this.winningTimeoutMs);
+			// two times the length of the word as points for the player, who solved it
+			this.addPointsToPlayer(senderId, this.currentWord.length);
+		} else if (isCorrectGuess) {
+			// one point for every correct character, that does not solve the word
+			const numMatchingChars = this.currentWord
+				.split('')
+				.filter((c) => c === char).length;
+			this.addPointsToPlayer(senderId, numMatchingChars);
 		}
 
 		this.updateClients();
+	}
+
+	addPointsToPlayer(playerId: string, points: number): void {
+		const playerScore = this.scoreboard.find((sb) => sb.playerId === playerId);
+		if (playerScore) {
+			playerScore.points += points;
+		}
 	}
 
 	/**
@@ -248,21 +347,21 @@ export default class HangmanGame implements ModuleGameInterface {
 	 */
 	updateClients(): void {
 		const solutionChars = (this.currentWord || '').split('');
-		const letters = solutionChars.map((char) => {
-			const isVisibleChar =
-				this.guessedChars.includes(char) || syntaxCharacters.includes(char);
+		const letters: LetterHint[] = solutionChars.map((char) => {
+			if (this.guessedChars.includes(char) || syntaxCharacters.includes(char)) {
+				return { state: 'guessed', value: char };
+			}
+			if (this.isOnGameOverTimeout) {
+				return { state: 'gameover', value: char };
+			}
 
-			return isVisibleChar ? char : undefined;
+			return null;
 		});
 		const wrongChars = this.guessedChars.filter(
 			(char) => !solutionChars.includes(char)
 		);
 
-		const currentPhase: GamePhase = this.isOnWinningTimeout
-			? 'waiting'
-			: this.currentWord === undefined
-			? 'spelling'
-			: 'guessing';
+		const currentPhase: GamePhase = this.getCurrentPhase();
 
 		this.api.getPlayerApi().sendRoomMessage('gameStateUpdated', {
 			phase: currentPhase,
@@ -275,8 +374,24 @@ export default class HangmanGame implements ModuleGameInterface {
 				autoGeneratedWords: this.generateWordsAutomatically,
 				maxWordLength: this.maxWordLength,
 				minWordLength: this.minWordLength,
+				scoreWinningThreshold: this.scoreWinningThreshold,
+				turnWinningThreshold: this.turnWinningThreshold,
+				maxWrongGuesses: this.maxWrongGuesses,
 			},
+			scoreboard: this.scoreboard,
 		} as GameState);
+	}
+
+	getCurrentPhase(): GamePhase {
+		if (this.gameFinishState !== undefined) {
+			return 'finished';
+		}
+
+		if (this.isOnWinningTimeout || this.isOnGameOverTimeout) {
+			return 'waiting';
+		}
+
+		return this.currentWord === undefined ? 'spelling' : 'guessing';
 	}
 
 	/**

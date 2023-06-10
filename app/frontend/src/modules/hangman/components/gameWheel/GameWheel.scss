@@ -66,6 +66,10 @@
 				&.solved {
 					border-color: $success;
 				}
+
+				&.missing {
+					border-color: $error;
+				}
 			}
 		}
 	}

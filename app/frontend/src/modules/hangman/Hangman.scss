@@ -13,6 +13,8 @@
 	}
 
 	@import 'components/gameWheel/GameWheel';
+	@import 'components/scoreboard/Scoreboard';
+	@import 'components/finishScreen/FinishScreen';
 
 	.game-data-interface {
 		display: flex;
@@ -30,6 +32,20 @@
 
 		& > * {
 			flex: 1 1 auto;
+		}
+
+		.hangman-visualisation {
+			max-height: 200px;
+			text-align: center;
+			flex: 1;
+			color: $white;
+
+			.hangman-svg {
+				transition: stroke-dashoffset 1s ease-in-out;
+				stroke-dashoffset: 0;
+				height: 100%;
+			}
+
 		}
 
 		@import 'components/inputField/InputField';

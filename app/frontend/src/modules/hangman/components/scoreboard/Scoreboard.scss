@@ -1,0 +1,36 @@
+.hangman-scoreboard {
+
+	.scoreboard-header {
+		text-align: right;
+		margin-bottom: 1rem;
+		text-decoration: underline;
+		font-size: 2rem;
+	}
+
+	.scoreboard-winning-condition {
+		padding-bottom: 1rem;
+		font-size: 1.2rem;
+	}
+
+	.scoreboard-row {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0.5rem;
+
+		&:nth-of-type(2n+1) {
+			background-color: $background;
+		}
+
+		.scoreboard-col-player {
+			display: flex;
+			align-items: center;
+			gap: 1rem;
+		}
+
+		.scoreboard-col-points {
+
+		}
+	}
+
+}

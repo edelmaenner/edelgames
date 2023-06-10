@@ -1,4 +1,5 @@
-import React, { ReactNode } from 'react';
+import React, {Component, ReactNode} from 'react';
+import User from "../../util/User";
 
 type IProps = {
 	picture: string | null;
@@ -15,7 +16,7 @@ interface IState {
 	hasPictureError: boolean;
 }
 
-export default class ProfileImage extends React.Component<IProps, IState> {
+export default class ProfileImage extends Component<IProps, IState> {
 	state = {
 		hasPictureError: false,
 	};
@@ -64,4 +65,34 @@ export default class ProfileImage extends React.Component<IProps, IState> {
 			</div>
 		);
 	}
+}
+
+
+type IPropsUser = {
+	user: User,
+	className?: string;
+	onClick?: { (): void };
+	onHover?: { (): void };
+	onHoverEnd?: { (): void };
+	sizeMultiplier?: number;
+};
+
+export class UserProfileImage extends Component<IPropsUser,{}> {
+
+	render() {
+		return (
+			<ProfileImage
+				picture={this.props.user.getPicture()}
+				username={this.props.user.getUsername()}
+				id={this.props.user.getId()}
+
+				className={this.props.className}
+				onClick={this.props.onClick}
+				onHover={this.props.onHover}
+				onHoverEnd={this.props.onHoverEnd}
+				sizeMultiplier={this.props.sizeMultiplier}
+			/>
+		)
+	}
+
 }

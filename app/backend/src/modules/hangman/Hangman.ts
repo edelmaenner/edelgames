@@ -29,6 +29,27 @@ class Hangman implements ModuleInterface {
 				99,
 				15
 			),
+			new IntegerConfig(
+				'max_wrong_guesses',
+				'Maximale Anzahl falsche Versuche (0 für keine Grenze)',
+				0,
+				999,
+				10
+			),
+			new IntegerConfig(
+				'score_winning_threshold',
+				'Sieg ab ... Punkten (0 für Endlosspiel):',
+				0,
+				999,
+				50
+			),
+			new IntegerConfig(
+				'turn_winning_threshold',
+				'Spielende nach ... Runden (0 für Endlosspiel):',
+				0,
+				999,
+				10
+			),
 		]);
 	}
 

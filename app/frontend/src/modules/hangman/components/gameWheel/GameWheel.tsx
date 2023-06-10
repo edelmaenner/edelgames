@@ -110,14 +110,15 @@ export default class GameWheel extends Component<IProps, IState> {
 				>
 					<div className={'letter-container'}>
 						{this.props.letters.map((letter, index) => {
+							const letterState = letter === null ? ''
+								: letter.state === 'guessed' ? 'solved' : 'missing';
+
 							return (
 								<div
 									key={index}
-									className={`hangman-letter ${
-										letter !== null ? 'solved' : ''
-									}`}
+									className={`hangman-letter ${letterState}`}
 								>
-									{letter === ' ' || !letter ? <>&nbsp;</> : letter}
+									{letter === null || letter.value === ' ' ? <>&nbsp;</> : letter.value}
 								</div>
 							);
 						})}

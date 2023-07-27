@@ -4,8 +4,8 @@ import roomManager from '../../../util/RoomManager';
 import profileManager from '../../../util/ProfileManager';
 import socketManager from '../../../util/SocketManager';
 import moduleRegistry from '../../../modules/ModuleRegistry';
-import {PlayerRangeDefinition} from "@edelgames/types/src/app/ModuleTypes";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import { PlayerRangeDefinition } from '@edelgames/types/src/app/ModuleTypes';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export const GameSelectionEvents = {
 	startGame: 'startGame',
@@ -36,14 +36,16 @@ export default class GameSelection extends React.Component {
 		const requirements = module.getPlayerRequirements();
 		return (
 			<div
-				className={'game-preview ' + (this.isPlayerRequirementFulfilled(requirements) ? '' : 'game-unavailable')}
+				className={
+					'game-preview ' +
+					(this.isPlayerRequirementFulfilled(requirements)
+						? ''
+						: 'game-unavailable')
+				}
 				key={module.getUniqueId()}
 				onClick={this.onSelectGame.bind(this, module.getUniqueId())}
 			>
-				<img
-					src={module.getPreviewImage()}
-				 	alt={module.getTitle()}
-				/>
+				<img src={module.getPreviewImage()} alt={module.getTitle()} />
 
 				<div className={'preview-hover'}>
 					{module.getTitle()}
@@ -54,28 +56,24 @@ export default class GameSelection extends React.Component {
 	}
 
 	renderPlayerRequirements(condition: PlayerRangeDefinition): JSX.Element {
-		const playerCondition = typeof condition === 'number' ?
-			condition :
-			`${condition.min}-${condition.max}`;
+		const playerCondition =
+			typeof condition === 'number'
+				? condition
+				: `${condition.min}-${condition.max}`;
 
 		return (
 			<span>
-				(
-				{playerCondition}
+				({playerCondition}
 				&nbsp;
-				<FontAwesomeIcon
-					icon={['fad', 'people-group']}
-					size="1x"
-				/>
-				)
+				<FontAwesomeIcon icon={['fad', 'people-group']} size="1x" />)
 			</span>
 		);
 	}
 
 	isPlayerRequirementFulfilled(condition: PlayerRangeDefinition) {
 		const numPlayers = roomManager.getRoomMembers().length;
-		return (typeof condition === 'number') ?
-			numPlayers === condition :
-			(numPlayers >= condition.min && numPlayers <= condition.max);
+		return typeof condition === 'number'
+			? numPlayers === condition
+			: numPlayers >= condition.min && numPlayers <= condition.max;
 	}
 }

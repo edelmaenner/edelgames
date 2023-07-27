@@ -2,7 +2,7 @@ import ModuleInterface from '../../framework/modules/ModuleInterface';
 import preview from './preview.png';
 import ExampleChatGame from './ExampleChatGame';
 import { ReactNode } from 'react';
-import {PlayerRangeDefinition} from "@edelgames/types/src/app/ModuleTypes";
+import { PlayerRangeDefinition } from '@edelgames/types/src/app/ModuleTypes';
 
 /*
  * A static singleton class, that contains technical details and a render method for showing the game
@@ -21,7 +21,7 @@ class ExampleChat implements ModuleInterface {
 	}
 
 	getPlayerRequirements(): PlayerRangeDefinition {
-		return {min: 1, max: 1000}
+		return { min: 1, max: 1000 };
 	}
 
 	renderGame(): ReactNode {

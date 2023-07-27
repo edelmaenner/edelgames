@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import {PlayerRangeDefinition} from "@edelgames/types/src/app/ModuleTypes";
+import { PlayerRangeDefinition } from '@edelgames/types/src/app/ModuleTypes';
 
 export default interface ModuleInterface {
 	getTitle(): string;

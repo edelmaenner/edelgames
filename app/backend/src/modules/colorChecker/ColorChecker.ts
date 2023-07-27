@@ -4,6 +4,7 @@ import ColorCheckerGame from './ColorCheckerGame';
 import ModuleConfig from '../../framework/modules/configuration/ModuleConfig';
 import SelectOneConfig from '../../framework/modules/configuration/elements/SelectOneConfig';
 import BooleanConfig from '../../framework/modules/configuration/elements/BooleanConfig';
+import { PlayerRangeDefinition } from '@edelgames/types/src/app/ModuleTypes';
 
 /*
  * This singleton is used to register the game to the ModuleList
@@ -34,6 +35,10 @@ class ColorChecker implements ModuleInterface {
 
 	getGameInstance(): ModuleGameInterface {
 		return new ColorCheckerGame();
+	}
+
+	getRequiredPlayersRange(): PlayerRangeDefinition {
+		return { min: 1, max: 50 };
 	}
 }
 

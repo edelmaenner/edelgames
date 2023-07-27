@@ -9,6 +9,7 @@ import {
 	baseNumbers,
 	punctuation,
 } from '../../framework/modules/configuration/elements/Collections';
+import { PlayerRangeDefinition } from '@edelgames/types/src/app/ModuleTypes';
 
 class StadtLandFluss implements ModuleInterface {
 	getGameInstance(): ModuleGameInterface {
@@ -27,6 +28,10 @@ class StadtLandFluss implements ModuleInterface {
 			).changeAllowedQuantities(3, 20, defaultSLFCategories),
 			new IntegerConfig('slf_num_rounds', 'Anzahl der Runden', 1, 30, 10),
 		]);
+	}
+
+	getRequiredPlayersRange(): PlayerRangeDefinition {
+		return { min: 1, max: 20 };
 	}
 
 	getUniqueId(): string {

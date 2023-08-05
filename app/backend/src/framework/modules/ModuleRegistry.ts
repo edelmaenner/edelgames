@@ -1,15 +1,15 @@
-import ModuleInterface from './ModuleInterface';
+import Module from './Module';
 import ModuleList from '../../modules/ModuleList';
 import Room from '../Room';
 import { systemLogger } from '../util/Logger';
 import ModuleApi from './ModuleApi';
 
 class ModuleRegistry {
-	public getModuleList(): ModuleInterface[] {
+	public getModuleList(): Module[] {
 		return ModuleList;
 	}
 
-	public getModuleById(id: string): ModuleInterface | null {
+	public getModuleById(id: string): Module | null {
 		return (
 			this.getModuleList().find((module) => module.getUniqueId() === id) || null
 		);
@@ -42,10 +42,7 @@ class ModuleRegistry {
 		}
 	}
 
-	private checkModuleRequirements(
-		room: Room,
-		module: ModuleInterface
-	): boolean {
+	private checkModuleRequirements(room: Room, module: Module): boolean {
 		const memberCount = room.getMemberCount();
 		const requiredPlayers = module.getRequiredPlayersRange();
 

@@ -1,4 +1,4 @@
-import ModuleGameInterface from '../../framework/modules/ModuleGameInterface';
+import ModuleGame from '../../framework/modules/ModuleGame';
 import User from '../../framework/User';
 import drawAndGuess from './DrawAndGuess';
 import { clearTimeout } from 'timers';
@@ -14,7 +14,7 @@ enum gameStates {
 	CLOSING = 'closing',
 }
 
-export default class DrawAndGuessGame implements ModuleGameInterface {
+export default class DrawAndGuessGame extends ModuleGame {
 	// misc variables
 	api: ModuleApi = null;
 	activePlayerIndex = 0;

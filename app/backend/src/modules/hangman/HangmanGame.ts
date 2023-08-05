@@ -1,4 +1,4 @@
-import ModuleGameInterface from '../../framework/modules/ModuleGameInterface';
+import ModuleGame from '../../framework/modules/ModuleGame';
 import ModuleApi from '../../framework/modules/ModuleApi';
 import {
 	GamePhase,
@@ -26,7 +26,7 @@ const allowedCharacters = [...alphabet, ...specialChars, ...syntaxCharacters];
 /*
  * The actual game instance, that controls and manages the game
  */
-export default class HangmanGame implements ModuleGameInterface {
+export default class HangmanGame extends ModuleGame {
 	// technical properties
 	api: ModuleApi = null;
 	clientUpdateInterval: NodeJS.Timer = null;

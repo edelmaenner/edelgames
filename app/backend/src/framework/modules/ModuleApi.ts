@@ -1,12 +1,9 @@
 import Room from '../Room';
-import ModuleGameInterface from './ModuleGameInterface';
+import ModuleGame from './ModuleGame';
 import { Logger } from '../util/Logger';
 import ModulePlayerApi from './api/ModulePlayerApi';
 import ModuleEventApi from './api/ModuleEventApi';
-import ModuleConfig from './configuration/ModuleConfig';
-import ModuleInterface from './ModuleInterface';
-import { ConfigurationTypes } from '@edelgames/types/src/app/ConfigurationTypes';
-import { anyObject } from '@edelgames/types/src/app/BasicTypes';
+import Module from './Module';
 import ModuleConfigApi from './api/ModuleConfigApi';
 
 /*
@@ -14,33 +11,33 @@ import ModuleConfigApi from './api/ModuleConfigApi';
  * That way, a game cannot influence a room more than it is supposed to
  */
 export default class ModuleApi {
-	private readonly game: ModuleGameInterface;
-	private readonly gameId: string;
+	private readonly game: ModuleGame;
+	private readonly gameDefinition: Module;
 	private readonly playerApi: ModulePlayerApi;
 	private readonly eventApi: ModuleEventApi;
 	private readonly configApi: ModuleConfigApi;
 	private readonly logger: Logger;
 
-	constructor(
-		gameDefinition: ModuleInterface,
-		game: ModuleGameInterface,
-		room: Room
-	) {
+	constructor(gameDefinition: Module, game: ModuleGame, room: Room) {
 		this.game = game;
-		this.gameId = gameDefinition.getUniqueId();
+		this.gameDefinition = gameDefinition;
 
-		this.logger = new Logger(this.gameId);
+		this.logger = new Logger(this.getGameId());
 		this.eventApi = new ModuleEventApi(this);
 		this.playerApi = new ModulePlayerApi(room, this);
 		this.configApi = new ModuleConfigApi(gameDefinition.getGameConfig());
 	}
 
 	public getGameId(): string {
-		return this.gameId;
+		return this.gameDefinition.getUniqueId();
 	}
 
-	public getGame(): ModuleGameInterface {
+	public getGame(): ModuleGame {
 		return this.game;
+	}
+
+	public getGameDefinition(): Module {
+		return this.gameDefinition;
 	}
 
 	public getLogger(): Logger {

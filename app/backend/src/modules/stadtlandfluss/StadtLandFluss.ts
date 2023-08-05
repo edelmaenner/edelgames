@@ -1,5 +1,5 @@
-import ModuleInterface from '../../framework/modules/ModuleInterface';
-import ModuleGameInterface from '../../framework/modules/ModuleGameInterface';
+import Module from '../../framework/modules/Module';
+import ModuleGame from '../../framework/modules/ModuleGame';
 import StadtLandFlussGame, { defaultSLFCategories } from './StadtLandFlussGame';
 import ModuleConfig from '../../framework/modules/configuration/ModuleConfig';
 import StringConfig from '../../framework/modules/configuration/elements/StringConfig';
@@ -11,8 +11,8 @@ import {
 } from '../../framework/modules/configuration/elements/Collections';
 import { PlayerRangeDefinition } from '@edelgames/types/src/app/ModuleTypes';
 
-class StadtLandFluss implements ModuleInterface {
-	getGameInstance(): ModuleGameInterface {
+class StadtLandFluss extends Module {
+	getGameInstance(): ModuleGame {
 		return new StadtLandFlussGame();
 	}
 
@@ -28,10 +28,6 @@ class StadtLandFluss implements ModuleInterface {
 			).changeAllowedQuantities(3, 20, defaultSLFCategories),
 			new IntegerConfig('slf_num_rounds', 'Anzahl der Runden', 1, 30, 10),
 		]);
-	}
-
-	getRequiredPlayersRange(): PlayerRangeDefinition {
-		return { min: 1, max: 20 };
 	}
 
 	getUniqueId(): string {

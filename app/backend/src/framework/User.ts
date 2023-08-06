@@ -9,91 +9,64 @@ import {
 	authDataContainer,
 	EventDataObject,
 	IUser,
+	ListenerFunction,
 } from '@edelgames/types/src/app/ApiTypes';
 import RandomNameGenerator from './util/RandomNameGenerator';
+import serverConfiguration from './util/ServerConfiguration';
+import { clearTimeout } from 'timers';
 
 export default class User implements IUser {
 	private readonly id: string = ''; // required for identifying users with the same name
-	private name = ''; // basically the username or guest_{id}
+	private name = ''; // basically the username or generated guest username
 	private verified = false; // true, if the user did authenticate itself by login
 	private currentRoom: Room | null = null;
 	private pictureUrl: string | null = null;
 	private authSessionId: string | null = null;
-	private readonly socket: Socket;
+	private socket: Socket | null = null; // the connected web socket, or null if none connected
+	private disconnectTimeout: NodeJS.Timer | null = null;
+
+	private listeners: { event: string; handler: ListenerFunction }[] = [
+		{ event: 'userLoginAttempt', handler: this.authenticate.bind(this) },
+		{
+			event: 'refreshLobbyRoomData',
+			handler: this.onRefreshLobbyRoomData.bind(this),
+		},
+		{ event: 'createNewRoom', handler: this.onCreateNewRoom.bind(this) },
+		{ event: 'returnToLobby', handler: this.onReturnToLobby.bind(this) },
+		{ event: 'joinRoom', handler: this.onJoinRoom.bind(this) },
+		{ event: 'startGame', handler: this.onStartGame.bind(this) },
+		{
+			event: 'clientToServerGameMessage',
+			handler: this.onReceivedGameMessage.bind(this),
+		},
+		{
+			event: 'returnToGameSelection',
+			handler: this.onGameCancelRequested.bind(this),
+		},
+		{
+			event: 'changeRoomName',
+			handler: this.onRoomNameChangeRequested.bind(this),
+		},
+		{
+			event: 'changeRoomPass',
+			handler: this.onRoomPassChangeRequested.bind(this),
+		},
+		{ event: 'gameConfigEdited', handler: this.onGameConfigEdited.bind(this) },
+		{
+			event: 'gameConfigFinished',
+			handler: this.onGameConfigFinished.bind(this),
+		},
+		{
+			event: 'gameConfigPubliclyStateChanged',
+			handler: this.onGameConfigPubliclyChanged.bind(this),
+		},
+	];
 
 	constructor(socket: Socket) {
-		this.socket = socket;
 		this.id = this.createIdHash();
-		this.name = 'guest_' + this.id;
 		this.name = RandomNameGenerator.generate();
+		this.setSocket(socket, true);
 		this.sendUserProfileChangedMessage();
-
-		// register generic listeners
-		SocketManager.subscribeEventToSocket(
-			socket,
-			'userLoginAttempt',
-			this.authenticate.bind(this)
-		);
-		SocketManager.subscribeEventToSocket(
-			socket,
-			'refreshLobbyRoomData',
-			this.onRefreshLobbyRoomData.bind(this)
-		);
-		SocketManager.subscribeEventToSocket(
-			socket,
-			'createNewRoom',
-			this.onCreateNewRoom.bind(this)
-		);
-		SocketManager.subscribeEventToSocket(
-			socket,
-			'returnToLobby',
-			this.onReturnToLobby.bind(this)
-		);
-		SocketManager.subscribeEventToSocket(
-			socket,
-			'joinRoom',
-			this.onJoinRoom.bind(this)
-		);
-		SocketManager.subscribeEventToSocket(
-			socket,
-			'startGame',
-			this.onStartGame.bind(this)
-		);
-		SocketManager.subscribeEventToSocket(
-			socket,
-			'clientToServerGameMessage',
-			this.onReceivedGameMessage.bind(this)
-		);
-		SocketManager.subscribeEventToSocket(
-			socket,
-			'returnToGameSelection',
-			this.onGameCancelRequested.bind(this)
-		);
-		SocketManager.subscribeEventToSocket(
-			socket,
-			'changeRoomName',
-			this.onRoomNameChangeRequested.bind(this)
-		);
-		SocketManager.subscribeEventToSocket(
-			socket,
-			'changeRoomPass',
-			this.onRoomPassChangeRequested.bind(this)
-		);
-		SocketManager.subscribeEventToSocket(
-			socket,
-			'gameConfigEdited',
-			this.onGameConfigEdited.bind(this)
-		);
-		SocketManager.subscribeEventToSocket(
-			socket,
-			'gameConfigFinished',
-			this.onGameConfigFinished.bind(this)
-		);
-		SocketManager.subscribeEventToSocket(
-			socket,
-			'gameConfigPubliclyStateChanged',
-			this.onGameConfigPubliclyChanged.bind(this)
-		);
 	}
 
 	/** This will remove the user from its current room, hopefully leaving no reference behind. Thus allowing it to be cleared by the garbage collection
@@ -104,6 +77,54 @@ export default class User implements IUser {
 			this.currentRoom.removeUserFromRoom(this);
 			this.currentRoom = null;
 		}
+	}
+
+	public setSocket(socket: Socket | null, isFirstConnection = false): void {
+		this.socket = socket;
+
+		if (socket) {
+			if (!isFirstConnection) {
+				systemLogger.debug(`user ${this.id} switched to socket ${socket.id}!`);
+			}
+
+			// prevent disconnect, when reconnecting
+			if (this.disconnectTimeout) {
+				clearTimeout(this.disconnectTimeout);
+				this.disconnectTimeout = null;
+			}
+
+			if (this.currentRoom) {
+				this.socket.join(this.currentRoom.getRoomId());
+			}
+
+			// register generic listeners and remove old ones
+			for (const eventDefinition of this.listeners) {
+				this.socket.removeAllListeners(eventDefinition.event);
+				SocketManager.subscribeEventToSocket(
+					this.socket,
+					eventDefinition.event,
+					eventDefinition.handler
+				);
+			}
+		} else {
+			// socket was set to null... probably by disconnect. Wait for the given amount of time, before disconnecting entirely
+			if (this.disconnectTimeout) {
+				clearTimeout(this.disconnectTimeout);
+			}
+			this.disconnectTimeout = setTimeout(
+				this.destroyUser.bind(this),
+				serverConfiguration.apiDisconnectTimeoutSec * 1000
+			);
+		}
+
+		if (this.currentRoom) {
+			// update all other players. Is relevant to display the connection status of other players
+			this.currentRoom.onUserReconnect(this);
+			this.currentRoom.sendRoomChangedBroadcast();
+		}
+
+		// update this player
+		this.sendUserProfileChangedMessage();
 	}
 
 	public getUsername(): string {
@@ -122,8 +143,17 @@ export default class User implements IUser {
 		return this.currentRoom;
 	}
 
-	public getSocket(): Socket {
+	public getSocket(): Socket | null {
 		return this.socket;
+	}
+
+	public isConnected(): boolean {
+		return this.getSocket() !== null;
+	}
+
+	// avoid passing the authSessionId to the outside
+	public matchAuthenticationId(authId: string): boolean {
+		return authId === this.authSessionId;
 	}
 
 	public isVerified(): boolean {
@@ -135,12 +165,20 @@ export default class User implements IUser {
 	}
 
 	/**
-	 * Switches the user to the given room. SocketIo allows for multiple rooms at once, but we only want one at a time, so we leave the last one
+	 * Switches the user to the given room
 	 */
 	public async switchRoom(newRoom: Room) {
+		if (null === this.getSocket()) {
+			// special handling for a disconnected user -> avoid all socket actions
+			this.currentRoom.removeUserFromRoom(this);
+			this.currentRoom = newRoom;
+			return;
+		}
+
 		await this.socket.join(newRoom.getRoomId());
 
 		if (this.currentRoom) {
+			// SocketIo allows for multiple rooms at once, but we only want one at a time, so we leave the last one
 			this.socket.leave(this.currentRoom.getRoomId());
 			this.currentRoom.removeUserFromRoom(this);
 		}
@@ -149,7 +187,9 @@ export default class User implements IUser {
 	}
 
 	public messageUser(eventName: string, data: object): void {
-		SocketManager.directMessageToSocket(this.socket, eventName, data);
+		if (this.socket) {
+			SocketManager.directMessageToSocket(this.socket, eventName, data);
+		}
 	}
 
 	private sendUserProfileChangedMessage(): void {
@@ -167,13 +207,13 @@ export default class User implements IUser {
 		username: string;
 		password: string;
 	}): void {
-		const { username, password } = loginData;
+		const { username, password, isAuthSessionId } = loginData;
 
-		if (this.verified) {
+		if (this.isVerified()) {
 			return;
 		}
 
-		if (loginData.isAuthSessionId) {
+		if (isAuthSessionId) {
 			const sessionId = this.authSessionId ?? password;
 			systemLogger.info(`user ${this.id} attempted login with authId`);
 			XenforoApi.loginWithToken(sessionId, this.onAuthResponse.bind(this));
@@ -208,6 +248,34 @@ export default class User implements IUser {
 			return;
 		}
 
+		// check if this authentication is already assigned to a user
+		const existingSocketUser = RoomManager.isAuthenticatedUserAlreadyConnected(
+			data.authCookie
+		);
+		if (existingSocketUser) {
+			if (existingSocketUser.isConnected()) {
+				// prevent login
+				SocketManager.sendNotificationBubbleToSocket(
+					this.socket,
+					'Account already connected!',
+					'error'
+				);
+			} else {
+				// there is another authenticated user, that disconnected before -> switch to this user and throw away this one
+				systemLogger.info(
+					`user ${this.id} is redirected to ${existingSocketUser.getId()}!`
+				);
+				if (this.currentRoom) {
+					this.getSocket().leave(this.currentRoom.getRoomId());
+				}
+				existingSocketUser.setSocket(this.getSocket());
+				this.setSocket(null);
+				this.destroyUser();
+			}
+			return;
+		}
+
+		// all clear, this user is not yet connected
 		this.verified = true;
 		this.name = data.username;
 		this.pictureUrl = data.profileImageUrl;
@@ -221,11 +289,7 @@ export default class User implements IUser {
 	}
 
 	public onRefreshLobbyRoomData(): void {
-		SocketManager.directMessageToSocket(
-			this.socket,
-			'lobbyRoomsChanged',
-			RoomManager.getLobbyMemberRoomData()
-		);
+		this.messageUser('lobbyRoomsChanged', RoomManager.getLobbyMemberRoomData());
 	}
 
 	public onCreateNewRoom(): void {
@@ -279,11 +343,13 @@ export default class User implements IUser {
 		) {
 			this.currentRoom.setCurrentGame(null);
 			for (const user of this.currentRoom.getRoomMembers()) {
-				SocketManager.sendNotificationBubbleToSocket(
-					user.getSocket(),
-					`${this.getUsername()} hat das Spiel beendet`,
-					'info'
-				);
+				if (user.getSocket()) {
+					SocketManager.sendNotificationBubbleToSocket(
+						user.getSocket(),
+						`${this.getUsername()} hat das Spiel beendet`,
+						'info'
+					);
+				}
 			}
 		}
 	}

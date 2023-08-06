@@ -64,6 +64,35 @@ class RoomManager {
 		}
 		return roomData;
 	}
+
+	/**
+	 * Searches for an existing user with the given authSessionId and returns is or null otherwise
+	 */
+	public isAuthenticatedUserAlreadyConnected(
+		authSessionId: string
+	): User | null {
+		for (const room of [...this.rooms, this.lobby]) {
+			for (const user of room.getRoomMembers()) {
+				if (user.matchAuthenticationId(authSessionId)) {
+					return user;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	public getUserBySocketId(socketId: string): User | null {
+		for (const room of [...this.rooms, this.lobby]) {
+			for (const user of room.getRoomMembers()) {
+				const socket = user.getSocket();
+				if (socket && socket.id === socketId) {
+					return user;
+				}
+			}
+		}
+		return null;
+	}
 }
 
 const roomManager = new RoomManager();

@@ -76,8 +76,12 @@ export default class ModulePlayerApi {
 		return this.room;
 	}
 
-	public getRoomMembers(): User[] {
-		return this.room.getRoomMembers();
+	public getRoomMembers(onlyConnected = false): User[] {
+		let members = this.room.getRoomMembers();
+		if (onlyConnected) {
+			members = members.filter((member) => member.isConnected());
+		}
+		return members;
 	}
 
 	public getRoomMaster(): User {

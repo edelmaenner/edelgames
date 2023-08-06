@@ -52,6 +52,13 @@ export default class ModuleEventApi {
 		this.addEventHandler('userJoined', handler);
 	}
 
+	// just an alias for addEventHandler('userReconnected', handler) for better usability
+	public addUserReconnectedHandler(
+		handler: internalEventHandlerFunction
+	): void {
+		this.addEventHandler('userReconnected', handler);
+	}
+
 	// just an alias for addEventHandler('userLeft', handler) for better usability
 	public addUserLeaveHandler(handler: internalEventHandlerFunction): void {
 		this.addEventHandler('userLeft', handler);

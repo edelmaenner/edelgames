@@ -1,4 +1,4 @@
-import ModuleGameInterface from '../../framework/modules/ModuleGameInterface';
+import ModuleGame from '../../framework/modules/ModuleGame';
 import ModuleApi from '../../framework/modules/ModuleApi';
 import User from '../../framework/User';
 import { EventDataObject } from '@edelgames/types/src/app/ApiTypes';
@@ -36,7 +36,7 @@ export enum YahtzeeClientToServerEventNames {
 /*
  * The actual game instance, that controls and manages the game
  */
-export default class YahtzeeGame implements ModuleGameInterface {
+export default class YahtzeeGame extends ModuleGame {
 	// technical properties
 	api: ModuleApi = null;
 	playerIndex = 0;
@@ -322,7 +322,7 @@ export default class YahtzeeGame implements ModuleGameInterface {
 				(scores[ScoreCellIDs.CHANCE] || 0) +
 				(scores[ScoreCellIDs.FULL_HOUSE] || 0) +
 				(scores[ScoreCellIDs.SMALL_STRAIGHT] || 0) +
-				(scores[ScoreCellIDs.SMALL_STRAIGHT] || 0);
+				(scores[ScoreCellIDs.LARGE_STRAIGHT] || 0);
 
 			scores.total = firstPart + (firstPart >= 63 ? 35 : 0) + secondPart;
 

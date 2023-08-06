@@ -1,4 +1,4 @@
-import ModuleGameInterface from '../../framework/modules/ModuleGameInterface';
+import ModuleGame from '../../framework/modules/ModuleGame';
 import ModuleApi from '../../framework/modules/ModuleApi';
 import User from '../../framework/User';
 import { EventDataObject } from '@edelgames/types/src/app/ApiTypes';
@@ -29,7 +29,7 @@ import { variant3Grid } from './gridTemplates/variant_3';
 /*
  * The actual game instance, that controls and manages the game
  */
-export default class ColorCheckerGame implements ModuleGameInterface {
+export default class ColorCheckerGame extends ModuleGame {
 	// technical properties
 	api: ModuleApi = null;
 	playerIndex = 0;

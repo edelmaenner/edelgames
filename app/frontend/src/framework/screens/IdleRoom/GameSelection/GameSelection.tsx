@@ -4,6 +4,8 @@ import roomManager from '../../../util/RoomManager';
 import profileManager from '../../../util/ProfileManager';
 import socketManager from '../../../util/SocketManager';
 import moduleRegistry from '../../../modules/ModuleRegistry';
+import { PlayerRangeDefinition } from '@edelgames/types/src/app/ModuleTypes';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export const GameSelectionEvents = {
 	startGame: 'startGame',
@@ -31,16 +33,47 @@ export default class GameSelection extends React.Component {
 	}
 
 	renderGameIcon(module: ModuleInterface): ReactNode {
+		const requirements = module.getPlayerRequirements();
 		return (
 			<div
-				className={'game-preview'}
+				className={
+					'game-preview ' +
+					(this.isPlayerRequirementFulfilled(requirements)
+						? ''
+						: 'game-unavailable')
+				}
 				key={module.getUniqueId()}
 				onClick={this.onSelectGame.bind(this, module.getUniqueId())}
 			>
 				<img src={module.getPreviewImage()} alt={module.getTitle()} />
 
-				<div className={'preview-hover'}>{module.getTitle()}</div>
+				<div className={'preview-hover'}>
+					{module.getTitle()}
+					{this.renderPlayerRequirements(requirements)}
+				</div>
 			</div>
 		);
+	}
+
+	renderPlayerRequirements(condition: PlayerRangeDefinition): JSX.Element {
+		const playerCondition =
+			typeof condition === 'number'
+				? condition
+				: `${condition.min}-${condition.max}`;
+
+		return (
+			<span>
+				({playerCondition}
+				&nbsp;
+				<FontAwesomeIcon icon={['fad', 'people-group']} size="1x" />)
+			</span>
+		);
+	}
+
+	isPlayerRequirementFulfilled(condition: PlayerRangeDefinition) {
+		const numPlayers = roomManager.getRoomMembers().length;
+		return typeof condition === 'number'
+			? numPlayers === condition
+			: numPlayers >= condition.min && numPlayers <= condition.max;
 	}
 }

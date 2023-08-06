@@ -1,4 +1,4 @@
-import ModuleGameInterface from '../../framework/modules/ModuleGameInterface';
+import ModuleGame from '../../framework/modules/ModuleGame';
 import User from '../../framework/User';
 import ModuleApi from '../../framework/modules/ModuleApi';
 import {
@@ -12,7 +12,7 @@ export const defaultSLFCategories = ['Stadt', 'Land', 'Fluss'];
 /**
  * Main class for the Stadt Land Fluss game.
  */
-export default class StadtLandFlussGame implements ModuleGameInterface {
+export default class StadtLandFlussGame extends ModuleGame {
 	api: ModuleApi;
 	gameState: GameState | null = null;
 

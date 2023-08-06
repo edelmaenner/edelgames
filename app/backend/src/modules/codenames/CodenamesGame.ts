@@ -1,4 +1,4 @@
-import ModuleGameInterface from '../../framework/modules/ModuleGameInterface';
+import ModuleGame from '../../framework/modules/ModuleGame';
 import ModuleApi from '../../framework/modules/ModuleApi';
 import AbstractState from './gameStates/AbstractState';
 import InitialState from './gameStates/InitialState';
@@ -11,7 +11,7 @@ import { BoardElement } from './BoardElement';
 /*
  * The actual game instance, that controls and manages the game
  */
-export default class CodenamesGame implements ModuleGameInterface {
+export default class CodenamesGame extends ModuleGame {
 	gameApi: ModuleApi | null = null;
 	gameState: AbstractState;
 	gameMembers: Team[];

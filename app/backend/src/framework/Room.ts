@@ -319,4 +319,11 @@ export default class Room {
 			.setPubliclyEditable(!!newVisibilityState);
 		this.sendRoomChangedBroadcast();
 	}
+
+	// returns, if players can join the room
+	public isPlayerJoinAllowed(): boolean {
+		return (
+			!this.moduleApi || this.moduleApi.getGameDefinition().allowLateJoin()
+		);
+	}
 }

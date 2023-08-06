@@ -57,7 +57,7 @@ class RoomManager {
 			roomData.rooms.push({
 				roomId: room.getRoomId(),
 				roomName: room.getRoomName(),
-				allowJoin: !room.getCurrentGameId(),
+				allowJoin: room.isPlayerJoinAllowed(),
 				requirePassphrase: !!room.getRoomPassword(),
 				roomMembers: room.getPublicRoomMemberList(),
 			});

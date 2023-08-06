@@ -93,6 +93,7 @@ export default class User implements IUser {
 				this.disconnectTimeout = null;
 			}
 
+			// update the socket, according to the current room
 			if (this.currentRoom) {
 				this.socket.join(this.currentRoom.getRoomId());
 			}

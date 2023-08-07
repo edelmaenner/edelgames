@@ -19,11 +19,9 @@ export default class CodenamesGame extends ModuleGame {
 	board: BoardElement[] = [];
 	hint: Hint[] = [];
 
-	onGameInitialize(gameApi: ModuleApi): void {
-		this.gameApi = gameApi;
+	onGameInitialize(): void {
+		this.gameApi = this.api;
 		this.room = this.gameApi.getPlayerApi().getRoom();
-		this.gameApi.getEventApi().addUserLeaveHandler(this.onUserLeave.bind(this));
-		this.gameApi.getEventApi().addUserJoinedHandler(this.onUserJoin.bind(this));
 		this.gameApi
 			.getEventApi()
 			.addEventHandler(
@@ -33,16 +31,16 @@ export default class CodenamesGame extends ModuleGame {
 		this.gameApi
 			.getEventApi()
 			.addEventHandler('requestGameState', this.onGameStateRequest.bind(this));
-		this.gameState = new InitialState(gameApi);
+		this.gameState = new InitialState(this.gameApi);
 		this.gameMembers = [new Team('A', 5), new Team('B', 5)];
 		this.sendCurrentStateOfGame();
 	}
 
-	onUserJoin() {
+	onPlayerJoin() {
 		this.sendCurrentStateOfGame();
 	}
 
-	onUserLeave(eventData: EventDataObject) {
+	onPlayerLeave(eventData: EventDataObject) {
 		this.gameState.handleUserLeave(this.gameMembers, eventData.senderId);
 		this.sendCurrentStateOfGame();
 	}

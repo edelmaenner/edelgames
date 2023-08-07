@@ -1,5 +1,4 @@
 import ModuleGame from '../../framework/modules/ModuleGame';
-import ModuleApi from '../../framework/modules/ModuleApi';
 import User from '../../framework/User';
 import { EventDataObject } from '@edelgames/types/src/app/ApiTypes';
 import {
@@ -38,7 +37,6 @@ export enum YahtzeeClientToServerEventNames {
  */
 export default class YahtzeeGame extends ModuleGame {
 	// technical properties
-	api: ModuleApi = null;
 	playerIndex = 0;
 
 	// game properties
@@ -49,12 +47,10 @@ export default class YahtzeeGame extends ModuleGame {
 	remainingRolls = 0;
 	scoreboard: YahtzeeScoreboardType = [];
 
-	onGameInitialize(api: ModuleApi): void {
-		this.api = api;
+	onGameInitialize(): void {
 		this.initScoreboard();
 
 		const eventApi = this.api.getEventApi();
-		eventApi.addUserLeaveHandler(this.onPlayerLeft.bind(this));
 		eventApi.addEventHandler(
 			YahtzeeClientToServerEventNames.ROLL_REQUESTED,
 			this.onPlayerRolledDice.bind(this)
@@ -211,7 +207,7 @@ export default class YahtzeeGame extends ModuleGame {
 		}
 	}
 
-	onPlayerLeft(eventData: EventDataObject): void {
+	onPlayerLeave(eventData: EventDataObject): void {
 		const removedUser = eventData.removedUser as User;
 
 		this.api

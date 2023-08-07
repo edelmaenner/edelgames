@@ -3,7 +3,6 @@ import ModuleGame from '../../framework/modules/ModuleGame';
 import DrawAndGuessGame from './DrawAndGuessGame';
 import { systemLogger } from '../../framework/util/Logger';
 import wordList from './Wordlist';
-import ModuleConfig from '../../framework/modules/configuration/ModuleConfig';
 import { PlayerRangeDefinition } from '@edelgames/types/src/app/ModuleTypes';
 
 /*

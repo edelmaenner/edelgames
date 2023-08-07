@@ -4,7 +4,6 @@ import HangmanGame from './HangmanGame';
 import ModuleConfig from '../../framework/modules/configuration/ModuleConfig';
 import BooleanConfig from '../../framework/modules/configuration/elements/BooleanConfig';
 import IntegerConfig from '../../framework/modules/configuration/elements/IntegerConfig';
-import { PlayerRangeDefinition } from '@edelgames/types/src/app/ModuleTypes';
 
 /*
  * This singleton is used to register the game to the ModuleList

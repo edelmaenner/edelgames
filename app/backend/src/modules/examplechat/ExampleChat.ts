@@ -8,7 +8,6 @@ import IntegerConfig from '../../framework/modules/configuration/elements/Intege
 import FloatConfig from '../../framework/modules/configuration/elements/FloatConfig';
 import BooleanConfig from '../../framework/modules/configuration/elements/BooleanConfig';
 import SelectOneConfig from '../../framework/modules/configuration/elements/SelectOneConfig';
-import { PlayerRangeDefinition } from '@edelgames/types/src/app/ModuleTypes';
 
 /*
  * This singleton is used to register the game to the ModuleList

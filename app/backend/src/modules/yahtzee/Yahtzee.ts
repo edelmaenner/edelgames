@@ -1,7 +1,6 @@
 import Module from '../../framework/modules/Module';
 import ModuleGame from '../../framework/modules/ModuleGame';
 import YahtzeeGame from './YahtzeeGame';
-import ModuleConfig from '../../framework/modules/configuration/ModuleConfig';
 import { PlayerRangeDefinition } from '@edelgames/types/src/app/ModuleTypes';
 
 /*

@@ -1,6 +1,5 @@
 import ConfigElement from '../ConfigElement';
 import {
-	ColorValue,
 	ConfigurationTypes,
 	ConfigurationTypesDefs,
 	NativeConfigurationElementConfig,

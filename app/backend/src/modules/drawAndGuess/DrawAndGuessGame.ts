@@ -473,4 +473,35 @@ export default class DrawAndGuessGame extends ModuleGame {
 			rounds: clamp(1, oldConfig.rounds, 10),
 		};
 	}
+
+	public onPlayerReconnect(eventData: EventDataObject | null) {
+		const user = eventData.user as User;
+		const playerId = user.getId();
+
+		this.api.getPlayerApi().sendPlayerMessage(playerId, 'activePlayerChanged', {
+			activePlayer: this.activePlayer.getId(),
+		});
+
+		// tell all players the wordmask
+		this.api.getPlayerApi().sendRoomMessage('wordToGuessChanged', {
+			mask: this.activeWordMask,
+			timeUntil: this.drawingTimerTimestamp + this.msUntilDrawingTimeout,
+		});
+
+		if (this.activePlayer.getId() === playerId) {
+			this.api
+				.getPlayerApi()
+				.sendPlayerMessage(playerId, 'wordSelectionOptions', {
+					options: this.availableWords,
+				});
+
+			// tell the painter the selected word
+			this.api
+				.getPlayerApi()
+				.sendPlayerMessage(this.activePlayer.getId(), 'wordToDrawChanged', {
+					word: this.activeWord,
+				});
+		}
+		this.setGameState(this.activeGameState);
+	}
 }

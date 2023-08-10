@@ -83,6 +83,7 @@ export default class ScoreBoard extends Component<IProps, {}> {
 
 		return (
 			<ProfileImage
+				key={'profile_image_'+member.getId()}
 				picture={member.getPicture()}
 				username={member.getUsername()}
 				id={member.getId()}

@@ -7,6 +7,7 @@ import Room from '../../framework/Room';
 import { EventDataObject } from '@edelgames/types/src/app/ApiTypes';
 import { Category, Hint } from '@edelgames/types/src/modules/codenames/CNTypes';
 import { BoardElement } from './BoardElement';
+import User from '../../framework/User';
 
 /*
  * The actual game instance, that controls and manages the game
@@ -161,5 +162,12 @@ export default class CodenamesGame extends ModuleGame {
 			return cardTeamName;
 		}
 		return undefined;
+	}
+
+	public onPlayerReconnect() {
+		//const user = eventData.user as User;
+		this.sendCurrentStateOfGame();
+
+		// todo: test this and/or extend this method, if necessary
 	}
 }

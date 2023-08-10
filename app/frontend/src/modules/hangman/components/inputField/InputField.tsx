@@ -150,7 +150,7 @@ export default class InputField extends Component<IProps, IState> {
 				{this.props.gameState.phase === 'guessing' && (
 					<div className={'wrong-character-list'}>
 						{this.props.gameState.wrongChars.sort().map((char) => (
-							<span className={'wrong-char'}>{char}</span>
+							<span key={'char_'+char} className={'wrong-char'}>{char}</span>
 						))}
 					</div>
 				)}
@@ -165,6 +165,7 @@ export default class InputField extends Component<IProps, IState> {
 					className={'guess-input'}
 					value={this.state.currentCharValue}
 					onKeyDown={this.onGuessCharKeyDown.bind(this)}
+					onChange={() => {}} // to prevent react from sending error messages
 					placeholder={'?'}
 					autoFocus={true}
 				/>

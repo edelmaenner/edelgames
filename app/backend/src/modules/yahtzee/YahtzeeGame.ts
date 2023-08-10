@@ -333,4 +333,10 @@ export default class YahtzeeGame extends ModuleGame {
 
 		return highestScorePlayerCount === 1 ? highestScorePlayerId : null;
 	}
+
+	onPlayerReconnect() {
+		this.sendScoresChangedUpdate();
+		this.sendGameStateUpdate();
+		this.sendDicesChangedUpdate(false);
+	}
 }

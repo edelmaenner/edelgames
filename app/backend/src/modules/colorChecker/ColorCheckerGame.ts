@@ -415,6 +415,23 @@ export default class ColorCheckerGame extends ModuleGame {
 			.getPlayerApi()
 			.sendRoomBubble(removedUser.getUsername() + ' left the game', 'error');
 	}
+
+	public onPlayerReconnect(eventData: EventDataObject | null) {
+		const user = eventData.user as User;
+		const playerId = user.getId();
+		setTimeout(this.onPlayerReconnectDelayed.bind(this, playerId), 500);
+	}
+
+	// execute this after a timeout, to ensure the frontend is loaded
+	public onPlayerReconnectDelayed(playerId: string) {
+		this.updateClientPlayerState(playerId);
+		this.updateClientRemainingPlayers(this.playerHelper.readyPlayers);
+		this.updateClientGameStates();
+		this.updateClientPlayerGrid(
+			playerId,
+			this.playerHelper.getDataByPlayerId(playerId).grid
+		);
+	}
 }
 
 export const SelectableColors = [

@@ -5,6 +5,7 @@ import {
 	Guesses,
 	Players,
 } from '@edelgames/types/src/modules/stadtLandFluss/SLFTypes';
+import { EventDataObject } from '@edelgames/types/src/app/ApiTypes';
 
 export const defaultSLFCategories = ['Stadt', 'Land', 'Fluss'];
 
@@ -457,5 +458,10 @@ export default class StadtLandFlussGame extends ModuleGame {
 		throw new Error(
 			'For some reason more than 26 round were played. There are no more letters to use.'
 		);
+	}
+
+	public onPlayerReconnect(eventData: EventDataObject | null) {
+		const user = eventData.user as User;
+		this.publishGameState(user.getId());
 	}
 }

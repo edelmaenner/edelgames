@@ -120,8 +120,8 @@ export default class User implements IUser {
 
 		if (this.currentRoom) {
 			// update all other players. Is relevant to display the connection status of other players
-			this.currentRoom.onUserReconnect(this);
 			this.currentRoom.sendRoomChangedBroadcast();
+			this.currentRoom.onUserReconnect(this);
 		}
 
 		// update this player

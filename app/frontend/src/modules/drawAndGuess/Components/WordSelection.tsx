@@ -12,6 +12,7 @@ export default class WordSelection extends Component<IProps, {}> {
 				{this.props.options.map((word) => {
 					return (
 						<div
+							key={'word_option_'+word}
 							className={'word-option'}
 							onClick={() => this.props.onSelect(word)}
 						>

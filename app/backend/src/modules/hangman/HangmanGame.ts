@@ -405,4 +405,8 @@ export default class HangmanGame extends ModuleGame {
 			? validWordList[Math.floor(Math.random() * validWordList.length)]
 			: wordList[Math.floor(Math.random() * wordList.length)];
 	}
+
+	public onPlayerReconnect(eventData: EventDataObject | null) {
+		this.updateClients();
+	}
 }

@@ -176,8 +176,18 @@ export default class Room {
 		return Math.random().toString().slice(2);
 	}
 
-	public getMemberCount(): number {
-		return this.roomMembers.length;
+	public getMemberCount(
+		onlyConnected = false,
+		onlyAuthenticated = false
+	): number {
+		let members = this.roomMembers;
+		if (onlyConnected) {
+			members = members.filter((member) => member.isConnected());
+		}
+		if (onlyAuthenticated) {
+			members = members.filter((member) => member.isVerified());
+		}
+		return members.length;
 	}
 
 	/*
@@ -210,6 +220,14 @@ export default class Room {
 		return true;
 	}
 
+	public onUserReconnect(user: User): void {
+		if (this.moduleApi) {
+			this.moduleApi.getEventApi().alertEvent('userReconnected', {
+				user: user,
+			});
+		}
+	}
+
 	/**
 	 * @internal
 	 * this should only be called, when the user object also changes! never on its own!
@@ -227,8 +245,16 @@ export default class Room {
 			});
 		}
 
-		if (this.getMemberCount() === 0) {
+		const hasAuthenticatedMembers = this.getMemberCount(false, true) > 0;
+		const hasConnectedMembers = this.getMemberCount(true) > 0;
+		if (!hasAuthenticatedMembers && !hasConnectedMembers) {
 			this.setCurrentGame(null);
+			for (const member of this.roomMembers.filter(
+				(member) => !member.isConnected()
+			)) {
+				// destroy disconnected, unauthenticated users (as they are not able to rejoin)
+				member.destroyUser();
+			}
 			roomManager.removeRoom(this);
 		} else if (this.roomMaster === user) {
 			this.roomMaster = this.roomMembers[0];
@@ -248,6 +274,7 @@ export default class Room {
 				id: member.getId(),
 				picture: member.getPicture(),
 				isRoomMaster: member === this.roomMaster,
+				isConnected: member.isConnected(),
 			};
 		});
 	}
@@ -300,7 +327,7 @@ export default class Room {
 		if (config.isFullyConfigured()) {
 			this.isEditingGameConfig = false;
 			this.sendRoomChangedBroadcast();
-			this.moduleApi.getGame().onGameInitialize(this.moduleApi);
+			this.moduleApi.getGame().__initialize(this.moduleApi);
 		}
 	}
 

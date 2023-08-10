@@ -4,8 +4,8 @@ import SocketManager from '../../util/SocketManager';
 import User from '../../User';
 import { EventDataObject } from '@edelgames/types/src/app/ApiTypes';
 
-/*
- * This class will be passed to the game instance to allow for restricted access to the room data.
+/**
+ * @description This class will be passed to the game instance to allow for restricted access to the room data.
  * That way, a game cannot influence a room more than it is supposed to
  */
 export default class ModulePlayerApi {
@@ -17,6 +17,9 @@ export default class ModulePlayerApi {
 		this.moduleApi = moduleApi;
 	}
 
+	/**
+	 * @description Send a socket-event-message as a broadcast to every player in the current room
+	 */
 	public sendRoomMessage(eventName: string, eventData: EventDataObject): void {
 		const event = this.moduleApi.getGameId() + '_' + eventName;
 		SocketManager.broadcast(
@@ -29,6 +32,9 @@ export default class ModulePlayerApi {
 		);
 	}
 
+	/**
+	 * @description Send a socket-event-message to a specific player
+	 */
 	public sendPlayerMessage(
 		playerId: string,
 		eventName: string,
@@ -48,6 +54,9 @@ export default class ModulePlayerApi {
 		);
 	}
 
+	/**
+	 * @description Display a notification bubble to the player with the given id
+	 */
 	public sendPlayerBubble(
 		playerId: string,
 		message: string,
@@ -63,6 +72,9 @@ export default class ModulePlayerApi {
 		);
 	}
 
+	/**
+	 * @description Display a notification bubble to every player in the room
+	 */
 	public sendRoomBubble(
 		message: string,
 		type: 'info' | 'error' | 'success' | 'warning' = 'info'
@@ -76,8 +88,12 @@ export default class ModulePlayerApi {
 		return this.room;
 	}
 
-	public getRoomMembers(): User[] {
-		return this.room.getRoomMembers();
+	public getRoomMembers(onlyConnected = false): User[] {
+		let members = this.room.getRoomMembers();
+		if (onlyConnected) {
+			members = members.filter((member) => member.isConnected());
+		}
+		return members;
 	}
 
 	public getRoomMaster(): User {

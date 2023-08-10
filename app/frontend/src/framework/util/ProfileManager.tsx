@@ -27,6 +27,7 @@ class ProfileManager {
 	private verified: boolean = false;
 	private picture: string | null = null;
 	private authSessionId: string | null = null;
+	private attemptedAutomatedAuthLogin: boolean = false;
 
 	constructor() {
 		EventManager.subscribe(
@@ -43,7 +44,8 @@ class ProfileManager {
 		data = data as ServerProfileObject; // just for correct typechecking
 
 		// try automatic login, if the user has no session set
-		if (data.authSessionId === null) {
+		if (data.authSessionId === null && !this.attemptedAutomatedAuthLogin) {
+			this.attemptedAutomatedAuthLogin = true;
 			this.attemptAutomaticAuthLogin();
 		}
 

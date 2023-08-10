@@ -1,5 +1,4 @@
 import ModuleGame from '../../framework/modules/ModuleGame';
-import ModuleApi from '../../framework/modules/ModuleApi';
 import {
 	GamePhase,
 	GameState,
@@ -28,7 +27,6 @@ const allowedCharacters = [...alphabet, ...specialChars, ...syntaxCharacters];
  */
 export default class HangmanGame extends ModuleGame {
 	// technical properties
-	api: ModuleApi = null;
 	clientUpdateInterval: NodeJS.Timer = null;
 
 	// configuration
@@ -57,24 +55,23 @@ export default class HangmanGame extends ModuleGame {
 	activeGuesserId: string;
 	currentHostId: string = undefined;
 
-	onGameInitialize(api: ModuleApi): void {
-		this.api = api;
-		this.generateWordsAutomatically = api
+	onGameInitialize(): void {
+		this.generateWordsAutomatically = this.api
 			.getConfigApi()
 			.getBooleanConfigValue('automated_words', false);
-		this.minWordLength = api
+		this.minWordLength = this.api
 			.getConfigApi()
 			.getSingleNumberConfigValue('min_word_length', 5);
-		this.maxWordLength = api
+		this.maxWordLength = this.api
 			.getConfigApi()
 			.getSingleNumberConfigValue('max_word_length', 15);
-		this.scoreWinningThreshold = api
+		this.scoreWinningThreshold = this.api
 			.getConfigApi()
 			.getSingleNumberConfigValue('score_winning_threshold', 50);
-		this.turnWinningThreshold = api
+		this.turnWinningThreshold = this.api
 			.getConfigApi()
 			.getSingleNumberConfigValue('turn_winning_threshold', 10);
-		this.maxWrongGuesses = api
+		this.maxWrongGuesses = this.api
 			.getConfigApi()
 			.getSingleNumberConfigValue('max_wrong_guesses', 0);
 
@@ -114,7 +111,6 @@ export default class HangmanGame extends ModuleGame {
 			this.updateClients.bind(this),
 			5000
 		);
-		this.api.getEventApi().addGameStoppedHandler(this.onGameStopped.bind(this));
 	}
 
 	onGameStopped(): void {
@@ -408,5 +404,9 @@ export default class HangmanGame extends ModuleGame {
 		return validWordList.length
 			? validWordList[Math.floor(Math.random() * validWordList.length)]
 			: wordList[Math.floor(Math.random() * wordList.length)];
+	}
+
+	public onPlayerReconnect(eventData: EventDataObject | null) {
+		this.updateClients();
 	}
 }

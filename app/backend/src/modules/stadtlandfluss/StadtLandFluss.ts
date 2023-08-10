@@ -9,7 +9,6 @@ import {
 	baseNumbers,
 	punctuation,
 } from '../../framework/modules/configuration/elements/Collections';
-import { PlayerRangeDefinition } from '@edelgames/types/src/app/ModuleTypes';
 
 class StadtLandFluss extends Module {
 	getGameInstance(): ModuleGame {

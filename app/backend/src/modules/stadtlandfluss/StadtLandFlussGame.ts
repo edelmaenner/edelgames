@@ -1,11 +1,11 @@
 import ModuleGame from '../../framework/modules/ModuleGame';
 import User from '../../framework/User';
-import ModuleApi from '../../framework/modules/ModuleApi';
 import {
 	GameState,
 	Guesses,
 	Players,
 } from '@edelgames/types/src/modules/stadtLandFluss/SLFTypes';
+import { EventDataObject } from '@edelgames/types/src/app/ApiTypes';
 
 export const defaultSLFCategories = ['Stadt', 'Land', 'Fluss'];
 
@@ -13,7 +13,6 @@ export const defaultSLFCategories = ['Stadt', 'Land', 'Fluss'];
  * Main class for the Stadt Land Fluss game.
  */
 export default class StadtLandFlussGame extends ModuleGame {
-	api: ModuleApi;
 	gameState: GameState | null = null;
 
 	/**
@@ -43,11 +42,8 @@ export default class StadtLandFlussGame extends ModuleGame {
 
 	/**
 	 * Register the relevant event handlers and set up the initial player list.
-	 *
-	 * @param {ModuleApi} api
 	 */
-	onGameInitialize(api: ModuleApi): void {
-		this.api = api;
+	onGameInitialize(): void {
 		const eventApi = this.api.getEventApi();
 		eventApi.addEventHandler('nextRound', this.onNextRound.bind(this));
 		eventApi.addEventHandler('updateGuesses', this.onUpdateGuesses.bind(this));
@@ -59,8 +55,6 @@ export default class StadtLandFlussGame extends ModuleGame {
 		eventApi.addEventHandler('playAgain', this.onPlayAgain.bind(this));
 		eventApi.addEventHandler('setDownvote', this.onToggleDownvote.bind(this));
 
-		eventApi.addUserJoinedHandler(this.onUserJoin.bind(this));
-		eventApi.addUserLeaveHandler(this.onUserLeave.bind(this));
 		this.gameState = this.createInitialGameState();
 
 		// start game
@@ -227,7 +221,7 @@ export default class StadtLandFlussGame extends ModuleGame {
 	 *
 	 * @param {{ newUser: User, userList: Array<{ username: string, id: string, picture: string | null, isRoomMaster: boolean }> }} eventData
 	 */
-	private onUserJoin(eventData: {
+	public onPlayerJoin(eventData: {
 		newUser: User;
 		userList: Array<{
 			username: string;
@@ -258,7 +252,7 @@ export default class StadtLandFlussGame extends ModuleGame {
 	 *
 	 * @param {{ removedUser: User, userList: object[] }} eventData
 	 */
-	private onUserLeave(eventData: {
+	public onPlayerLeave(eventData: {
 		removedUser: User;
 		userList: object[];
 	}): void {
@@ -464,5 +458,10 @@ export default class StadtLandFlussGame extends ModuleGame {
 		throw new Error(
 			'For some reason more than 26 round were played. There are no more letters to use.'
 		);
+	}
+
+	public onPlayerReconnect(eventData: EventDataObject | null) {
+		const user = eventData.user as User;
+		this.publishGameState(user.getId());
 	}
 }

@@ -38,7 +38,7 @@ class ModuleRegistry {
 		room.setCurrentGame(moduleApi);
 		if (!room.isInConfigEditMode()) {
 			// if this game does not trigger the config edit mode, we continue to start the game
-			gameInstance.onGameInitialize(moduleApi);
+			gameInstance.__initialize(moduleApi);
 		}
 	}
 

@@ -31,7 +31,6 @@ import { variant3Grid } from './gridTemplates/variant_3';
  */
 export default class ColorCheckerGame extends ModuleGame {
 	// technical properties
-	api: ModuleApi = null;
 	playerIndex = 0;
 	activePlayerId: string;
 	gameState: GameStates = GameStates.INIT;
@@ -42,9 +41,7 @@ export default class ColorCheckerGame extends ModuleGame {
 	playerHelper = new PlayerHelper();
 	diceHelper = new DiceHelper();
 
-	onGameInitialize(api: ModuleApi): void {
-		this.api = api;
-
+	onGameInitialize(): void {
 		this.showOpponentsGrids = this.api
 			.getConfigApi()
 			.getBooleanConfigValue('show_opponents_grids', false);
@@ -62,7 +59,6 @@ export default class ColorCheckerGame extends ModuleGame {
 		}
 
 		const eventApi = this.api.getEventApi();
-		eventApi.addUserLeaveHandler(this.onPlayerLeft.bind(this));
 		eventApi.addEventHandler(
 			C2SEvents.ON_SELECTION_MADE,
 			this.onPlayerSelectionMadeEvent.bind(this)
@@ -378,7 +374,7 @@ export default class ColorCheckerGame extends ModuleGame {
 			.sendRoomMessage(S2CEvents.ON_GAME_STATE_UPDATE, eventData);
 	}
 
-	onPlayerLeft(eventData: EventDataObject): void {
+	onPlayerLeave(eventData: EventDataObject): void {
 		const removedUser = eventData.removedUser as User;
 
 		if (this.api.getPlayerApi().getRoomMembers().length === 0) {
@@ -418,6 +414,23 @@ export default class ColorCheckerGame extends ModuleGame {
 		this.api
 			.getPlayerApi()
 			.sendRoomBubble(removedUser.getUsername() + ' left the game', 'error');
+	}
+
+	public onPlayerReconnect(eventData: EventDataObject | null) {
+		const user = eventData.user as User;
+		const playerId = user.getId();
+		setTimeout(this.onPlayerReconnectDelayed.bind(this, playerId), 500);
+	}
+
+	// execute this after a timeout, to ensure the frontend is loaded
+	public onPlayerReconnectDelayed(playerId: string) {
+		this.updateClientPlayerState(playerId);
+		this.updateClientRemainingPlayers(this.playerHelper.readyPlayers);
+		this.updateClientGameStates();
+		this.updateClientPlayerGrid(
+			playerId,
+			this.playerHelper.getDataByPlayerId(playerId).grid
+		);
 	}
 }
 

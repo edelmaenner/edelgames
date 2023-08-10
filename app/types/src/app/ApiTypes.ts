@@ -23,6 +23,7 @@ export type ServerRoomMember = {
 	username: string;
 	picture: string | null;
 	isRoomMaster: boolean;
+	isConnected: boolean;
 };
 
 export type ServerRoomObject = {

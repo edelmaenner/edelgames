@@ -17,7 +17,7 @@ export default class Controller {
 	onConnect(socket: Socket): void {
 		// create user and register disconnect listener
 		const user: User = new User(socket);
-		socket.on('disconnect', this.onDisconnect.bind(this, socket, user));
+		socket.on('disconnect', this.onDisconnect.bind(this, socket));
 
 		// debug output
 		Controller.connectedUsers++;
@@ -31,13 +31,29 @@ export default class Controller {
 		roomManager.getLobbyRoom().joinRoom(user);
 	}
 
-	onDisconnect(socket: Socket, user: User): void {
+	onDisconnect(socket: Socket): void {
+		const user = roomManager.getUserBySocketId(socket.id);
+		if (!user) {
+			systemLogger.warning(`Unregistered socket ${socket.id} disconnected!`);
+			return;
+		}
+
 		Controller.connectedUsers--;
 		systemLogger.debug(
 			`user ${user.getId()} (socket ${socket.id}) disconnected! (${
 				Controller.connectedUsers
 			} users remaining)`
 		);
-		user.destroyUser();
+
+		if (
+			!user.isVerified() ||
+			(user.getCurrentRoom() && user.getCurrentRoom().getRoomId() === 'lobby')
+		) {
+			// users in the lobby or guest users can simply be disconnected entirely
+			user.destroyUser();
+		} else {
+			// users not in the lobby will leave their user object behind to allow reconnecting
+			user.setSocket(null);
+		}
 	}
 }

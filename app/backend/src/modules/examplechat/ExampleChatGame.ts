@@ -1,15 +1,11 @@
 import ModuleGame from '../../framework/modules/ModuleGame';
-import ModuleApi from '../../framework/modules/ModuleApi';
 import { EventDataObject } from '@edelgames/types/src/app/ApiTypes';
 
 /*
  * The actual game instance, that controls and manages the game
  */
 export default class ExampleChatGame extends ModuleGame {
-	api: ModuleApi = null;
-
-	onGameInitialize(api: ModuleApi): void {
-		this.api = api;
+	onGameInitialize(): void {
 		this.api
 			.getEventApi()
 			.addEventHandler(

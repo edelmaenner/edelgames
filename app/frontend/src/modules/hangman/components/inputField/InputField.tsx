@@ -150,7 +150,9 @@ export default class InputField extends Component<IProps, IState> {
 				{this.props.gameState.phase === 'guessing' && (
 					<div className={'wrong-character-list'}>
 						{this.props.gameState.wrongChars.sort().map((char) => (
-							<span key={'char_'+char} className={'wrong-char'}>{char}</span>
+							<span key={'char_' + char} className={'wrong-char'}>
+								{char}
+							</span>
 						))}
 					</div>
 				)}

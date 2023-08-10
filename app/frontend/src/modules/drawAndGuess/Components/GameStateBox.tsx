@@ -53,9 +53,20 @@ export default class GameStateBox extends Component<IProps, IState> {
 
 	renderMaskedLetter(letter: string, index: number): JSX.Element {
 		if (letter === '_') {
-			return <span key={'masked_letter_'+letter+index} className={'masked-letter'}>&nbsp;</span>;
+			return (
+				<span
+					key={'masked_letter_' + letter + index}
+					className={'masked-letter'}
+				>
+					&nbsp;
+				</span>
+			);
 		} else {
-			return <span key={'masked_letter_'+letter+index} className={'hint-letter'}>{letter}</span>;
+			return (
+				<span key={'masked_letter_' + letter + index} className={'hint-letter'}>
+					{letter}
+				</span>
+			);
 		}
 	}
 

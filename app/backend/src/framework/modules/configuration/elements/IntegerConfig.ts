@@ -1,4 +1,3 @@
-import ConfigElement from '../ConfigElement';
 import {
 	ConfigurationTypes,
 	ConfigurationTypesDefs,

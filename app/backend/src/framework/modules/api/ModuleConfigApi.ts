@@ -1,10 +1,9 @@
-import { EventDataObject } from '@edelgames/types/src/app/ApiTypes';
 import ModuleConfig from '../configuration/ModuleConfig';
 import { anyObject } from '@edelgames/types/src/app/BasicTypes';
 import { ConfigurationTypes } from '@edelgames/types/src/app/ConfigurationTypes';
 
-/*
- * This class will be passed to the game instance to allow for restricted access to the room data.
+/**
+ * @description This class will be passed to the game instance to allow for restricted access to the room data.
  * That way, a game cannot influence a room more than it is supposed to
  */
 export default class ModuleConfigApi {

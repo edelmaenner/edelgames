@@ -1,8 +1,7 @@
-import ModuleGameInterface from '../../framework/modules/ModuleGameInterface';
+import ModuleGame from '../../framework/modules/ModuleGame';
 import User from '../../framework/User';
 import drawAndGuess from './DrawAndGuess';
 import { clearTimeout } from 'timers';
-import ModuleApi from '../../framework/modules/ModuleApi';
 import { EventDataObject } from '@edelgames/types/src/app/ApiTypes';
 import { GameConfigObject } from '@edelgames/types/src/modules/drawAndGuess/DAGTypes';
 
@@ -14,9 +13,8 @@ enum gameStates {
 	CLOSING = 'closing',
 }
 
-export default class DrawAndGuessGame implements ModuleGameInterface {
+export default class DrawAndGuessGame extends ModuleGame {
 	// misc variables
-	api: ModuleApi = null;
 	activePlayerIndex = 0;
 	activePlayer: User = undefined; //
 	activeGameState: gameStates = gameStates.CONFIGURATION; // what the server is currently doing
@@ -41,8 +39,7 @@ export default class DrawAndGuessGame implements ModuleGameInterface {
 	availableWords: string[] = ['you should', 'not see', 'this list'];
 	playersWithCorrectGuess: { playerId: string; timing: number }[] = [];
 
-	onGameInitialize(api: ModuleApi): void {
-		this.api = api;
+	onGameInitialize(): void {
 		this.api
 			.getEventApi()
 			.addEventHandler(
@@ -67,9 +64,6 @@ export default class DrawAndGuessGame implements ModuleGameInterface {
 				'configChangedPreview',
 				this.onConfigChangedPreview.bind(this)
 			);
-		this.api
-			.getEventApi()
-			.addUserLeaveHandler(this.onUserLeaveHandler.bind(this));
 	}
 
 	updateActivePlayer(stepToNextPlayer = false): void {
@@ -356,7 +350,7 @@ export default class DrawAndGuessGame implements ModuleGameInterface {
 		}
 	}
 
-	onUserLeaveHandler(eventData: EventDataObject): void {
+	onPlayerLeave(eventData: EventDataObject): void {
 		const removedUser = eventData.removedUser as User;
 
 		this.sendRoomChatMessage(removedUser.getId(), 'left the game', 'error');
@@ -478,5 +472,36 @@ export default class DrawAndGuessGame implements ModuleGameInterface {
 			maxHints: clamp(0, oldConfig.maxHints / 100, 1),
 			rounds: clamp(1, oldConfig.rounds, 10),
 		};
+	}
+
+	public onPlayerReconnect(eventData: EventDataObject | null) {
+		const user = eventData.user as User;
+		const playerId = user.getId();
+
+		this.api.getPlayerApi().sendPlayerMessage(playerId, 'activePlayerChanged', {
+			activePlayer: this.activePlayer.getId(),
+		});
+
+		// tell all players the wordmask
+		this.api.getPlayerApi().sendRoomMessage('wordToGuessChanged', {
+			mask: this.activeWordMask,
+			timeUntil: this.drawingTimerTimestamp + this.msUntilDrawingTimeout,
+		});
+
+		if (this.activePlayer.getId() === playerId) {
+			this.api
+				.getPlayerApi()
+				.sendPlayerMessage(playerId, 'wordSelectionOptions', {
+					options: this.availableWords,
+				});
+
+			// tell the painter the selected word
+			this.api
+				.getPlayerApi()
+				.sendPlayerMessage(this.activePlayer.getId(), 'wordToDrawChanged', {
+					word: this.activeWord,
+				});
+		}
+		this.setGameState(this.activeGameState);
 	}
 }

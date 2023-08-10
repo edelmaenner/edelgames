@@ -1,4 +1,4 @@
-import ModuleGameInterface from '../../framework/modules/ModuleGameInterface';
+import ModuleGame from '../../framework/modules/ModuleGame';
 import ModuleApi from '../../framework/modules/ModuleApi';
 import AbstractState from './gameStates/AbstractState';
 import InitialState from './gameStates/InitialState';
@@ -7,11 +7,12 @@ import Room from '../../framework/Room';
 import { EventDataObject } from '@edelgames/types/src/app/ApiTypes';
 import { Category, Hint } from '@edelgames/types/src/modules/codenames/CNTypes';
 import { BoardElement } from './BoardElement';
+import User from '../../framework/User';
 
 /*
  * The actual game instance, that controls and manages the game
  */
-export default class CodenamesGame implements ModuleGameInterface {
+export default class CodenamesGame extends ModuleGame {
 	gameApi: ModuleApi | null = null;
 	gameState: AbstractState;
 	gameMembers: Team[];
@@ -19,11 +20,9 @@ export default class CodenamesGame implements ModuleGameInterface {
 	board: BoardElement[] = [];
 	hint: Hint[] = [];
 
-	onGameInitialize(gameApi: ModuleApi): void {
-		this.gameApi = gameApi;
+	onGameInitialize(): void {
+		this.gameApi = this.api;
 		this.room = this.gameApi.getPlayerApi().getRoom();
-		this.gameApi.getEventApi().addUserLeaveHandler(this.onUserLeave.bind(this));
-		this.gameApi.getEventApi().addUserJoinedHandler(this.onUserJoin.bind(this));
 		this.gameApi
 			.getEventApi()
 			.addEventHandler(
@@ -33,16 +32,16 @@ export default class CodenamesGame implements ModuleGameInterface {
 		this.gameApi
 			.getEventApi()
 			.addEventHandler('requestGameState', this.onGameStateRequest.bind(this));
-		this.gameState = new InitialState(gameApi);
+		this.gameState = new InitialState(this.gameApi);
 		this.gameMembers = [new Team('A', 5), new Team('B', 5)];
 		this.sendCurrentStateOfGame();
 	}
 
-	onUserJoin() {
+	onPlayerJoin() {
 		this.sendCurrentStateOfGame();
 	}
 
-	onUserLeave(eventData: EventDataObject) {
+	onPlayerLeave(eventData: EventDataObject) {
 		this.gameState.handleUserLeave(this.gameMembers, eventData.senderId);
 		this.sendCurrentStateOfGame();
 	}
@@ -163,5 +162,12 @@ export default class CodenamesGame implements ModuleGameInterface {
 			return cardTeamName;
 		}
 		return undefined;
+	}
+
+	public onPlayerReconnect() {
+		//const user = eventData.user as User;
+		this.sendCurrentStateOfGame();
+
+		// todo: test this and/or extend this method, if necessary
 	}
 }

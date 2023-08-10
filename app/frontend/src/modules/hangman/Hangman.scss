@@ -1,0 +1,52 @@
+#hangman {
+	display: flex;
+	justify-content: space-evenly;
+	align-items: center;
+	flex-direction: row;
+	width: 100%;
+	overflow-y: hidden;
+
+	@media screen and (max-width: 1150px) {
+		& {
+			justify-content: flex-start;
+		}
+	}
+
+	@import 'components/gameWheel/GameWheel';
+	@import 'components/scoreboard/Scoreboard';
+	@import 'components/finishScreen/FinishScreen';
+
+	.game-data-interface {
+		display: flex;
+		flex-direction: column;
+		//background-color: red;
+		height: 100%;
+		flex: 1 1 100%;
+		padding: 1rem;
+		gap: 1rem;
+		background-color: $backgroundDark;
+		border: 3px solid $backgroundDark;
+		border-radius: 5px;
+		max-width: 35rem;
+		min-width: 25rem;
+
+		& > * {
+			flex: 1 1 auto;
+		}
+
+		.hangman-visualisation {
+			max-height: 200px;
+			text-align: center;
+			flex: 1;
+			color: $white;
+
+			.hangman-svg {
+				transition: stroke-dashoffset 1s ease-in-out;
+				stroke-dashoffset: 0;
+				height: 100%;
+			}
+		}
+
+		@import 'components/inputField/InputField';
+	}
+}

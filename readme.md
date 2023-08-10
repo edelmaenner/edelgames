@@ -71,19 +71,19 @@ Create the following file and folder structure inside of `app/backend/src/module
 **AdvancedMemory.ts**
 
 ```typescript
-import ModuleInterface from '../../framework/modules/ModuleInterface';
-import ModuleGameInterface from '../../framework/modules/ModuleGameInterface';
+import Module from '../../framework/modules/Module';
+import ModuleGame from '../../framework/modules/ModuleGame';
 import AdvancedMemoryGame from './AdvancedMemoryGame';
 
 /*
  * This singleton is used to register the game to the ModuleList
  */
-class AdvancedMemory implements ModuleInterface {
+class AdvancedMemory extends Module {
 	getUniqueId(): string {
 		return 'advancedMemory';
 	}
 
-	getGameInstance(): ModuleGameInterface {
+	getGameInstance(): ModuleGame {
 		return new AdvancedMemoryGame();
 	}
 }
@@ -95,13 +95,13 @@ export default advancedMemory;
 **AdvancedMemoryGame.ts**
 
 ```typescript
-import ModuleGameInterface from '../../framework/modules/ModuleGameInterface';
+import ModuleGame from '../../framework/modules/ModuleGame';
 import ModuleApi from '../../framework/modules/ModuleApi';
 
 /*
  * The actual game instance, that controls and manages the game
  */
-export default class AdvancedMemoryGame implements ModuleGameInterface {
+export default class AdvancedMemoryGame extends ModuleGame {
 	private readonly api: ModuleApi;
 
 	onGameInitialize(api: ModuleApi): void {
@@ -167,13 +167,13 @@ export default advancedMemory;
 
 ```typescript jsx
 import React, { ReactNode } from 'react';
-import ModuleGameInterface from '../../framework/modules/ModuleGameInterface';
+import ModuleGame from '../../framework/modules/ModuleGame';
 import ModuleApi from '../../framework/modules/ModuleApi';
 import advancedMemory from './AdvancedMemory';
 
 export default class AdvancedMemoryGame
 	extends React.Component<{}, {}>
-	implements ModuleGameInterface
+	implements ModuleGame
 {
 	private readonly api: ModuleApi;
 	private initialized: boolean = false;

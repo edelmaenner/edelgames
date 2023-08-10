@@ -1,5 +1,5 @@
-import ModuleInterface from '../../framework/modules/ModuleInterface';
-import ModuleGameInterface from '../../framework/modules/ModuleGameInterface';
+import Module from '../../framework/modules/Module';
+import ModuleGame from '../../framework/modules/ModuleGame';
 import StadtLandFlussGame, { defaultSLFCategories } from './StadtLandFlussGame';
 import ModuleConfig from '../../framework/modules/configuration/ModuleConfig';
 import StringConfig from '../../framework/modules/configuration/elements/StringConfig';
@@ -10,8 +10,8 @@ import {
 	punctuation,
 } from '../../framework/modules/configuration/elements/Collections';
 
-class StadtLandFluss implements ModuleInterface {
-	getGameInstance(): ModuleGameInterface {
+class StadtLandFluss extends Module {
+	getGameInstance(): ModuleGame {
 		return new StadtLandFlussGame();
 	}
 

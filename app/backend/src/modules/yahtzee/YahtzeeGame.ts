@@ -1,5 +1,4 @@
-import ModuleGameInterface from '../../framework/modules/ModuleGameInterface';
-import ModuleApi from '../../framework/modules/ModuleApi';
+import ModuleGame from '../../framework/modules/ModuleGame';
 import User from '../../framework/User';
 import { EventDataObject } from '@edelgames/types/src/app/ApiTypes';
 import {
@@ -36,9 +35,8 @@ export enum YahtzeeClientToServerEventNames {
 /*
  * The actual game instance, that controls and manages the game
  */
-export default class YahtzeeGame implements ModuleGameInterface {
+export default class YahtzeeGame extends ModuleGame {
 	// technical properties
-	api: ModuleApi = null;
 	playerIndex = 0;
 
 	// game properties
@@ -49,12 +47,10 @@ export default class YahtzeeGame implements ModuleGameInterface {
 	remainingRolls = 0;
 	scoreboard: YahtzeeScoreboardType = [];
 
-	onGameInitialize(api: ModuleApi): void {
-		this.api = api;
+	onGameInitialize(): void {
 		this.initScoreboard();
 
 		const eventApi = this.api.getEventApi();
-		eventApi.addUserLeaveHandler(this.onPlayerLeft.bind(this));
 		eventApi.addEventHandler(
 			YahtzeeClientToServerEventNames.ROLL_REQUESTED,
 			this.onPlayerRolledDice.bind(this)
@@ -211,7 +207,7 @@ export default class YahtzeeGame implements ModuleGameInterface {
 		}
 	}
 
-	onPlayerLeft(eventData: EventDataObject): void {
+	onPlayerLeave(eventData: EventDataObject): void {
 		const removedUser = eventData.removedUser as User;
 
 		this.api
@@ -322,7 +318,7 @@ export default class YahtzeeGame implements ModuleGameInterface {
 				(scores[ScoreCellIDs.CHANCE] || 0) +
 				(scores[ScoreCellIDs.FULL_HOUSE] || 0) +
 				(scores[ScoreCellIDs.SMALL_STRAIGHT] || 0) +
-				(scores[ScoreCellIDs.SMALL_STRAIGHT] || 0);
+				(scores[ScoreCellIDs.LARGE_STRAIGHT] || 0);
 
 			scores.total = firstPart + (firstPart >= 63 ? 35 : 0) + secondPart;
 
@@ -336,5 +332,11 @@ export default class YahtzeeGame implements ModuleGameInterface {
 		}
 
 		return highestScorePlayerCount === 1 ? highestScorePlayerId : null;
+	}
+
+	onPlayerReconnect() {
+		this.sendScoresChangedUpdate();
+		this.sendGameStateUpdate();
+		this.sendDicesChangedUpdate(false);
 	}
 }

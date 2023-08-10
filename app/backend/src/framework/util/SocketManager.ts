@@ -41,10 +41,12 @@ export default class SocketManager {
 		eventName: string,
 		eventData: EventDataObject = {}
 	): void {
-		socket.emit('message', {
-			eventName: eventName,
-			eventData: eventData,
-		});
+		if (socket) {
+			socket.emit('message', {
+				eventName: eventName,
+				eventData: eventData,
+			});
+		}
 	}
 
 	public static sendNotificationBubbleToSocket(

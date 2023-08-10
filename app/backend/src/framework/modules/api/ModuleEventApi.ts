@@ -7,6 +7,10 @@ type internalEventList = {
 	[key: string]: internalEventHandlerFunction[];
 };
 
+/**
+ * @description This class will be passed to the game instance to allow for restricted access to the room data.
+ * That way, a game cannot influence a room more than it is supposed to
+ */
 export default class ModuleEventApi {
 	private readonly moduleApi: ModuleApi;
 	private eventListeners: internalEventList = {};
@@ -45,21 +49,6 @@ export default class ModuleEventApi {
 		this.eventListeners[event].push(handler);
 
 		this.moduleApi.getLogger().info('registering event listener for ' + event);
-	}
-
-	// just an alias for addEventHandler('userJoined', handler) for better usability
-	public addUserJoinedHandler(handler: internalEventHandlerFunction): void {
-		this.addEventHandler('userJoined', handler);
-	}
-
-	// just an alias for addEventHandler('userLeft', handler) for better usability
-	public addUserLeaveHandler(handler: internalEventHandlerFunction): void {
-		this.addEventHandler('userLeft', handler);
-	}
-
-	// just an alias for addEventHandler('gameStopped', handler) for better usability
-	public addGameStoppedHandler(handler: internalEventHandlerFunction): void {
-		this.addEventHandler('gameStopped', handler);
 	}
 
 	public sendRoomMessage(eventName: string, eventData: EventDataObject): void {

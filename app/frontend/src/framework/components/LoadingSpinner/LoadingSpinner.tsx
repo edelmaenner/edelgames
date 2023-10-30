@@ -12,7 +12,7 @@ const LoadingMessages = [
 const LoadingMessageTimer = 8000;
 
 interface IState {
-	messageTimer: NodeJS.Timeout | null;
+	messageTimer: ReturnType<typeof setTimeout> | null;
 	message: string;
 }
 

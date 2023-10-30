@@ -9,7 +9,7 @@ export default class SLFGuessing extends Component<GuessingProps, {}> {
 	/**
 	 * Holds a reference to the timeout, after which unsaved guesses will be saved.
 	 */
-	private blurTimeout: NodeJS.Timeout | null = null;
+	private blurTimeout: ReturnType<typeof setTimeout> | null = null;
 
 	/**
 	 * Send the current guesses to the server.

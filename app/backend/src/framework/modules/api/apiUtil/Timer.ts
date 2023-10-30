@@ -3,11 +3,11 @@ import ModuleApi from '../../ModuleApi';
 
 type TimerListEntry = {
 	name: string;
-	timeoutId: NodeJS.Timer;
+	timeoutId: ReturnType<typeof setInterval>;
 };
 type IntervalListEntry = {
 	name: string;
-	intervalId: NodeJS.Timer;
+	intervalId: ReturnType<typeof setInterval>;
 	maxCallCount: number | undefined;
 };
 
@@ -28,7 +28,7 @@ export default class Timer {
 	 * @param callback
 	 * @param ms
 	 */
-	public startTimeout(name: string, callback: { (): void }, ms: number) {
+	public startTimeout(name: string, callback: { (): void }, ms: number): void {
 		this.stopTimeout(name);
 		const timer: TimerListEntry = {
 			name: name,
@@ -69,7 +69,7 @@ export default class Timer {
 		callback: { (): void },
 		ms: number,
 		maxCallCount: number | undefined = undefined
-	) {
+	): void {
 		this.stopInterval(name);
 		const interval: IntervalListEntry = {
 			name: name,

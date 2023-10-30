@@ -27,7 +27,7 @@ const allowedCharacters = [...alphabet, ...specialChars, ...syntaxCharacters];
  */
 export default class HangmanGame extends ModuleGame {
 	// technical properties
-	clientUpdateInterval: NodeJS.Timer = null;
+	clientUpdateInterval: ReturnType<typeof setInterval> = null;
 
 	// configuration
 	generateWordsAutomatically: boolean;

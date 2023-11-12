@@ -16,8 +16,8 @@ export default class PlayerHelper {
 	}
 
 	removePlayer(playerId: string): void {
-		this.players.filter((playerData) => playerData.playerId !== playerId);
-		this.readyPlayers.filter((player) => player !== playerId);
+		this.players = this.players.filter((playerData) => playerData.playerId !== playerId);
+		this.readyPlayers = this.readyPlayers.filter((player) => player !== playerId);
 	}
 
 	getDataByPlayerId(playerId: string): PlayerData | undefined {

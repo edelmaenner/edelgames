@@ -17,6 +17,33 @@ export default class DiceTable extends React.Component<IProps, {}> {
 	rollIndex: number = 0;
 	lastRollTimeStamp: number | string = -1;
 
+	spaceDownListener: {(event: KeyboardEvent): void};
+
+	constructor(props: IProps) {
+		super(props);
+		this.spaceDownListener = this.onSpaceDownPressed.bind(this);
+	}
+
+	componentDidMount(): void {
+		window.addEventListener('keypress', this.spaceDownListener);
+	}
+
+	componentWillUnmount(): void {
+		window.removeEventListener('keypress', this.spaceDownListener);
+	}
+
+	/**
+	 * attempt to trigger a dice roll, if the active player presses spacebar
+	 * @param event
+	 */
+	onSpaceDownPressed(event: KeyboardEvent): void {
+		console.log(event.key);
+		if (event.key === ' ') {
+			this.onRollRequested();
+		}
+	};
+
+
 	/* Locale Events */
 	onDiceClicked(diceId: number): void {
 		if (!this.props.isLocalPlayerActive) {

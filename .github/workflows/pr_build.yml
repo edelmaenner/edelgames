@@ -27,5 +27,7 @@ jobs:
         (cd app/backend && npm i && npm run build)
     
     - name: Build Frontend
+      env:
+        FONT_AWESOME_AUTH_TOKEN: ${{ secrets.FONT_AWESOME_AUTH_TOKEN }}
       run: |
         (cd app/frontend && npm i && npm run build)

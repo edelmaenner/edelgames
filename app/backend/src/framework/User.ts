@@ -23,7 +23,7 @@ export default class User implements IUser {
 	private pictureUrl: string | null = null;
 	private authSessionId: string | null = null;
 	private socket: Socket | null = null; // the connected web socket, or null if none connected
-	private disconnectTimeout: NodeJS.Timer | null = null;
+	private disconnectTimeout: ReturnType<typeof setInterval> | null = null;
 
 	private listeners: { event: string; handler: ListenerFunction }[] = [
 		{ event: 'userLoginAttempt', handler: this.authenticate.bind(this) },

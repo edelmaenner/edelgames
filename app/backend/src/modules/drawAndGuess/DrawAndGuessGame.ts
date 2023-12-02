@@ -30,9 +30,9 @@ export default class DrawAndGuessGame extends ModuleGame {
 
 	// dynamic variables for active use -> do not change default value
 	msToNextHint = 0;
-	hintsTimer: NodeJS.Timeout = null;
-	wordSelectionTimer: NodeJS.Timeout = null;
-	wordDrawingTimer: NodeJS.Timeout = null;
+	hintsTimer: ReturnType<typeof setTimeout> = null;
+	wordSelectionTimer: ReturnType<typeof setTimeout> = null;
+	wordDrawingTimer: ReturnType<typeof setTimeout> = null;
 	drawingTimerTimestamp = 0;
 	activeWord: string = undefined; // the current word, that has to be guessed
 	activeWordMask: string = undefined; // defines, what the players are allowed to see

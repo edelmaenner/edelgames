@@ -24,8 +24,8 @@ jobs:
 
     - name: Build Backend
       run: |
-        (cd app/backend && npm run build)
+        (cd app/backend && npm i && npm run build)
     
     - name: Build Frontend
       run: |
-        (cd app/frontend && npm run build)
+        (cd app/frontend && npm i && npm run build)

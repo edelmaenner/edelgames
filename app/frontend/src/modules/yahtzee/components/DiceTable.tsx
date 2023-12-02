@@ -60,6 +60,7 @@ export default class DiceTable extends React.Component<IProps, {}> {
 		this.setState({});
 	}
 
+	/* The user is trying to roll the dice */
 	onRollRequested(): void {
 		if (!this.props.isLocalPlayerActive) {
 			return;

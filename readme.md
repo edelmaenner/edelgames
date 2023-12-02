@@ -216,4 +216,4 @@ A preview image to be show in the game selection screen - use whatever image you
 <hr>
 
 Now add the exported game instance (`advancedMemory`) to the list of modules contained in `app/frontend/src/modules/ModuleList.tsx`
-And the path to your main scss file (`Advancedmemory.scss`) to the scss file in `app/frontend/src/modules/Modules.scss`
+and the path to your main scss file (`Advancedmemory.scss`) to the scss file in `app/frontend/src/modules/Modules.scss`

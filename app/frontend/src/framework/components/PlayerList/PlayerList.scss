@@ -21,6 +21,10 @@
 		width: 100%;
 		margin-top: 0.5rem;
 
+		&.menu-opened {
+			border-color: $signature;
+		}
+
 		.profile-picture {
 		}
 
@@ -28,6 +32,17 @@
 			display: flex;
 			margin-top: 7px;
 			margin-left: 1rem;
+		}
+	}
+
+	.popup {
+		min-width: 5rem;
+
+		.popup-header {
+			border-bottom: 2px solid $backgroundLight;
+			font-size: 1.3rem;
+			padding-bottom: 0.5rem;
+			margin-bottom: 1rem;
 		}
 	}
 }

@@ -51,6 +51,10 @@ export default class User implements IUser {
 			event: 'changeRoomPass',
 			handler: this.onRoomPassChangeRequested.bind(this),
 		},
+		{
+			event: 'changeRoomHost',
+			handler: this.onRoomHostChangeRequested.bind(this),
+		},
 		{ event: 'gameConfigEdited', handler: this.onGameConfigEdited.bind(this) },
 		{
 			event: 'gameConfigFinished',
@@ -227,6 +231,17 @@ export default class User implements IUser {
 				password,
 				this.onAuthResponse.bind(this)
 			);
+			/*
+			Only for debugging purposes!
+			this.onAuthResponse(true,{
+				username: 'Brogamer5000',
+				profileImageUrl: undefined,
+				authCookie: 'hello123',
+				user_id: 1234,
+				custom_title: 'Developer',
+				group_id: 1
+			});
+			 */
 		}
 	}
 
@@ -352,6 +367,21 @@ export default class User implements IUser {
 					);
 				}
 			}
+		}
+	}
+
+	public onRoomHostChangeRequested(eventData: EventDataObject): void {
+		const newRoomHostId = eventData.newHostID || '';
+
+		const matchingMember = this.currentRoom.getRoomMembers().find((member) => member.getId() === newRoomHostId);
+
+		if (
+			matchingMember !== undefined &&
+			this.currentRoom.getRoomId() !== 'lobby' &&
+			this.currentRoom.getRoomMaster() === this &&
+			matchingMember !== this
+		) {
+			this.currentRoom.setRoomMaster(matchingMember);
 		}
 	}
 

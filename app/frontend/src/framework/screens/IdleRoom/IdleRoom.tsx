@@ -7,7 +7,7 @@ export default class IdleRoom extends React.Component {
 		return (
 			<div id="screenIdleRoom">
 				<div className={'idle-room-overview'}>
-					<PlayerList />
+					<PlayerList allowRenderHostFunctions={true} />
 				</div>
 
 				<div className={'idle-game-selection'}>

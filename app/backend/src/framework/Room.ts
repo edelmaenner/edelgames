@@ -73,6 +73,16 @@ export default class Room {
 		return this.roomMaster;
 	}
 
+	public setRoomMaster(newRoomMaster: User): boolean {
+		if (!this.roomMembers.includes(newRoomMaster) || newRoomMaster === this.roomMaster) {
+			return false;
+		}
+
+		this.roomMaster = newRoomMaster;
+		this.sendRoomChangedBroadcast();
+		return true;
+	}
+
 	public setRoomName(newName: string): void {
 		if (newName !== this.roomName) {
 			this.roomName = newName;

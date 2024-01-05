@@ -226,13 +226,9 @@ export default class User implements IUser {
 			systemLogger.info(
 				`user ${this.id} attempted login as ${username} using password`
 			);
-			XenforoApi.loginWithPassword(
-				username,
-				password,
-				this.onAuthResponse.bind(this)
-			);
+
+			// Only for debugging purposes!
 			/*
-			Only for debugging purposes!
 			this.onAuthResponse(true,{
 				username: 'Brogamer5000',
 				profileImageUrl: undefined,
@@ -241,7 +237,13 @@ export default class User implements IUser {
 				custom_title: 'Developer',
 				group_id: 1
 			});
-			 */
+			return;
+			*/
+			XenforoApi.loginWithPassword(
+				username,
+				password,
+				this.onAuthResponse.bind(this)
+			);
 		}
 	}
 

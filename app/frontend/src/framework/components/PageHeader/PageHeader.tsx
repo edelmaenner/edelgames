@@ -4,8 +4,8 @@ import LoginWindow from '../LoginWindow/LoginWindow';
 import eventManager from '../../util/EventManager';
 import roomManager from '../../util/RoomManager';
 import React, { ReactNode } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import RoomActionPanel from './RoomActionPanel';
+import PopUp from "../PopUp/PopUp";
 
 type IState = {
 	showLoginWindow: boolean;
@@ -58,27 +58,29 @@ export default class PageHeader extends React.Component<{}, IState> {
 
 	renderRoomData(): ReactNode {
 		return (
-			<div className={'room-data'}>
+			<div className={'room-data'}
+				 onClick={event => {
+					 event.stopPropagation();
+					 this.toggleRoomActionPanel();
+				 }}
+			>
 				<div className={'room-name'}>{roomManager.getRoomName()}</div>
 
-				<div className={'room-actions'}>
-					<FontAwesomeIcon
-						icon={['fad', 'circle-chevron-down']}
-						size="1x"
-						style={{
-							transition: 'transform 0.2s ease-in-out',
-							transform: `rotate(${
-								this.state.showRoomActionWindow ? 0 : -90
-							}deg)`,
-						}}
-						onClick={this.toggleRoomActionPanel.bind(this)}
-					/>
-				</div>
-
 				{this.state.showRoomActionWindow ? (
-					<RoomActionPanel
-						panelRemoteCloseCallback={this.toggleRoomActionPanel.bind(this)}
-					/>
+					<PopUp
+						closeWithoutFocus={true}
+						onClose={this.toggleRoomActionPanel.bind(this)}
+						position={'absolute'}
+						style={{
+							left: '50%',
+							top: '100%',
+							transform: 'translateX(-50%)',
+						}}
+					>
+						<RoomActionPanel
+							panelRemoteCloseCallback={this.toggleRoomActionPanel.bind(this)}
+						/>
+					</PopUp>
 				) : null}
 			</div>
 		);

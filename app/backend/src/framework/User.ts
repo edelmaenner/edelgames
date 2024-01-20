@@ -294,7 +294,7 @@ export default class User implements IUser {
 	}
 
 	public onCreateNewRoom(): void {
-		if (this.verified && this.currentRoom.getRoomId() === 'lobby') {
+		if (this.currentRoom.getRoomId() === 'lobby') {
 			RoomManager.createRoom(this);
 		}
 	}

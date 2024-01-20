@@ -108,17 +108,15 @@ export default class RoomListBox extends React.Component<{}, IState> {
 			<div id="roomListBox">
 				{this.state.rooms.map(this.renderRoom.bind(this))}
 
-				{!profileManager.isVerified() ? null : (
-					<div className="room-overview-box room-create-box">
-						<div className="room-overview-box--room-data">Create Room</div>
-						<div
-							className="room-overview-box--member-list"
-							onClick={this.onCreateRoom.bind(this)}
-						>
-							<FontAwesomeIcon icon={['fad', 'plus']} size="3x" />
-						</div>
+				<div className="room-overview-box room-create-box">
+					<div className="room-overview-box--room-data">Create Room</div>
+					<div
+						className="room-overview-box--member-list"
+						onClick={this.onCreateRoom.bind(this)}
+					>
+						<FontAwesomeIcon icon={['fad', 'plus']} size="3x" />
 					</div>
-				)}
+				</div>
 			</div>
 		);
 	}

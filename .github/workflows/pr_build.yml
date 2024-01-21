@@ -24,9 +24,9 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - name: Test secret env
       env:
-        DEBUG_VALUE: ${{ secrets.DEBUG_VALUE }}
+        DEB_VALUE: ${{ secrets.DEBUG_VALUE }}
       run: |
-        echo $DEBUG_VALUE
+        echo "The debug value is: $DEB_VALUE"
 
     - name: Build Backend
       run: |

@@ -54,7 +54,7 @@ export default class Core extends React.Component {
 		}
 
 		return (
-			<div id="pageWrap">
+			<div id="pageWrap" onClick={event => eventManager.publish('page-clicked', event)}>
 				<PageHeader />
 
 				<div id="pageContent">{this.renderRoomScreen()}</div>

@@ -74,7 +74,7 @@ class EventManager {
 		clientLogger.debug('publishing event: ' + event, eventData);
 
 		let foundListener = false;
-		if (this.eventListeners[event]) {
+		if (event in this.eventListeners) {
 			for (let listener of this.eventListeners[event]) {
 				listener(eventData);
 				foundListener = true;

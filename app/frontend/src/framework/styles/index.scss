@@ -19,23 +19,24 @@
 /*
  * Component style files, containing specific styles for a single component
  */
-@import 'src/framework/components/PageHeader/PageHeader';
-@import 'src/framework/components/LoginWindow/LoginWindow';
-@import 'src/framework/components/RoomListBox/RoomListBox';
-@import 'src/framework/components/ProfileImage/ProfileImage';
-@import 'src/framework/components/NotificationBubble/NotificationBubble';
-@import 'src/framework/components/Inputs/RangeSlider';
-@import 'src/framework/components/PlayerList/PlayerList';
-@import 'src/framework/components/DiceBox/DiceBox';
-@import 'src/framework/components/LoadingSpinner/LoadingSpinner';
+@import '../components/PageHeader/PageHeader';
+@import '../components/LoginWindow/LoginWindow';
+@import '../components/RoomListBox/RoomListBox';
+@import '../components/ProfileImage/ProfileImage';
+@import '../components/NotificationBubble/NotificationBubble';
+@import '../components/Inputs/RangeSlider';
+@import '../components/PlayerList/PlayerList';
+@import '../components/DiceBox/DiceBox';
+@import '../components/LoadingSpinner/LoadingSpinner';
+@import '../components/PopUp/PopUp';
 
 /*
  * Screen style files, containing specific styles for a single page
  */
-@import 'src/framework/screens/Lobby/Lobby';
-@import 'src/framework/screens/IdleRoom/IdleRoom';
-@import 'src/framework/screens/ConfigRoom/ConfigRoom';
-@import 'src/framework/screens/GameRoom/GameRoom';
+@import '../screens/Lobby/Lobby';
+@import '../screens/IdleRoom/IdleRoom';
+@import '../screens/ConfigRoom/ConfigRoom';
+@import '../screens/GameRoom/GameRoom';
 
 /*
  * Default import for modules

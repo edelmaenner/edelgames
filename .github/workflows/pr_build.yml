@@ -14,6 +14,9 @@ jobs:
       matrix:
         node-version: [18.x]
 
+    env:
+      FONT_AWESOME_AUTH_TOKEN: ${{ secrets.FONT_AWESOME_AUTH_TOKEN }}
+
     steps:
     - uses: actions/checkout@v3
 
@@ -23,11 +26,13 @@ jobs:
         node-version: ${{ matrix.node-version }}
 
     - name: Build Backend
+      working-directory: ./app/backend
       run: |
-        (cd app/backend && npm i && npm run build)
+        npm i
+        npm run build
     
     - name: Build Frontend
-      env:
-        FONT_AWESOME_AUTH_TOKEN: ${{ secrets.FONT_AWESOME_AUTH_TOKEN }}
+      working-directory: ./app/frontend
       run: |
-        (cd app/frontend && npm i && npm run build)
+        npm i
+        npm run build

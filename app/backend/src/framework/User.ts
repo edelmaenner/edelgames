@@ -51,6 +51,10 @@ export default class User implements IUser {
 			event: 'changeRoomPass',
 			handler: this.onRoomPassChangeRequested.bind(this),
 		},
+		{
+			event: 'changeRoomHost',
+			handler: this.onRoomHostChangeRequested.bind(this),
+		},
 		{ event: 'gameConfigEdited', handler: this.onGameConfigEdited.bind(this) },
 		{
 			event: 'gameConfigFinished',
@@ -222,6 +226,19 @@ export default class User implements IUser {
 			systemLogger.info(
 				`user ${this.id} attempted login as ${username} using password`
 			);
+
+			// Only for debugging purposes!
+			/*
+			this.onAuthResponse(true,{
+				username: 'Brogamer5000',
+				profileImageUrl: undefined,
+				authCookie: 'hello123',
+				user_id: 1234,
+				custom_title: 'Developer',
+				group_id: 1
+			});
+			return;
+			*/
 			XenforoApi.loginWithPassword(
 				username,
 				password,
@@ -352,6 +369,21 @@ export default class User implements IUser {
 					);
 				}
 			}
+		}
+	}
+
+	public onRoomHostChangeRequested(eventData: EventDataObject): void {
+		const newRoomHostId = eventData.newHostID || '';
+
+		const matchingMember = this.currentRoom.getRoomMembers().find((member) => member.getId() === newRoomHostId);
+
+		if (
+			matchingMember !== undefined &&
+			this.currentRoom.getRoomId() !== 'lobby' &&
+			this.currentRoom.getRoomMaster() === this &&
+			matchingMember !== this
+		) {
+			this.currentRoom.setRoomMaster(matchingMember);
 		}
 	}
 

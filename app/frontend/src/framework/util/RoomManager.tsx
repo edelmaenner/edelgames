@@ -19,6 +19,7 @@ export const RoomEventNames = {
 	returnToGameSelection: 'returnToGameSelection',
 	changeRoomName: 'changeRoomName',
 	changeRoomPass: 'changeRoomPass',
+	changeRoomHost: 'changeRoomHost',
 };
 
 class RoomManager {
